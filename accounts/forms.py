@@ -1,0 +1,35 @@
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+
+
+class StyledAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(label='E-mail / Username')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control', 'placeholder': field.label})
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(label='Full Name', required=True)
+    phone = forms.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'email', 'username', 'phone', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        placeholders = {
+            'first_name': 'Full Name',
+            'email': 'Email Address',
+            'username': 'Username',
+            'phone': 'Phone Number',
+            'password1': 'Password',
+            'password2': 'Confirm Password',
+        }
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control', 'placeholder': placeholders.get(name, field.label)})

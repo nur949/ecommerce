@@ -1,0 +1,65 @@
+<svg width="1600" height="1100" viewBox="0 0 1600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="watchBg" x1="120" y1="60" x2="1400" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF7FF"/>
+      <stop offset="1" stop-color="#5D96DE"/>
+    </linearGradient>
+    <linearGradient id="watchBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#173E92"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="watchRed" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FF1D1D"/>
+      <stop offset="1" stop-color="#FF3B30"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1100" rx="34" fill="url(#watchBg)"/>
+  <rect y="92" width="1600" height="120" fill="#D5EAFE" fill-opacity=".85"/>
+  <rect y="362" width="1600" height="95" transform="rotate(4.4 0 362)" fill="url(#watchRed)"/>
+  <path d="M0 750L1600 540V1100H0V750Z" fill="url(#watchBlue)"/>
+  <path d="M0 780L1600 560V1100H0V780Z" fill="url(#watchRed)"/>
+  <path d="M0 660C100 640 146 630 240 642V1100H0V660Z" fill="#2C67B5"/>
+  <g opacity=".18" stroke="white" stroke-width="2">
+    <path d="M20 710H240"/>
+    <path d="M20 748H240"/>
+    <path d="M20 786H240"/>
+    <path d="M40 690V1100"/>
+    <path d="M84 690V1100"/>
+    <path d="M128 690V1100"/>
+    <path d="M172 690V1100"/>
+    <path d="M216 690V1100"/>
+  </g>
+  <text x="138" y="112" fill="#142B62" font-family="Arial, sans-serif" font-size="40" font-weight="700">SMART ON WRIST</text>
+  <text x="48" y="230" fill="#FF1D1D" font-family="Arial, sans-serif" font-size="116" font-weight="900">38%</text>
+  <text x="355" y="178" fill="#2A66B7" font-family="Arial, sans-serif" font-size="40" font-weight="900">UPTO</text>
+  <text x="355" y="232" fill="#2A66B7" font-family="Arial, sans-serif" font-size="58" font-weight="900">DISCOUNT</text>
+  <text x="152" y="302" fill="#142B62" font-family="Arial, sans-serif" font-size="40" font-weight="700">SMARTER IN LIFE</text>
+  <g transform="translate(370 306) rotate(-14)">
+    <rect x="-62" y="-118" width="124" height="290" rx="56" fill="#1E355D"/>
+    <rect x="-74" y="146" width="148" height="190" rx="52" fill="#29416C"/>
+    <rect x="-88" y="-34" width="176" height="254" rx="44" fill="#0F172A"/>
+    <rect x="-70" y="-8" width="140" height="206" rx="34" fill="#05070A"/>
+    <text x="-34" y="70" fill="white" font-family="Arial, sans-serif" font-size="74" font-weight="900">08</text>
+    <text x="-30" y="142" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="72" font-weight="900">28</text>
+  </g>
+  <g transform="translate(735 592) rotate(2)">
+    <rect x="-74" y="-150" width="148" height="340" rx="64" fill="#F5E8DB"/>
+    <rect x="-92" y="160" width="184" height="250" rx="62" fill="#F5E8DB"/>
+    <rect x="-102" y="-30" width="204" height="278" rx="48" fill="#E7B768"/>
+    <rect x="-84" y="-4" width="168" height="226" rx="36" fill="#0F172A"/>
+    <text x="-48" y="44" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="54" font-weight="900">20:09</text>
+    <rect x="-58" y="72" width="116" height="98" rx="12" fill="#FFCA28"/>
+    <text x="-36" y="126" fill="#111827" font-family="Arial, sans-serif" font-size="42" font-weight="900">05:36</text>
+  </g>
+  <g transform="translate(1100 348) rotate(12)">
+    <rect x="-78" y="-120" width="156" height="260" rx="60" fill="#2A2D32"/>
+    <rect x="-90" y="120" width="180" height="236" rx="60" fill="#2E3137"/>
+    <rect x="-118" y="-10" width="236" height="260" rx="44" fill="#818487"/>
+    <rect x="-96" y="18" width="192" height="204" rx="30" fill="#101215"/>
+    <circle cx="-42" cy="74" r="36" fill="#FF8A00"/>
+    <circle cx="36" cy="74" r="36" fill="#FF8A00"/>
+    <circle cx="-42" cy="74" r="24" fill="#0F172A"/>
+    <circle cx="36" cy="74" r="24" fill="#0F172A"/>
+    <text x="-78" y="164" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="32" font-weight="700">10:10</text>
+  </g>
+</svg>

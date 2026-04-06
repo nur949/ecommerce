@@ -1,0 +1,126 @@
+.site-header.cos-header {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  backdrop-filter: none !important;
+}
+
+.site-header.cos-header > .container {
+  max-width: 1320px;
+}
+
+.site-header.cos-header .cos-shell {
+  background: #fffaf7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 16px 36px rgba(120, 20, 65, 0.12) !important;
+}
+
+.site-header.cos-header .cos-row {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  column-gap: 2rem !important;
+  padding: 1.05rem 1.45rem !important;
+}
+
+.site-header.cos-header .cos-logo {
+  font-size: 2rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  color: #a3265d !important;
+  letter-spacing: -0.04em !important;
+  white-space: nowrap !important;
+}
+
+.site-header.cos-header .cos-logo::after {
+  content: ".";
+}
+
+.site-header.cos-header .cos-nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 1.5rem !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
+
+.site-header.cos-header .cos-nav-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #4f4f4f !important;
+  text-decoration: none !important;
+  padding: 0.3rem 0.2rem !important;
+}
+
+.site-header.cos-header .cos-nav-link:hover {
+  color: #9a2356 !important;
+}
+
+.site-header.cos-header .cos-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.45rem !important;
+  flex-shrink: 0 !important;
+}
+
+.site-header.cos-header .cos-icon-btn {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #4f4f4f !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  text-decoration: none !important;
+  overflow: hidden !important;
+  font-size: 0 !important;
+}
+
+.site-header.cos-header .cos-icon-btn > svg {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  display: block !important;
+}
+
+.site-header.cos-header .cos-icon-btn:hover {
+  border-color: rgba(154, 35, 86, 0.28) !important;
+  background: rgba(154, 35, 86, 0.06) !important;
+  color: #9a2356 !important;
+}
+
+.site-header.cos-header .nav-mega-item {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.site-header.cos-header .nav-mega-item .mega-menu {
+  top: calc(100% + 12px) !important;
+}
+
+@media (max-width: 991px) {
+  .site-header.cos-header .cos-row {
+    grid-template-columns: 1fr auto !important;
+    row-gap: 0.75rem !important;
+    padding: 0.95rem 1rem !important;
+  }
+
+  .site-header.cos-header .cos-logo {
+    font-size: 1.65rem !important;
+  }
+
+  .site-header.cos-header .cos-nav {
+    grid-column: 1 / -1 !important;
+    order: 3 !important;
+    overflow-x: auto !important;
+    gap: 1rem !important;
+    padding-bottom: 0.1rem !important;
+  }
+}
