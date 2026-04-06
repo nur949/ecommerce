@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Order Tracking | Zynvo{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="bg-white rounded-5 p-5 shadow-sm theme-panel">
+                <h1 class="h3 fw-bold mb-4 text-center">Track Your Order</h1>
+                <form method="post" class="d-grid gap-3 mb-4">
+                    {% csrf_token %}
+                    <input type="text" name="order_number" class="form-control" placeholder="Enter order number">
+                    <button class="btn btn-primary rounded-pill">Track Order</button>
+                </form>
+                {% if order %}
+                <div class="bg-slate-50 rounded-4 p-4 theme-soft">
+                    <div class="fw-semibold">Order: {{ order.order_number }}</div>
+                    <div>Status: {{ order.get_status_display }}</div>
+                    <div>Placed: {{ order.created_at|date:'d M Y, h:i A' }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

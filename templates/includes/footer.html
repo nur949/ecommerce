@@ -1,0 +1,28 @@
+<footer class="cos-footer-wrap mt-5">
+  <div class="container pb-4">
+    <div class="cos-shell cos-footer-shell" style="background:#fffaf7;border:1px solid rgba(255,255,255,.9);border-radius:28px;box-shadow:0 16px 36px rgba(120,20,65,.12);">
+      <div class="cos-row cos-footer-row" style="display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:2rem;padding:1.05rem 1.45rem;">
+        <a href="{% url 'core:home' %}" class="text-decoration-none cos-logo" style="font-size:2rem;font-weight:900;line-height:1;color:#a3265d;letter-spacing:-.04em;white-space:nowrap;">{{ site_settings.site_name }}.</a>
+        <nav class="cos-nav cos-footer-nav" aria-label="Footer" style="display:flex;align-items:center;justify-content:flex-start;gap:1.5rem;min-width:0;white-space:nowrap;">
+          <a href="{% url 'catalog:shop' %}" class="cos-nav-link" style="font-size:1rem;font-weight:600;color:#4f4f4f;text-decoration:none;">Shop</a>
+          <a href="{% url 'core:blog_index' %}" class="cos-nav-link" style="font-size:1rem;font-weight:600;color:#4f4f4f;text-decoration:none;">Blog</a>
+          <a href="{% url 'core:corporate' %}" class="cos-nav-link" style="font-size:1rem;font-weight:600;color:#4f4f4f;text-decoration:none;">Corporate</a>
+          <a href="{% url 'core:outlets' %}" class="cos-nav-link" style="font-size:1rem;font-weight:600;color:#4f4f4f;text-decoration:none;">Outlets</a>
+          <a href="{% url 'orders:tracking' %}" class="cos-nav-link" style="font-size:1rem;font-weight:600;color:#4f4f4f;text-decoration:none;">Track Order</a>
+        </nav>
+        <div class="cos-actions" style="display:inline-flex;align-items:center;justify-content:flex-end;gap:.45rem;flex-shrink:0;">
+          <a href="{{ site_settings.facebook_url|default:'#' }}" class="cos-icon-btn" aria-label="Facebook" style="width:36px;height:36px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#4f4f4f;background:transparent;border:1px solid transparent;text-decoration:none;overflow:hidden;font-size:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.7l.5-3h-3.2V9.1c0-.9.3-1.6 1.7-1.6H17V4.8c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.4V11H7.8v3h2.6v8h3.1Z"/></svg>
+          </a>
+          <a href="{{ site_settings.instagram_url|default:'#' }}" class="cos-icon-btn" aria-label="Instagram" style="width:36px;height:36px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#4f4f4f;background:transparent;border:1px solid transparent;text-decoration:none;overflow:hidden;font-size:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="{{ site_settings.youtube_url|default:'#' }}" class="cos-icon-btn" aria-label="YouTube" style="width:36px;height:36px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#4f4f4f;background:transparent;border:1px solid transparent;text-decoration:none;overflow:hidden;font-size:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.9 2.9 0 0 0-2-2.1C17.8 4.5 12 4.5 12 4.5s-5.8 0-7.6.6a2.9 2.9 0 0 0-2 2.1C1.8 9.1 1.8 12 1.8 12s0 2.9.6 4.8a2.9 2.9 0 0 0 2 2.1c1.8.6 7.6.6 7.6.6s5.8 0 7.6-.6a2.9 2.9 0 0 0 2-2.1c.6-1.9.6-4.8.6-4.8s0-2.9-.6-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+

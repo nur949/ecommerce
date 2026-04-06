@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block title %}Account | Zynvo{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
+                <div class="d-flex gap-2 mb-4">
+                    <a href="{% url 'accounts:login' %}" class="btn {% if active_tab == 'login' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50 rounded-pill">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn {% if active_tab == 'register' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50 rounded-pill">Register</a>
+                </div>
+                {% if active_tab == 'register' %}
+                    <form method="post" action="{% url 'accounts:register' %}" class="d-grid gap-3">
+                        {% csrf_token %}
+                        {{ register_form.first_name }}
+                        {{ register_form.email }}
+                        {{ register_form.username }}
+                        {{ register_form.phone }}
+                        {{ register_form.password1 }}
+                        {{ register_form.password2 }}
+                        <button class="btn btn-primary rounded-pill">Create Account</button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'accounts:login' %}" class="d-grid gap-3">
+                        {% csrf_token %}
+                        {{ form.username }}
+                        {{ form.password }}
+                        <button class="btn btn-primary rounded-pill">Login</button>
+                    </form>
+                {% endif %}
+                <div class="text-center text-muted mt-3 small">Secure access to your Zynvo account.</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

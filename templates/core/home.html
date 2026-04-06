@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Zynvo | Home{% endblock %}
+{% block content %}
+{% for section in home_sections %}
+  {% if section.is_active %}
+    {% if section.key == 'hero' %}{% include 'core/partials/hero_section.html' %}{% endif %}
+    {% if section.key == 'hero_showcase' %}{% include 'core/partials/hero_showcase.html' %}{% endif %}
+    {% if section.key == 'popular_categories' %}{% include 'core/partials/popular_categories.html' %}{% endif %}
+    {% if section.key == 'daily_deals' %}{% include 'core/partials/daily_deals.html' %}{% endif %}
+    {% if section.key == 'new_collection' %}{% include 'core/partials/new_collection.html' %}{% endif %}
+    {% if section.key == 'collection_showcase' %}{% include 'core/partials/collection_showcase.html' %}{% endif %}
+    {% if section.key == 'gadget_banners' %}{% include 'core/partials/gadget_banners.html' %}{% endif %}
+    {% if section.key == 'trending_now' %}{% include 'core/partials/trending_now.html' %}{% endif %}
+    {% if section.key == 'unlimited_offer' %}{% include 'core/partials/unlimited_offer.html' %}{% endif %}
+    {% if section.key == 'corporate_cta' %}{% include 'core/partials/corporate_cta.html' %}{% endif %}
+  {% endif %}
+{% endfor %}
+{% endblock %}

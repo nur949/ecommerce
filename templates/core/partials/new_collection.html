@@ -1,0 +1,8 @@
+<section class="container py-4">
+  <div class="section-header"><h2>New Collection</h2><a href="{% url 'catalog:shop' %}" class="text-primary">See More</a></div>
+  <div class="row g-4">
+    {% for product in new_collection %}
+    <div class="col-lg-3 col-md-4 col-sm-6">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+    {% endfor %}
+  </div>
+</section>

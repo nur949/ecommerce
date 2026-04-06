@@ -1,0 +1,28 @@
+<section class="container py-4">
+  <div class="section-header"><h2>Gadget Festive</h2></div>
+  <div class="row g-3">
+    {% for banner in gadget_banners %}
+    <div class="col-lg-4 col-md-6">
+      <a href="{{ banner.url }}" class="wide-banner gadget-festive-card d-block rounded-5 text-decoration-none shadow-sm overflow-hidden" style="background: {{ banner.color }};">
+        {% if banner.image %}
+        <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% elif 'laptop' in banner.title|lower or 'notebook' in banner.title|lower %}
+        <img src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% elif 'phone' in banner.title|lower or 'mobile' in banner.title|lower %}
+        <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% elif 'monitor' in banner.title|lower or 'gaming' in banner.title|lower %}
+        <img src="https://images.pexels.com/photos/777001/pexels-photo-777001.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% elif 'headphone' in banner.title|lower or 'audio' in banner.title|lower %}
+        <img src="https://images.pexels.com/photos/3394665/pexels-photo-3394665.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% else %}
+        <img src="https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
+        {% endif %}
+        <div class="gadget-festive-overlay">
+          <h4 class="fw-bold mb-2">{{ banner.title }}</h4>
+          {% if banner.subtitle %}<p class="mb-0">{{ banner.subtitle }}</p>{% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>

@@ -1,0 +1,24 @@
+<div class="card product-card border-0 shadow-sm h-100 overflow-hidden">
+    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-slate-800">
+        <div class="card-top product-media position-relative">
+            {% if product.discount_amount %}
+                <span class="product-badge">Save: &#2547;{{ product.discount_amount }} (-{{ product.discount_percentage }}%)</span>
+            {% elif product.badge_text %}
+                <span class="product-badge">{{ product.badge_text }}</span>
+            {% elif product.is_new %}
+                <span class="product-badge">New Arrival</span>
+            {% endif %}
+            <div class="product-image-shell">
+                <img src="{{ product.primary_image_url }}" class="product-image product-image-fill" alt="{{ product.name }}">
+            </div>
+        </div>
+        <div class="card-body product-copy pt-3">
+            <h3 class="h6 product-title mb-3">{{ product.name }}</h3>
+            <div class="price-row">
+                <span class="product-price">&#2547;{{ product.price }}</span>
+                {% if product.compare_at_price %}<small class="product-compare">&#2547;{{ product.compare_at_price }}</small>{% endif %}
+            </div>
+            {% if show_stock %}<div class="text-muted small mt-2">Available: {{ product.stock }}</div>{% endif %}
+        </div>
+    </a>
+</div>

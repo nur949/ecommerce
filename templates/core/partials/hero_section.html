@@ -1,0 +1,56 @@
+{% load static %}
+<section class="container py-4">
+  <div class="row g-4 align-items-stretch">
+    <div class="col-lg-8">
+      <div id="heroCarousel" class="carousel slide hero-card hero-banner-card overflow-hidden rounded-5 shadow-sm" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for slide in hero_slides %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <a href="{{ slide.cta_url }}" class="hero-slide hero-slide-link text-decoration-none" style="background: {{ slide.bg_color }};">
+              {% if forloop.counter0|divisibleby:3 %}
+              <img src="https://images.pexels.com/photos/10339115/pexels-photo-10339115.jpeg?auto=compress&cs=tinysrgb&w=1400&h=760&fit=crop" alt="{{ slide.title }}" class="hero-slide-image">
+              {% elif forloop.counter0|add:'2'|divisibleby:3 %}
+              <img src="https://images.pexels.com/photos/5877660/pexels-photo-5877660.jpeg?auto=compress&cs=tinysrgb&w=1400&h=760&fit=crop" alt="{{ slide.title }}" class="hero-slide-image">
+              {% else %}
+              <img src="https://images.pexels.com/photos/5957/gift-brown-shopping-market.jpg?auto=compress&cs=tinysrgb&w=1400&h=760&fit=crop" alt="{{ slide.title }}" class="hero-slide-image">
+              {% endif %}
+            </a>
+          </div>
+          {% empty %}
+          <div class="carousel-item active">
+            <a href="{% url 'catalog:shop' %}" class="hero-slide hero-slide-link text-decoration-none bg-blue-50">
+              <img src="https://images.pexels.com/photos/10339115/pexels-photo-10339115.jpeg?auto=compress&cs=tinysrgb&w=1400&h=760&fit=crop" alt="{{ site_settings.hero_title }}" class="hero-slide-image">
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="carousel-indicators hero-indicators">
+          {% for slide in hero_slides %}
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" {% if forloop.first %}aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+          {% empty %}
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="d-grid gap-3 h-100 hero-side-banners">
+        {% for banner in hero_right_banners %}
+        <a href="{{ banner.url }}" class="promo-box hero-side-card rounded-4 text-decoration-none shadow-sm" style="background: {{ banner.color }};">
+          {% if forloop.counter == 1 %}
+          <img src="https://images.pexels.com/photos/8824337/pexels-photo-8824337.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="{{ banner.title }}" class="hero-side-image">
+          {% elif forloop.counter == 2 %}
+          <img src="https://images.pexels.com/photos/7081097/pexels-photo-7081097.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="{{ banner.title }}" class="hero-side-image">
+          {% else %}
+          <img src="https://images.pexels.com/photos/8945086/pexels-photo-8945086.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="{{ banner.title }}" class="hero-side-image">
+          {% endif %}
+        </a>
+        {% empty %}
+        <a href="{% url 'catalog:shop' %}" class="promo-box hero-side-card rounded-4 text-decoration-none shadow-sm"><img src="https://images.pexels.com/photos/8824337/pexels-photo-8824337.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="Kitchen appliances" class="hero-side-image"></a>
+        <a href="{% url 'catalog:shop' %}" class="promo-box hero-side-card rounded-4 text-decoration-none shadow-sm"><img src="https://images.pexels.com/photos/7081097/pexels-photo-7081097.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="Fashion friends" class="hero-side-image"></a>
+        <a href="{% url 'catalog:shop' %}" class="promo-box hero-side-card rounded-4 text-decoration-none shadow-sm"><img src="https://images.pexels.com/photos/8945086/pexels-photo-8945086.jpeg?auto=compress&cs=tinysrgb&w=900&h=320&fit=crop" alt="Stylish group" class="hero-side-image"></a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

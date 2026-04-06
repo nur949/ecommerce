@@ -1,0 +1,10 @@
+<section class="container py-4">
+  <div class="showcase-shell rounded-5 p-4">
+    <div class="section-header signature-header"><h2>Signature Collection</h2><a href="{% url 'catalog:shop' %}">See More</a></div>
+    <div class="row g-4">
+      {% for product in collection_showcase %}
+      <div class="col-lg-3 col-md-4 col-sm-6">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

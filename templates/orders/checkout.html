@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block title %}Checkout | Zynvo{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
+                <h1 class="h3 fw-bold mb-4">Shipping Address</h1>
+                <form method="post" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="{% if field.name == 'address_line' %}col-12{% else %}col-md-6{% endif %}">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:', ' }}</div>{% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-12"><label class="form-label">Note</label><textarea class="form-control" name="note" rows="3" placeholder="Any delivery note or landmark"></textarea></div>
+                    <div class="col-12"><button class="btn btn-primary rounded-pill px-4">Continue to Payment</button></div>
+                </form>
+            </div>
+            <div class="bg-white rounded-5 p-4 shadow-sm mt-4 theme-panel">
+                <h2 class="h5 mb-3">Items</h2>
+                {% for item in items %}
+                <div class="d-flex align-items-center gap-3 {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                    <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">{{ item.product.name }}</div>
+                        <div class="text-muted small">Qty: {{ item.quantity }} {% if item.variant %}| {{ item.variant.value }}{% endif %}</div>
+                    </div>
+                    <div class="fw-semibold">৳{{ item.total }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="bg-white rounded-5 p-4 shadow-sm sticky-sidebar theme-panel">
+                <h2 class="h4 mb-4">Your Bill</h2>
+                <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><strong>৳{{ subtotal }}</strong></div>
+                <div class="d-flex justify-content-between mb-2"><span>Discount</span><strong>৳{{ discount }}</strong></div>
+                <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ total }}</span></div>
+                <p class="small text-muted mt-3 mb-0">By continuing, you agree to our delivery, payment, and return terms.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Superadmin Dashboard | Zynvo{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h1 class="fw-bold mb-1">Custom Superadmin Dashboard</h1>
+      <p class="text-muted mb-0">Manage homepage layout, SEO health, and storefront operations from one frontend panel.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{% url 'core:homepage_builder' %}" class="btn btn-primary rounded-pill px-4">Homepage Builder</a>
+      <a href="{% url 'core:seo_dashboard' %}" class="btn btn-outline-primary rounded-pill px-4">SEO Dashboard</a>
+      <a href="/admin/" class="btn btn-outline-dark rounded-pill px-4">Django Admin</a>
+    </div>
+  </div>
+  <div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6"><div class="dashboard-card"><div class="text-muted small">Homepage Sections</div><div class="display-6 fw-bold">{{ section_count }}</div></div></div>
+    <div class="col-lg-3 col-md-6"><div class="dashboard-card"><div class="text-muted small">Products</div><div class="display-6 fw-bold">{{ product_count }}</div></div></div>
+    <div class="col-lg-3 col-md-6"><div class="dashboard-card"><div class="text-muted small">Categories</div><div class="display-6 fw-bold">{{ category_count }}</div></div></div>
+    <div class="col-lg-3 col-md-6"><div class="dashboard-card"><div class="text-muted small">SEO Issues</div><div class="display-6 fw-bold">{{ seo_summary.products_missing_meta|add:seo_summary.categories_missing_meta|add:seo_summary.pages_missing_meta }}</div></div></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="dashboard-card h-100">
+        <h3 class="fw-bold mb-3">Quick Actions</h3>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'core:homepage_builder' %}" class="btn btn-primary rounded-pill">Reorder Homepage Sections</a>
+          <a href="{% url 'core:seo_dashboard' %}" class="btn btn-outline-primary rounded-pill">Fix SEO Metadata</a>
+          <a href="/admin/catalog/product/" class="btn btn-outline-dark rounded-pill">Manage Products</a>
+          <a href="/admin/core/promobanner/" class="btn btn-outline-dark rounded-pill">Manage Banners</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="dashboard-card h-100">
+        <h3 class="fw-bold mb-3">Top Categories</h3>
+        <div class="list-group list-group-flush">
+          {% for category in top_categories %}
+          <div class="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent">
+            <span>{{ category.name }}</span>
+            <span class="badge bg-primary-subtle text-primary rounded-pill">{{ category.product_total }} products</span>
+          </div>
+          {% empty %}
+          <p class="text-muted mb-0">No categories yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

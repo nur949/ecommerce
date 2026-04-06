@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Zynvo{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell">
+    <div class="bg-white rounded-5 p-5 shadow-sm theme-panel">
+        <h1 class="h3 fw-bold mb-2">Welcome, {{ request.user.first_name|default:request.user.username }}</h1>
+        <p class="text-muted mb-4">Manage your orders and account details.</p>
+        <div class="row g-4">
+            <div class="col-lg-4"><div class="dashboard-card"><h2 class="h5">Orders</h2><p class="mb-0">{{ orders|length }} recent order(s)</p></div></div>
+            <div class="col-lg-4"><div class="dashboard-card"><h2 class="h5">Addresses</h2><p class="mb-0">Manage your saved shipping addresses.</p></div></div>
+            <div class="col-lg-4"><div class="dashboard-card"><h2 class="h5">Wishlist</h2><p class="mb-0">Save products for later.</p></div></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

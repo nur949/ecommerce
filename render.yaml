@@ -1,0 +1,25 @@
+services:
+  - type: pserv
+    name: zynvo-db
+    env: postgresql
+    plan: free
+
+  - type: web
+    name: zynvo
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn zynvo_project.wsgi --log-file -
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://*.onrender.com
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zynvo-db
+          property: connectionString

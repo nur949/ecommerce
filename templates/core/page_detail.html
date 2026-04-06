@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}{{ page.meta_title|default:page.title }}{% endblock %}
+{% block meta_description %}{{ page.meta_description }}{% endblock %}
+{% block content %}
+<section class="container py-5 page-shell"><div class="bg-white rounded-5 p-5 shadow-sm theme-panel"><h1 class="h2 fw-bold mb-4">{{ page.title }}</h1>{{ page.body|linebreaks }}</div></section>
+{% endblock %}
+
