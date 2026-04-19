@@ -182,54 +182,157 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  document.querySelectorAll('form.js-add-to-cart-ajax').forEach((form) => {
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const submitter = event.submitter || form.querySelector("button[type='submit']");
-      const formData = new FormData(form);
-      if (submitter && submitter.name) {
-        formData.set(submitter.name, submitter.value);
+  document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form.js-add-to-cart-ajax');
+    if (!form) return;
+    event.preventDefault();
+    const submitter = event.submitter || form.querySelector("button[type='submit']");
+    const formData = new FormData(form);
+    if (submitter && submitter.name) {
+      formData.set(submitter.name, submitter.value);
+    }
+    const button = submitter && submitter.matches("button[type='submit']") ? submitter : form.querySelector("button[type='submit']");
+    const originalText = button ? button.textContent : '';
+    const nextUrl = String(formData.get('next') || '');
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Adding...';
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'same-origin',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Request failed');
+      const data = await response.json();
+      if (!data.ok) throw new Error('Invalid response');
+
+      replaceMiniCartPanelFromHtml(data.mini_cart_html);
+      updateMiniCartBadge(Number(data.cart_count || 0));
+      showCartNotice(data.message || 'Added to cart.');
+      if (nextUrl.includes('/checkout')) {
+        window.location.href = nextUrl;
+        return;
       }
-      const button = submitter && submitter.matches("button[type='submit']") ? submitter : form.querySelector("button[type='submit']");
-      const originalText = button ? button.textContent : '';
-      const nextUrl = String(formData.get('next') || '');
+      openMiniCart();
+    } catch (error) {
+      form.submit();
+    } finally {
       if (button) {
-        button.disabled = true;
-        button.textContent = 'Adding...';
+        button.disabled = false;
+        button.textContent = originalText;
       }
+    }
+  });
+
+  const shopForm = document.getElementById('shopAjaxForm');
+  const shopGrid = document.getElementById('shopProductGrid');
+  const shopCount = document.getElementById('shopProductCount');
+  const shopStatus = document.getElementById('shopResultsStatus');
+  const shopSearch = document.getElementById('shopSearch');
+  const shopSort = document.getElementById('shopSort');
+
+  if (shopForm && shopGrid) {
+    const categoryInput = shopForm.querySelector("input[name='category']");
+    const saleInput = shopForm.querySelector("input[name='sale']");
+    let shopTimer = null;
+    let activeController = null;
+
+    const setShopLoading = (isLoading) => {
+      shopGrid.classList.toggle('is-loading', isLoading);
+      if (shopStatus) {
+        shopStatus.textContent = isLoading ? 'Loading products...' : '';
+      }
+    };
+
+    const buildShopUrl = () => {
+      const formData = new FormData(shopForm);
+      const params = new URLSearchParams();
+      formData.forEach((value, key) => {
+        const nextValue = String(value || '').trim();
+        if (nextValue) {
+          params.set(key, nextValue);
+        }
+      });
+      return `${shopForm.action}?${params.toString()}`;
+    };
+
+    const loadShopProducts = async (pushState = true) => {
+      const url = buildShopUrl();
+      if (activeController) {
+        activeController.abort();
+      }
+      activeController = new AbortController();
+      setShopLoading(true);
 
       try {
-        const response = await fetch(form.action, {
-          method: 'POST',
+        const response = await fetch(url, {
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
           },
           credentials: 'same-origin',
-          body: formData,
+          signal: activeController.signal,
         });
-
-        if (!response.ok) throw new Error('Request failed');
+        if (!response.ok) throw new Error('Shop request failed');
         const data = await response.json();
-        if (!data.ok) throw new Error('Invalid response');
-
-        replaceMiniCartPanelFromHtml(data.mini_cart_html);
-        updateMiniCartBadge(Number(data.cart_count || 0));
-        showCartNotice(data.message || 'Added to cart.');
-        if (nextUrl.includes('/checkout')) {
-          window.location.href = nextUrl;
-          return;
+        if (!data.ok) throw new Error('Invalid shop payload');
+        shopGrid.innerHTML = data.html;
+        if (shopCount) {
+          shopCount.textContent = `${Number(data.count || 0)} products`;
         }
-        openMiniCart();
+        if (pushState) {
+          window.history.pushState({}, '', url);
+        }
       } catch (error) {
-        form.submit();
-      } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent = originalText;
+        if (error.name !== 'AbortError') {
+          window.location.href = url;
         }
+      } finally {
+        setShopLoading(false);
       }
+    };
+
+    shopForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      loadShopProducts();
     });
-  });
+
+    if (shopSort) {
+      shopSort.addEventListener('change', () => loadShopProducts());
+    }
+
+    if (shopSearch) {
+      shopSearch.addEventListener('input', () => {
+        clearTimeout(shopTimer);
+        shopTimer = setTimeout(() => loadShopProducts(), 400);
+      });
+    }
+
+    document.querySelectorAll('.filter-list a[data-category]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (categoryInput) {
+          categoryInput.value = link.dataset.category || '';
+        }
+        if (saleInput && link.href.includes('sale=1')) {
+          saleInput.value = '1';
+        }
+        document.querySelectorAll('.filter-list a[data-category]').forEach((item) => item.classList.remove('active'));
+        link.classList.add('active');
+        loadShopProducts();
+      });
+    });
+
+    window.addEventListener('popstate', () => {
+      window.location.reload();
+    });
+  }
 
   const updateCartSubtotalUI = (subtotal) => {
     const subtotalEl = document.querySelector('.cart-subtotal-value');

@@ -1867,3 +1867,136 @@ body.mini-cart-active {
     max-height: calc(100vh - 90px);
   }
 }
+
+/* Professional product browsing refresh */
+.header-nav-links {
+  gap: .35rem .6rem;
+}
+
+.site-header.cos-header .cos-nav-link {
+  border-radius: 8px !important;
+  padding: .58rem .82rem !important;
+}
+
+.shop-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+
+.shop-kicker {
+  color: #1769e8;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.shop-search-wrap {
+  width: min(420px, 100%);
+}
+
+.shop-search-input {
+  min-height: 46px;
+  background: #fff;
+}
+
+.shop-filter-panel {
+  top: 104px;
+}
+
+.shop-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.shop-count {
+  min-width: 92px;
+  text-align: right;
+}
+
+#shopProductGrid {
+  position: relative;
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+#shopProductGrid.is-loading {
+  opacity: .45;
+  transform: translateY(4px);
+  pointer-events: none;
+}
+
+.empty-products {
+  background: #fff;
+}
+
+.product-card {
+  box-shadow: 0 8px 22px rgba(16, 24, 40, .06) !important;
+}
+
+.product-card:hover {
+  box-shadow: 0 16px 34px rgba(16, 24, 40, .10) !important;
+}
+
+.product-actions {
+  display: block !important;
+}
+
+.product-action-btn {
+  min-height: 38px;
+}
+
+.product-detail-page .theme-panel {
+  background: #fff !important;
+}
+
+.product-gallery-panel,
+.product-info-panel {
+  min-height: 100%;
+}
+
+.product-breadcrumb a {
+  text-decoration: none;
+  color: #1769e8;
+}
+
+.product-short-copy,
+.product-detail-copy {
+  line-height: 1.75;
+}
+
+.product-detail-copy {
+  color: #4b5563;
+  border-top: 1px solid rgba(213, 219, 229, .9);
+  padding-top: 1.1rem;
+}
+
+.product-detail-cart-btn {
+  min-width: 160px;
+  border-radius: 8px !important;
+}
+
+@media (max-width: 991px) {
+  .shop-hero {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .shop-search-wrap {
+    width: 100%;
+  }
+
+  .shop-toolbar-controls {
+    justify-content: flex-start;
+  }
+
+  .shop-count {
+    text-align: left;
+  }
+}

@@ -5,45 +5,9 @@
                 <a href="{% url 'core:home' %}" class="text-decoration-none cos-logo">{{ site_settings.site_name }}.</a>
                 <nav class="cos-nav header-nav-panel" id="mobileNavPanel" aria-label="Primary">
                     <div class="header-nav-links">
-                        <div class="mega-trigger nav-mega-item" id="productsMegaItem">
-                            <div class="mobile-mega-head">
-                                <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Products</a>
-                                <button type="button" class="mobile-mega-toggle d-lg-none" aria-label="Toggle product categories" aria-controls="productsMegaMenu" aria-expanded="false">
-                                    <span></span>
-                                    <span></span>
-                                </button>
-                            </div>
-                            <div class="mega-menu shadow-lg rounded-4 p-4 bg-white" id="productsMegaMenu">
-                                <div class="row g-4">
-                                    {% for entry in mega_categories %}
-                                    <div class="col-lg-4">
-                                        <div class="mega-category-card h-100">
-                                            <a href="{{ entry.category.get_absolute_url }}" class="fw-bold text-decoration-none d-inline-block mb-2">{{ entry.category.name }}</a>
-                                            {% if entry.children %}
-                                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                                {% for child in entry.children %}
-                                                <a href="{{ child.get_absolute_url }}" class="badge text-bg-light text-decoration-none px-3 py-2 rounded-pill">{{ child.name }}</a>
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            {% if entry.featured_products %}
-                                            <div class="small text-muted mb-2">Popular products</div>
-                                            <div class="d-grid gap-2">
-                                                {% for product in entry.featured_products %}
-                                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none small text-slate-700 hover-link">{{ product.name }}</a>
-                                                {% endfor %}
-                                            </div>
-                                            {% else %}
-                                            <div class="text-muted small">Browse {{ entry.category.name }} collections.</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
+                        <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Products</a>
                         <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Shop</a>
-                        <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Sale</a>
+                        <a href="{% url 'catalog:shop' %}?sale=1" class="cos-nav-link">Sale</a>
                         <a href="{% url 'core:blog_index' %}" class="cos-nav-link">Blog</a>
                     </div>
                 </nav>

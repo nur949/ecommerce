@@ -3,40 +3,52 @@
 {% block meta_description %}Shop Zynvo products by category, price, and latest arrivals with secure checkout and fast delivery.{% endblock %}
 {% block content %}
 <section class="container py-5 page-shell">
+    <form method="get" action="{% url 'catalog:shop' %}" class="shop-ajax-form" id="shopAjaxForm">
+        <input type="hidden" name="sale" value="{% if sale %}1{% endif %}">
+        <input type="hidden" name="category" value="{{ active_category }}">
+        <div class="shop-hero theme-panel mb-4">
+            <div>
+                <p class="shop-kicker mb-2">Curated Store</p>
+                <h1 class="h2 m-0">Products</h1>
+            </div>
+            <div class="shop-search-wrap">
+                <label class="visually-hidden" for="shopSearch">Search products</label>
+                <input id="shopSearch" type="search" name="q" class="form-control shop-search-input" value="{{ query }}" placeholder="Search products">
+            </div>
+        </div>
+    </form>
     <div class="row g-4">
         <div class="col-lg-3">
-            <div class="bg-white rounded-4 p-4 shadow-sm sticky-sidebar theme-panel">
-                <h4 class="h5 mb-3">Categories</h4>
+            <div class="bg-white rounded-4 p-4 shadow-sm sticky-sidebar theme-panel shop-filter-panel">
+                <h2 class="h5 mb-3">Categories</h2>
                 <ul class="list-unstyled filter-list">
-                    <li><a href="{% url 'catalog:shop' %}" class="{% if not active_category %}active{% endif %}">All Products</a></li>
+                    <li><a href="{% url 'catalog:shop' %}{% if sale %}?sale=1{% endif %}" data-category="" class="{% if not active_category %}active{% endif %}">All Products</a></li>
                     {% for category in categories %}
-                        <li><a href="?category={{ category.slug }}{% if query %}&q={{ query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}" class="{% if active_category == category.slug %}active{% endif %}">{{ category.name }}</a></li>
+                        <li><a href="?category={{ category.slug }}{% if query %}&q={{ query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}{% if sale %}&sale=1{% endif %}" data-category="{{ category.slug }}" class="{% if active_category == category.slug %}active{% endif %}">{{ category.name }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4 shop-toolbar">
-                <h1 class="h3 m-0">Shop</h1>
-                <form method="get" class="shop-sort-form">
-                    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
-                    {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+                <div>
+                    <p class="text-muted small mb-1">{% if sale %}Sale products{% else %}Available products{% endif %}</p>
+                    <h2 class="h4 m-0">{% if sale %}Sale{% else %}Shop{% endif %}</h2>
+                </div>
+                <div class="shop-toolbar-controls">
                     <label class="visually-hidden" for="shopSort">Sort products</label>
-                    <select id="shopSort" name="sort" class="form-select" onchange="this.form.submit()">
+                    <select id="shopSort" name="sort" class="form-select" form="shopAjaxForm">
                         <option value="latest" {% if active_sort == 'latest' %}selected{% endif %}>Latest</option>
                         <option value="price_low" {% if active_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
                         <option value="price_high" {% if active_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
                         <option value="name" {% if active_sort == 'name' %}selected{% endif %}>Name</option>
                     </select>
-                </form>
-                <span class="text-muted">{{ products|length }} products</span>
+                    <span class="text-muted shop-count" id="shopProductCount">{{ products|length }} products</span>
+                </div>
             </div>
-            <div class="row g-3">
-                {% for product in products %}
-                    <div class="col-6 col-md-6 col-lg-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
-                {% empty %}
-                    <p>No products found.</p>
-                {% endfor %}
+            <div class="shop-results-status text-muted small mb-3" id="shopResultsStatus" role="status" aria-live="polite"></div>
+            <div class="row g-3" id="shopProductGrid">
+                {% include 'catalog/partials/product_grid.html' %}
             </div>
         </div>
     </div>

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -31,6 +32,9 @@ def shop(request):
     category_slug = request.GET.get('category')
     if category_slug:
         products = products.filter(category__slug=category_slug)
+    sale = request.GET.get('sale') in {'1', 'true', 'yes'}
+    if sale:
+        products = products.filter(compare_at_price__gt=F('price'))
     sort = request.GET.get('sort') or 'latest'
     sort_map = {
         'latest': '-created_at',
@@ -39,12 +43,24 @@ def shop(request):
         'name': 'name',
     }
     products = products.order_by(sort_map.get(sort, '-created_at'))
-    return render(request, 'catalog/shop.html', {
+    context = {
         'products': products,
         'categories': Category.objects.filter(parent__isnull=True).prefetch_related('children'),
         'query': q,
         'active_category': category_slug or '',
         'active_sort': sort,
+        'sale': sale,
+    }
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse(
+            {
+                'ok': True,
+                'html': render_to_string('catalog/partials/product_grid.html', context, request=request),
+                'count': products.count(),
+            }
+        )
+    return render(request, 'catalog/shop.html', {
+        **context,
     })
 
 
