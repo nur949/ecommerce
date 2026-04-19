@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const mobileNavToggle = document.getElementById('mobileNavToggle');
+  const mobileNavPanel = document.getElementById('mobileNavPanel');
+  const closeMobileNav = () => {
+    if (mobileNavToggle && mobileNavPanel) {
+      mobileNavPanel.classList.remove('is-open');
+      mobileNavToggle.classList.remove('is-open');
+      mobileNavToggle.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  if (mobileNavToggle && mobileNavPanel) {
+    mobileNavToggle.addEventListener('click', function () {
+      const nextState = !mobileNavPanel.classList.contains('is-open');
+      mobileNavPanel.classList.toggle('is-open', nextState);
+      mobileNavToggle.classList.toggle('is-open', nextState);
+      mobileNavToggle.setAttribute('aria-expanded', String(nextState));
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!mobileNavPanel.contains(event.target) && !mobileNavToggle.contains(event.target)) {
+        closeMobileNav();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 992) {
+        closeMobileNav();
+      }
+    });
+  }
+
   const toggle = document.getElementById('miniCartToggle');
   const panel = document.getElementById('miniCartPanel');
 
