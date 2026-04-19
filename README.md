@@ -1,8 +1,8 @@
 # Zynvo Ecommerce | Django Ecommerce Website
 
-A modern **Django ecommerce website** for a **single brand online store**, built with **Django, SQLite, HTML, CSS, JavaScript, Tailwind CSS, and Bootstrap**.
+A modern **Django ecommerce website** for a **single brand online store**, built using **Django**, **SQLite**, **HTML**, **CSS**, **JavaScript**, **Tailwind CSS**, and **Bootstrap**.
 
-This project includes a complete **ecommerce system with product listing, cart, checkout, payment integration, and admin dashboard**, making it a perfect starter for building an **online store using Django**.
+This project provides a complete **ecommerce system** with product listings, shopping cart functionality, checkout, payment integration, and an **admin dashboard**. It's an ideal starting point for building an **online store using Django**. 
 
 ## Live Demo
 [View Live Demo](https://ecommerce-1-pp7c.onrender.com)
@@ -14,17 +14,17 @@ This project includes a complete **ecommerce system with product listing, cart, 
 
 ## Features
 
-- Modern ecommerce homepage with clean section-based layout
-- Product listing and product detail pages (Django ecommerce UI)
-- Product variations (size, color, etc.)
-- Shopping cart and checkout system
-- Demo payment integration (bKash / Stripe-style / COD)
-- Order tracking system
-- User authentication (Login / Register system in Django)
-- Blog and CMS pages for SEO content
-- Customized Django admin dashboard
-- Demo data seeder for quick setup
-- Deployment-ready Django project (Render + Gunicorn + WhiteNoise)
+- **Modern ecommerce homepage** with a clean section-based layout
+- **Product listing** and **product detail pages** (Django ecommerce UI)
+- **Product variations** (size, color, etc.)
+- **Shopping cart** and **checkout system**
+- **Demo payment integration** (bKash / Stripe-style / COD)
+- **Order tracking system**
+- **User authentication** (Login / Register system in Django)
+- **Blog and CMS pages** for SEO content
+- **Customized Django admin dashboard** for easy management
+- **Demo data seeder** for quick setup
+- **Deployment-ready** Django project (Render + Gunicorn + WhiteNoise)
 
 ---
 
@@ -76,4 +76,4 @@ python manage.py seed_demo
 python manage.py runserver
 
 Open in browser:
-http://127.0.0.1:8000/
+http://127.0.0.1:8000/ 
