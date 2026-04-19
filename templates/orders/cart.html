@@ -19,7 +19,6 @@
                         {% csrf_token %}
                         <input type="hidden" name="item_key" value="{{ item.key }}">
                         <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control cart-qty-input">
-                        <button class="btn btn-sm btn-outline-primary rounded-pill">Update</button>
                     </form>
                     <div class="fw-semibold cart-line-total">৳{{ item.total }}</div>
                     <a href="{% url 'catalog:remove_cart_item' item.key %}" class="btn btn-sm btn-outline-danger rounded-pill js-cart-remove-link" data-item-key="{{ item.key }}">Remove</a>

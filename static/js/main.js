@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const incomingPanel = doc.getElementById('miniCartPanel');
     if (!incomingPanel) return;
 
-    panel.className = incomingPanel.className;
     panel.innerHTML = incomingPanel.innerHTML;
   };
 
