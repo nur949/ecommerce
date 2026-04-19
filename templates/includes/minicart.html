@@ -1,8 +1,12 @@
-<div class="container pb-3 d-none" id="miniCartPanel">
+<div class="mini-cart-backdrop d-none" id="miniCartBackdrop"></div>
+<aside class="mini-cart-drawer d-none" id="miniCartPanel" aria-hidden="true">
     <div class="mini-cart-card bg-white rounded-4 p-4 shadow-sm border">
+        <div class="mini-cart-head">
+            <h6 class="m-0 fw-bold">Cart Summary</h6>
+            <button type="button" class="mini-cart-close" id="miniCartClose" aria-label="Close cart panel">×</button>
+        </div>
         {% if cart_count %}
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="m-0">Cart Summary</h6>
+            <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                 <a href="{% url 'orders:cart' %}" class="text-primary text-decoration-none">View Cart</a>
             </div>
             {% for item in cart_items|slice:':3' %}
@@ -31,4 +35,4 @@
             </div>
         {% endif %}
     </div>
-</div>
+</aside>

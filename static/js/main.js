@@ -2,13 +2,47 @@ document.addEventListener('DOMContentLoaded', function () {
   const getMiniCartElements = () => ({
     toggle: document.getElementById('miniCartToggle'),
     panel: document.getElementById('miniCartPanel'),
+    backdrop: document.getElementById('miniCartBackdrop'),
   });
 
+  const finishCloseMiniCart = () => {
+    const { panel, backdrop } = getMiniCartElements();
+    if (panel && !panel.classList.contains('is-open')) {
+      panel.classList.add('d-none');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    if (backdrop && !backdrop.classList.contains('is-open')) {
+      backdrop.classList.add('d-none');
+    }
+    document.body.classList.remove('mini-cart-active');
+  };
+
+  const closeMiniCart = () => {
+    const { toggle, panel, backdrop } = getMiniCartElements();
+    if (!panel) return;
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    if (backdrop) {
+      backdrop.classList.remove('is-open');
+    }
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    window.setTimeout(finishCloseMiniCart, 240);
+  };
+
   const openMiniCart = () => {
-    const { toggle, panel } = getMiniCartElements();
+    const { toggle, panel, backdrop } = getMiniCartElements();
     if (!toggle || !panel) return;
     panel.classList.remove('d-none');
+    panel.setAttribute('aria-hidden', 'false');
+    if (backdrop) {
+      backdrop.classList.remove('d-none');
+      requestAnimationFrame(() => backdrop.classList.add('is-open'));
+    }
+    requestAnimationFrame(() => panel.classList.add('is-open'));
     toggle.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('mini-cart-active');
   };
 
   const updateMiniCartBadge = (count) => {
@@ -103,17 +137,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const toggle = document.getElementById('miniCartToggle');
   const panel = document.getElementById('miniCartPanel');
+  const backdrop = document.getElementById('miniCartBackdrop');
 
   if (toggle && panel) {
     toggle.addEventListener('click', function () {
-      const isHidden = panel.classList.contains('d-none');
-      panel.classList.toggle('d-none');
-      toggle.setAttribute('aria-expanded', String(isHidden));
+      const isOpen = panel.classList.contains('is-open');
+      if (isOpen) {
+        closeMiniCart();
+      } else {
+        openMiniCart();
+      }
     });
     document.addEventListener('click', function (event) {
       if (!panel.contains(event.target) && !toggle.contains(event.target)) {
-        panel.classList.add('d-none');
-        toggle.setAttribute('aria-expanded', 'false');
+        closeMiniCart();
+      }
+    });
+    if (backdrop) {
+      backdrop.addEventListener('click', closeMiniCart);
+    }
+    document.addEventListener('click', function (event) {
+      const closeBtn = event.target.closest('#miniCartClose');
+      if (closeBtn) {
+        closeMiniCart();
+      }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeMiniCart();
       }
     });
   }
