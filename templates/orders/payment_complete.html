@@ -18,7 +18,7 @@
             <div class="col-lg-7">
                 <h2 class="h5 mb-3">Items</h2>
                 {% for item in order.items.all %}
-                <div class="d-flex justify-content-between {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
+                <div class="d-flex justify-content-between order-line {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
                     <div>{{ item.product_name }} × {{ item.quantity }}</div>
                     <div>৳{{ item.total_price }}</div>
                 </div>
@@ -26,9 +26,9 @@
             </div>
             <div class="col-lg-5">
                 <div class="bg-slate-50 rounded-4 p-4 theme-soft">
-                    <div class="d-flex justify-content-between mb-2"><span>Payment Method</span><span>{{ order.get_payment_method_display }}</span></div>
-                    {% if latest_payment %}<div class="d-flex justify-content-between mb-2"><span>Reference</span><span>{{ latest_payment.reference }}</span></div>{% endif %}
-                    <div class="d-flex justify-content-between fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ order.total }}</span></div>
+                    <div class="d-flex justify-content-between summary-line mb-2"><span>Payment Method</span><span>{{ order.get_payment_method_display }}</span></div>
+                    {% if latest_payment %}<div class="d-flex justify-content-between summary-line mb-2"><span>Reference</span><span>{{ latest_payment.reference }}</span></div>{% endif %}
+                    <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ order.total }}</span></div>
                     <div class="d-grid gap-2 mt-4">
                         <a href="{{ order.get_absolute_url }}" class="btn btn-primary rounded-pill">View Order Details</a>
                         <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary rounded-pill">Track Order</a>
@@ -39,4 +39,5 @@
     </div>
 </section>
 {% endblock %}
+
 

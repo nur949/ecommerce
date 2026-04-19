@@ -23,7 +23,7 @@
             <div class="bg-white rounded-5 p-4 shadow-sm mt-4 theme-panel">
                 <h2 class="h5 mb-3">Items</h2>
                 {% for item in items %}
-                <div class="d-flex align-items-center gap-3 {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                <div class="d-flex align-items-center gap-3 checkout-line {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
                     <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
                     <div class="flex-grow-1">
                         <div class="fw-semibold">{{ item.product.name }}</div>
@@ -37,13 +37,14 @@
         <div class="col-lg-4">
             <div class="bg-white rounded-5 p-4 shadow-sm sticky-sidebar theme-panel">
                 <h2 class="h4 mb-4">Your Bill</h2>
-                <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><strong>৳{{ subtotal }}</strong></div>
-                <div class="d-flex justify-content-between mb-2"><span>Discount</span><strong>৳{{ discount }}</strong></div>
-                <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ total }}</span></div>
+                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong>৳{{ subtotal }}</strong></div>
+                <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><strong>৳{{ discount }}</strong></div>
+                <div class="d-flex justify-content-between summary-line fs-5 fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ total }}</span></div>
                 <p class="small text-muted mt-3 mb-0">By continuing, you agree to our delivery, payment, and return terms.</p>
             </div>
         </div>
     </div>
 </section>
 {% endblock %}
+
 
