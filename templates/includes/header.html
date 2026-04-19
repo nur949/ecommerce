@@ -1,4 +1,3 @@
-{% load static %}
 <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch" aria-labelledby="offcanvasSearchLabel">
   <div class="offcanvas-header justify-content-center">
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -17,9 +16,7 @@
 <nav class="main-menu d-flex navbar fixed-top navbar-expand-lg py-lg-4">
   <div class="container">
     <div class="main-logo d-lg-none">
-      <a href="{% url 'core:home' %}">
-        <img src="{% static 'aura/images/logo.png' %}" alt="{{ site_settings.site_name }}" class="img-fluid">
-      </a>
+      <a href="{% url 'core:home' %}" class="brand-wordmark brand-wordmark-light" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
     </div>
 
     <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -32,9 +29,7 @@
       </div>
       <div class="offcanvas-body justify-content-between align-items-center">
         <div class="main-logo">
-          <a href="{% url 'core:home' %}">
-            <img src="{% static 'aura/images/logo.png' %}" alt="{{ site_settings.site_name }}" class="img-fluid">
-          </a>
+          <a href="{% url 'core:home' %}" class="brand-wordmark brand-wordmark-light" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
         </div>
 
         <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 ps-lg-5 mb-0">

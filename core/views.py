@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import NoReverseMatch
@@ -125,11 +125,21 @@ def get_category_image(category):
 
 def home(request):
     sections = get_home_sections()
-    popular_categories = list(Category.objects.filter(is_featured=True)[:10])
+    popular_categories = list(
+        Category.objects.filter(is_featured=True, parent__isnull=True)
+        .annotate(
+            active_product_count=Count('products', filter=Q(products__is_active=True), distinct=True),
+            child_count=Count('children', distinct=True),
+        )
+        .order_by('order', 'name')[:8]
+    )
     popular_categories_data = [
         {
             'category': category,
             'image_url': get_category_image(category),
+            'product_count': category.active_product_count,
+            'child_count': category.child_count,
+            'subtitle': category.description[:90] if category.description else 'Curated essentials for daily shopping.',
         }
         for category in popular_categories
     ]
