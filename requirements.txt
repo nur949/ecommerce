@@ -1,5 +1,5 @@
-Django
-Pillow
-whitenoise
-gunicorn
-dj-database-url
+Django>=5.2,<6.0
+Pillow>=10.0,<13.0
+whitenoise>=6.0,<7.0
+gunicorn>=23.0,<26.0
+dj-database-url>=2.0,<4.0

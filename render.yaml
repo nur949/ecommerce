@@ -11,6 +11,8 @@ services:
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     startCommand: python manage.py migrate --noinput && gunicorn zynvo_project.wsgi --log-file -
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12
       - key: DEBUG
         value: False
       - key: ALLOWED_HOSTS
