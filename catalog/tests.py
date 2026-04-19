@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Category, Product
+from .models import Category, Product, ProductVariant
 
 
 class CatalogCartTests(TestCase):
@@ -65,3 +65,21 @@ class CatalogCartTests(TestCase):
 
         self.assertContains(category_response, product.name)
         self.assertContains(shop_response, product.name)
+
+    def test_product_detail_renders_purchase_summary_hooks(self):
+        variant = ProductVariant.objects.create(
+            product=self.product,
+            attribute_name='Size',
+            value='Mini',
+            sku='WM-001-MINI',
+            price_override='900.00',
+            stock=2,
+            is_default=True,
+        )
+
+        response = self.client.get(reverse('catalog:product_detail', args=[self.product.slug]), HTTP_HOST='testserver')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'detailTotalPrice')
+        self.assertContains(response, 'product-qty-controls')
+        self.assertContains(response, variant.sku)

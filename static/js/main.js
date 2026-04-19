@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const miniCartToggles = () => document.querySelectorAll('.js-mini-cart-toggle');
   const getMiniCartElements = () => ({
-    toggle: document.getElementById('miniCartToggle'),
     panel: document.getElementById('miniCartPanel'),
     backdrop: document.getElementById('miniCartBackdrop'),
   });
@@ -18,22 +18,20 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   const closeMiniCart = () => {
-    const { toggle, panel, backdrop } = getMiniCartElements();
+    const { panel, backdrop } = getMiniCartElements();
     if (!panel) return;
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     if (backdrop) {
       backdrop.classList.remove('is-open');
     }
-    if (toggle) {
-      toggle.setAttribute('aria-expanded', 'false');
-    }
+    miniCartToggles().forEach((toggle) => toggle.setAttribute('aria-expanded', 'false'));
     window.setTimeout(finishCloseMiniCart, 240);
   };
 
   const openMiniCart = () => {
-    const { toggle, panel, backdrop } = getMiniCartElements();
-    if (!toggle || !panel) return;
+    const { panel, backdrop } = getMiniCartElements();
+    if (!panel) return;
     panel.classList.remove('d-none');
     panel.setAttribute('aria-hidden', 'false');
     if (backdrop) {
@@ -41,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(() => backdrop.classList.add('is-open'));
     }
     requestAnimationFrame(() => panel.classList.add('is-open'));
-    toggle.setAttribute('aria-expanded', 'true');
+    miniCartToggles().forEach((toggle) => toggle.setAttribute('aria-expanded', 'true'));
     document.body.classList.add('mini-cart-active');
   };
 
@@ -64,20 +62,19 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   const updateMiniCartBadge = (count) => {
-    const { toggle } = getMiniCartElements();
-    if (!toggle) return;
-
-    let badge = toggle.querySelector('.badge');
-    if (count > 0) {
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill';
-        toggle.appendChild(badge);
+    miniCartToggles().forEach((toggle) => {
+      let badge = toggle.querySelector('.badge');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill';
+          toggle.appendChild(badge);
+        }
+        badge.textContent = String(count);
+      } else if (badge) {
+        badge.remove();
       }
-      badge.textContent = String(count);
-    } else if (badge) {
-      badge.remove();
-    }
+    });
   };
 
   const replaceMiniCartPanelFromHtml = (html) => {
@@ -153,19 +150,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  const toggle = document.getElementById('miniCartToggle');
   const panel = document.getElementById('miniCartPanel');
   const backdrop = document.getElementById('miniCartBackdrop');
 
-  if (toggle && panel) {
-    toggle.addEventListener('click', function (event) {
-      event.preventDefault();
-      const isOpen = panel.classList.contains('is-open');
-      if (isOpen) {
-        closeMiniCart();
-      } else {
-        openMiniCart();
-      }
+  if (panel) {
+    miniCartToggles().forEach((toggle) => {
+      toggle.addEventListener('click', function (event) {
+        event.preventDefault();
+        const isOpen = panel.classList.contains('is-open');
+        if (isOpen) {
+          closeMiniCart();
+        } else {
+          openMiniCart();
+        }
+      });
     });
     if (backdrop) {
       backdrop.addEventListener('click', closeMiniCart);
@@ -483,21 +481,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const variantInput = document.getElementById('variantIdInput');
   const variantPrice = document.getElementById('detailPrice');
+  const variantUnitPrice = document.getElementById('detailUnitPrice');
+  const variantTotalPrice = document.getElementById('detailTotalPrice');
   const variantStockLabel = document.getElementById('variantStockLabel');
+  const detailSkuLabel = document.getElementById('detailSkuLabel');
+  const detailAvailabilityLabel = document.getElementById('detailAvailabilityLabel');
+  const quantityInput = document.querySelector('.js-detail-quantity');
+  const quantityControls = document.querySelector('.product-qty-controls');
   const addToCartButton = document.getElementById('addToCartButton');
+  const formatCurrency = (value) => `\u09F3${Number(value || 0).toFixed(2).replace(/\.00$/, '')}`;
+  const getActiveMaxStock = () => Number((quantityControls && quantityControls.dataset.maxStock) || (quantityInput && quantityInput.max) || 0);
+  const clampDetailQuantity = () => {
+    if (!quantityInput) return 1;
+    const maxStock = getActiveMaxStock();
+    const safeMax = maxStock > 0 ? maxStock : 1;
+    const rawValue = Number(quantityInput.value || 1);
+    const nextValue = Math.min(Math.max(Number.isFinite(rawValue) ? rawValue : 1, 1), safeMax);
+    quantityInput.value = String(nextValue);
+    quantityInput.max = String(safeMax);
+    return nextValue;
+  };
+  const updateDetailTotal = () => {
+    if (!variantTotalPrice || !variantPrice) return;
+    const quantity = clampDetailQuantity();
+    const unitPrice = Number(variantTotalPrice.dataset.unitPrice || variantPrice.dataset.basePrice || 0);
+    if (variantUnitPrice) {
+      variantUnitPrice.textContent = formatCurrency(unitPrice);
+    }
+    variantPrice.textContent = formatCurrency(unitPrice);
+    variantPrice.dataset.basePrice = String(unitPrice);
+    variantTotalPrice.textContent = formatCurrency(unitPrice * quantity);
+  };
+
+  if (quantityInput) {
+    quantityInput.addEventListener('input', updateDetailTotal);
+    quantityInput.addEventListener('change', updateDetailTotal);
+  }
+
+  document.querySelectorAll('.js-qty-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!quantityInput) return;
+      const step = Number(button.dataset.step || 0);
+      const currentQuantity = clampDetailQuantity();
+      quantityInput.value = String(currentQuantity + step);
+      updateDetailTotal();
+    });
+  });
+
   if (variantInput && variantPrice && addToCartButton) {
     document.querySelectorAll('.js-variant-option').forEach((option) => {
       option.addEventListener('click', () => {
         const nextId = option.dataset.variantId || '';
-        const nextPrice = option.dataset.price || variantPrice.textContent.replace(/[^\d.]/g, '');
+        const nextPrice = Number(option.dataset.price || variantPrice.textContent.replace(/[^\d.]/g, ''));
         const nextStock = Number(option.dataset.stock || 0);
+        const nextSku = option.dataset.sku || '';
 
         variantInput.value = nextId;
-        variantPrice.textContent = `৳${nextPrice}`;
+        if (variantTotalPrice) {
+          variantTotalPrice.dataset.unitPrice = String(nextPrice);
+        }
         if (variantStockLabel) {
           variantStockLabel.textContent = nextStock > 0 ? `${nextStock} available` : 'Out of stock';
           variantStockLabel.classList.toggle('text-success', nextStock > 0);
           variantStockLabel.classList.toggle('text-danger', nextStock <= 0);
+        }
+        if (detailSkuLabel) {
+          detailSkuLabel.textContent = `SKU: ${nextSku}`;
+        }
+        if (detailAvailabilityLabel) {
+          detailAvailabilityLabel.textContent = nextStock > 0 ? 'In stock' : 'Unavailable';
+        }
+        if (quantityControls) {
+          quantityControls.dataset.maxStock = String(nextStock);
         }
         addToCartButton.disabled = nextStock <= 0;
         addToCartButton.textContent = nextStock > 0 ? 'Add to Cart' : 'Out of Stock';
@@ -507,9 +562,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         option.classList.add('active');
         option.setAttribute('aria-pressed', 'true');
+        updateDetailTotal();
       });
     });
   }
+  updateDetailTotal();
 
   const builderList = document.getElementById('sortableSections');
   const builderInput = document.getElementById('sectionOrderInput');
@@ -545,3 +602,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+

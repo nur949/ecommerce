@@ -21,9 +21,10 @@
         <p class="text-uppercase text-primary mb-2">{{ product.category.name }}</p>
         <h1 class="display-5 text-uppercase">{{ product.name }}</h1>
         {% if product.short_description %}<p class="aura-muted fs-5">{{ product.short_description }}</p>{% endif %}
-        <div class="d-flex align-items-center gap-3 mb-4">
-          <span class="h2 mb-0" id="detailPrice">&#2547;{{ selected_variant.price_override|default:product.price }}</span>
+        <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+          <span class="h2 mb-0" id="detailPrice" data-base-price="{{ selected_variant.price_override|default:product.price }}">&#2547;{{ selected_variant.price_override|default:product.price }}</span>
           {% if product.compare_at_price %}<span class="text-decoration-line-through aura-muted" id="detailComparePrice">&#2547;{{ product.compare_at_price }}</span>{% endif %}
+          <span class="badge text-bg-light border text-uppercase px-3 py-2">SKU {{ selected_variant.sku|default:product.sku }}</span>
         </div>
         <form action="{% url 'catalog:add_to_cart' product.slug %}" method="post" class="js-add-to-cart-ajax">
           {% csrf_token %}
@@ -40,6 +41,7 @@
                 data-variant-id="{{ variant.id }}"
                 data-price="{{ variant.price_override|default:product.price }}"
                 data-stock="{{ variant.stock }}"
+                data-sku="{{ variant.sku|default:product.sku }}"
                 aria-pressed="{% if selected_variant and selected_variant.id == variant.id %}true{% else %}false{% endif %}"
               >
                 {{ variant.attribute_name }}: {{ variant.value }}
@@ -49,13 +51,36 @@
             <div class="small mt-2 {% if selected_variant and selected_variant.stock > 0 %}text-success{% else %}text-danger{% endif %}" id="variantStockLabel">
               {% if selected_variant %}
                 {% if selected_variant.stock > 0 %}{{ selected_variant.stock }} available{% else %}Out of stock{% endif %}
+              {% else %}
+                {% if product.stock > 0 %}{{ product.stock }} available{% else %}Out of stock{% endif %}
               {% endif %}
             </div>
           </div>
           {% endif %}
-          <div class="product-qty d-flex align-items-center gap-3 mb-4">
-            <label class="form-label text-uppercase mb-0">Quantity</label>
-            <input id="quantity" type="number" name="quantity" class="form-control" value="1" min="1" style="max-width: 110px;">
+          <div class="product-purchase-card aura-card p-4 mb-4">
+            <div class="product-qty align-items-center gap-3 mb-4">
+              <label class="form-label text-uppercase mb-0" for="quantity">Quantity</label>
+              <div class="product-qty-controls" data-max-stock="{% if selected_variant %}{{ selected_variant.stock }}{% else %}{{ product.stock }}{% endif %}">
+                <button type="button" class="btn btn-outline-primary btn-sm js-qty-button" data-step="-1" aria-label="Decrease quantity">-</button>
+                <input id="quantity" type="number" name="quantity" class="form-control text-center js-detail-quantity" value="1" min="1" max="{% if selected_variant %}{{ selected_variant.stock }}{% else %}{{ product.stock }}{% endif %}" inputmode="numeric">
+                <button type="button" class="btn btn-outline-primary btn-sm js-qty-button" data-step="1" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+            <div class="product-price-summary d-grid gap-2 mb-4">
+              <div class="d-flex justify-content-between align-items-center gap-3">
+                <span class="aura-muted">Unit price</span>
+                <strong id="detailUnitPrice">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
+              </div>
+              <div class="d-flex justify-content-between align-items-center gap-3">
+                <span class="aura-muted">Quantity total</span>
+                <strong class="h4 mb-0 text-primary" id="detailTotalPrice" data-unit-price="{{ selected_variant.price_override|default:product.price }}">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
+              </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 small aura-muted product-meta-list">
+              <span>Brand: {{ product.brand }}</span>
+              <span id="detailSkuLabel">SKU: {{ selected_variant.sku|default:product.sku }}</span>
+              <span id="detailAvailabilityLabel">{% if selected_variant %}{% if selected_variant.stock > 0 %}In stock{% else %}Unavailable{% endif %}{% else %}{% if product.stock > 0 %}In stock{% else %}Unavailable{% endif %}{% endif %}</span>
+            </div>
           </div>
           <button class="btn btn-primary" id="addToCartButton" {% if not product.in_stock %}disabled{% endif %}>{% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}</button>
         </form>
@@ -73,6 +98,24 @@
         <div class="mt-5">
           {{ product.description|linebreaks }}
         </div>
+        {% if product.specifications or product.return_policy %}
+        <div class="aura-card p-4 mt-4">
+          <div class="row g-4">
+            {% if product.specifications %}
+            <div class="col-md-6">
+              <h2 class="h6 text-uppercase mb-2">Specifications</h2>
+              <div class="aura-muted small">{{ product.specifications|linebreaks }}</div>
+            </div>
+            {% endif %}
+            {% if product.return_policy %}
+            <div class="col-md-6">
+              <h2 class="h6 text-uppercase mb-2">Return Policy</h2>
+              <div class="aura-muted small">{{ product.return_policy|linebreaks }}</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
 
