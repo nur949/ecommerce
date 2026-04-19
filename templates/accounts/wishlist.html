@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Wishlist | Zynvo{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Wishlist</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
+    {% if wishlist_items %}
+    <div class="row g-4">
+      {% for item in wishlist_items %}
+      <div class="col-md-6 col-lg-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=item.product %}</div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="aura-card p-5 text-center">
+      <div class="mini-empty-icon">Love</div>
+      <h2 class="h4">Your wishlist is empty</h2>
+      <p class="aura-muted">Save products while browsing so you can compare and buy later.</p>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-primary">Browse Shop</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -10,7 +10,22 @@
         <div class="row g-4">
             <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Orders</h2><p class="mb-0">{{ orders|length }} recent order(s)</p></div></div>
             <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Addresses</h2><p class="mb-0">Manage your saved shipping addresses.</p></div></div>
-            <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Tracking</h2><p class="mb-0">Follow shipping and payment status from your order number.</p></div></div>
+            <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Wishlist</h2><p class="mb-0">{{ wishlist_count }} saved product(s) ready for later checkout.</p></div></div>
+        </div>
+        <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                <h2 class="h5 fw-bold mb-0">Wishlist</h2>
+                <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-primary btn-sm">View Wishlist</a>
+            </div>
+            {% if wishlist_items %}
+                <div class="row g-4">
+                    {% for item in wishlist_items %}
+                        <div class="col-md-6 col-xl-3">{% include 'catalog/partials/product_card.html' with product=item.product %}</div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="border p-3">No saved products yet. Add products to your wishlist while browsing.</div>
+            {% endif %}
         </div>
         <div class="mt-4">
             <h2 class="h5 fw-bold mb-3">Recent Orders</h2>

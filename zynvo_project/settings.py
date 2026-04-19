@@ -19,9 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = get_random_secret_key()
 
-default_allowed_hosts = '127.0.0.1,localhost,testserver'
-if not DEBUG:
-    default_allowed_hosts += ',.onrender.com'
+default_allowed_hosts = '127.0.0.1,localhost,testserver,.onrender.com'
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', default_allowed_hosts).split(',') if host.strip()]
 
 default_csrf_origins = ''
@@ -71,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.site_context',
+                'accounts.context_processors.account_context',
                 'orders.context_processors.cart_context',
             ],
         },

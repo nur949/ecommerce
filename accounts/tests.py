@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from catalog.models import Category, Product
+from .models import WishlistItem
+
 
 class PasswordResetTests(TestCase):
     def setUp(self):
@@ -18,3 +21,36 @@ class PasswordResetTests(TestCase):
             HTTP_HOST='testserver',
         )
         self.assertRedirects(response, reverse('accounts:password_reset_done'), fetch_redirect_response=False)
+
+
+class WishlistTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='nur', email='nur@example.com', password='StrongPass123')
+        category = Category.objects.create(name='Beauty', slug='beauty')
+        self.product = Product.objects.create(
+            category=category,
+            name='Glow Serum',
+            slug='glow-serum',
+            description='Brightening serum.',
+            price='999.00',
+            sku='GS-001',
+            stock=5,
+            is_active=True,
+        )
+
+    def test_authenticated_user_can_add_product_to_wishlist(self):
+        self.client.login(username='nur', password='StrongPass123')
+        response = self.client.post(reverse('accounts:add_to_wishlist', args=[self.product.slug]), {'next': reverse('catalog:shop')}, HTTP_HOST='testserver')
+        self.assertRedirects(response, reverse('catalog:shop'), fetch_redirect_response=False)
+        self.assertTrue(WishlistItem.objects.filter(user=self.user, product=self.product).exists())
+
+    def test_authenticated_user_can_remove_product_from_wishlist(self):
+        WishlistItem.objects.create(user=self.user, product=self.product)
+        self.client.login(username='nur', password='StrongPass123')
+        response = self.client.post(reverse('accounts:remove_from_wishlist', args=[self.product.slug]), {'next': reverse('accounts:wishlist')}, HTTP_HOST='testserver')
+        self.assertRedirects(response, reverse('accounts:wishlist'), fetch_redirect_response=False)
+        self.assertFalse(WishlistItem.objects.filter(user=self.user, product=self.product).exists())
+
+    def test_wishlist_page_requires_login(self):
+        response = self.client.get(reverse('accounts:wishlist'), HTTP_HOST='testserver')
+        self.assertEqual(response.status_code, 302)

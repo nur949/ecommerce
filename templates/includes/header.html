@@ -63,6 +63,12 @@
               </a>
             </li>
             <li class="lh-1">
+              <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="mx-3 position-relative" aria-label="Wishlist">
+                <iconify-icon icon="solar:heart-outline" class="fs-4 text-light"></iconify-icon>
+                {% if wishlist_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ wishlist_count }}</span>{% endif %}
+              </a>
+            </li>
+            <li class="lh-1">
               <a href="{% url 'orders:cart' %}" class="mx-3 position-relative" id="miniCartToggle" aria-label="Cart" aria-expanded="false" aria-controls="miniCartPanel">
                 <iconify-icon icon="mdi:cart" class="fs-4 text-light"></iconify-icon>
                 {% if cart_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ cart_count }}</span>{% endif %}
@@ -82,6 +88,7 @@
   <div class="container-fluid px-md-5 d-lg-none">
     <ul class="d-flex justify-content-end list-unstyled m-0 mt-4">
       <li class="lh-1"><a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="me-4"><iconify-icon icon="healthicons:person" class="fs-4 text-light"></iconify-icon></a></li>
+      <li class="lh-1"><a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="me-4 position-relative"><iconify-icon icon="solar:heart-outline" class="fs-4 text-light"></iconify-icon>{% if wishlist_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ wishlist_count }}</span>{% endif %}</a></li>
       <li class="lh-1"><a href="{% url 'orders:cart' %}" class="me-4 position-relative"><iconify-icon icon="mdi:cart" class="fs-4 text-light"></iconify-icon>{% if cart_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ cart_count }}</span>{% endif %}</a></li>
       <li class="lh-1"><a href="#" class="me-4" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch"><iconify-icon icon="tabler:search" class="fs-4 text-light"></iconify-icon></a></li>
     </ul>

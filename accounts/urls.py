@@ -2,7 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.urls import reverse_lazy
 
-from .views import UserLoginView, UserLogoutView, dashboard, register_view
+from .views import UserLoginView, UserLogoutView, add_to_wishlist, dashboard, register_view, remove_from_wishlist, wishlist_view
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
@@ -25,4 +25,7 @@ urlpatterns = [
         template_name='accounts/password_reset_complete.html',
     ), name='password_reset_complete'),
     path('dashboard/', dashboard, name='dashboard'),
+    path('wishlist/', wishlist_view, name='wishlist'),
+    path('wishlist/add/<slug:slug>/', add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<slug:slug>/', remove_from_wishlist, name='remove_from_wishlist'),
 ]

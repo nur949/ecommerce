@@ -857,6 +857,8 @@ Styles page style start
 .product-title { font-size: 1.05rem; line-height: 1.35; }
 .cart-concern form, .cart-concern button { width: 100%; }
 .cart-concern .btn-wrap { border: 0; background: transparent; color: var(--accent-color); }
+.wishlist-toggle-btn { color: var(--accent-color); }
+.wishlist-toggle-btn.is-active { color: #b10f2e; }
 .filter-list a { display: flex; justify-content: space-between; padding: .55rem 0; color: var(--light-dark-color); border-bottom: 1px solid rgba(95, 11, 24, .08); }
 .filter-list a.active, .filter-list a:hover { color: var(--accent-color); }
 .shop-toolbar-controls { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }

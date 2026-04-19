@@ -17,7 +17,15 @@
           {% if product.in_stock %}add to cart{% else %}out of stock{% endif %} <i class="icon icon-arrow-io pe-1"></i>
         </button>
       </form>
-      <a href="{{ product.get_absolute_url }}" class="view-btn mt-1" aria-label="View {{ product.name }}"><i class="icon icon-screen-full"></i></a>
+      {% if request.user.is_authenticated %}
+      <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="view-btn mt-1 wishlist-toggle-btn border-0 bg-transparent {% if product.id in wishlist_product_ids %}is-active{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}"><i class="icon icon-heart"></i></button>
+      </form>
+      {% else %}
+      <a href="{% url 'accounts:login' %}" class="view-btn mt-1" aria-label="Login to save {{ product.name }}"><i class="icon icon-heart"></i></a>
+      {% endif %}
     </div>
   </div>
   <div class="product-detail d-flex justify-content-between align-items-start gap-3 mt-2">
