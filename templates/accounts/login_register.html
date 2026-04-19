@@ -2,53 +2,59 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Account | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Account</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-5">
-            <div class="aura-card p-4">
-                <div class="d-flex gap-2 mb-4">
-                    <a href="{% url 'accounts:login' %}" class="btn {% if active_tab == 'login' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50">Login</a>
-                    <a href="{% url 'accounts:register' %}" class="btn {% if active_tab == 'register' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50">Register</a>
-                </div>
-                {% if active_tab == 'register' %}
-                    <form method="post" action="{% url 'accounts:register' %}" class="d-grid gap-3">
-                        {% csrf_token %}
-                        {% if register_form.non_field_errors %}<div class="alert alert-danger">{{ register_form.non_field_errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.first_name }}
-                        {% if register_form.first_name.errors %}<div class="text-danger small">{{ register_form.first_name.errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.email }}
-                        {% if register_form.email.errors %}<div class="text-danger small">{{ register_form.email.errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.username }}
-                        {% if register_form.username.errors %}<div class="text-danger small">{{ register_form.username.errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.phone }}
-                        {% if register_form.phone.errors %}<div class="text-danger small">{{ register_form.phone.errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.password1 }}
-                        {% if register_form.password1.errors %}<div class="text-danger small">{{ register_form.password1.errors|join:', ' }}</div>{% endif %}
-                        {{ register_form.password2 }}
-                        {% if register_form.password2.errors %}<div class="text-danger small">{{ register_form.password2.errors|join:', ' }}</div>{% endif %}
-                        <button class="btn btn-primary">Create Account</button>
-                    </form>
-                {% else %}
-                    <form method="post" action="{% url 'accounts:login' %}" class="d-grid gap-3">
-                        {% csrf_token %}
-                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
-                        {{ form.username }}
-                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors|join:', ' }}</div>{% endif %}
-                        {{ form.password }}
-                        {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|join:', ' }}</div>{% endif %}
-                        <button class="btn btn-primary">Login</button>
-                    </form>
-                    <div class="text-end mt-3">
-                        <a href="{% url 'accounts:password_reset' %}" class="small text-primary">Forgot password?</a>
-                    </div>
-                {% endif %}
-                <div class="text-center aura-muted mt-3 small">Secure access to your Zynvo account.</div>
-            </div>
-        </div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto grid max-w-7xl overflow-hidden rounded-[36px] border border-black/5 bg-white shadow-panel lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="bg-[#1b141a] p-8 text-white md:p-12">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Secure account</p>
+      <h1 class="mt-5 font-brand text-5xl font-semibold uppercase leading-none tracking-[0.12em] md:text-7xl">
+        {% if active_tab == 'register' %}Create Account{% else %}Welcome Back{% endif %}
+      </h1>
+      <p class="mt-6 max-w-md text-sm leading-7 text-white/70">Sign in to view orders, save wishlist picks, and move through checkout faster.</p>
+      <div class="mt-10 grid gap-3 text-sm text-white/70">
+        <div class="flex items-center gap-3"><i data-lucide="shield-check" class="h-4 w-4 text-white"></i><span>Protected session flow</span></div>
+        <div class="flex items-center gap-3"><i data-lucide="heart" class="h-4 w-4 text-white"></i><span>Wishlist and order history</span></div>
+        <div class="flex items-center gap-3"><i data-lucide="truck" class="h-4 w-4 text-white"></i><span>Faster checkout details</span></div>
+      </div>
+    </div>
+    <div class="p-6 md:p-10">
+      <div class="mb-6 grid grid-cols-2 gap-2">
+        <a href="{% url 'accounts:login' %}" class="btn {% if active_tab == 'login' %}btn-primary{% else %}btn-outline-primary{% endif %}">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn {% if active_tab == 'register' %}btn-primary{% else %}btn-outline-primary{% endif %}">Register</a>
+      </div>
+      {% if active_tab == 'register' %}
+      <form method="post" action="{% url 'accounts:register' %}" class="grid gap-4">
+        {% csrf_token %}
+        {% if register_form.non_field_errors %}<div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ register_form.non_field_errors|join:', ' }}</div>{% endif %}
+        {{ register_form.first_name }}
+        {% if register_form.first_name.errors %}<div class="text-sm text-rosewood">{{ register_form.first_name.errors|join:', ' }}</div>{% endif %}
+        {{ register_form.email }}
+        {% if register_form.email.errors %}<div class="text-sm text-rosewood">{{ register_form.email.errors|join:', ' }}</div>{% endif %}
+        {{ register_form.username }}
+        {% if register_form.username.errors %}<div class="text-sm text-rosewood">{{ register_form.username.errors|join:', ' }}</div>{% endif %}
+        {{ register_form.phone }}
+        {% if register_form.phone.errors %}<div class="text-sm text-rosewood">{{ register_form.phone.errors|join:', ' }}</div>{% endif %}
+        {{ register_form.password1 }}
+        {% if register_form.password1.errors %}<div class="text-sm text-rosewood">{{ register_form.password1.errors|join:', ' }}</div>{% endif %}
+        {{ register_form.password2 }}
+        {% if register_form.password2.errors %}<div class="text-sm text-rosewood">{{ register_form.password2.errors|join:', ' }}</div>{% endif %}
+        <button class="btn btn-primary w-full">Create Account</button>
+      </form>
+      {% else %}
+      <form method="post" action="{% url 'accounts:login' %}" class="grid gap-4">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
+        {{ form.username }}
+        {% if form.username.errors %}<div class="text-sm text-rosewood">{{ form.username.errors|join:', ' }}</div>{% endif %}
+        {{ form.password }}
+        {% if form.password.errors %}<div class="text-sm text-rosewood">{{ form.password.errors|join:', ' }}</div>{% endif %}
+        <button class="btn btn-primary w-full">Login</button>
+      </form>
+      <div class="mt-4 text-right">
+        <a href="/account/password-reset/" class="text-sm font-semibold text-rosewood">Forgot password?</a>
+      </div>
+      {% endif %}
+      <p class="mt-6 text-center text-sm text-stone">CSRF protection, Django validation, and existing auth redirects are preserved.</p>
     </div>
   </div>
 </section>
 {% endblock %}
-

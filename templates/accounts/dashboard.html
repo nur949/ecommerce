@@ -1,50 +1,71 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Dashboard</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="aura-card p-5">
-        <h1 class="h3 text-uppercase mb-2">Welcome, {{ request.user.first_name|default:request.user.username }}</h1>
-        <p class="aura-muted mb-4">Manage your orders and account details.</p>
-        <div class="row g-4">
-            <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Orders</h2><p class="mb-0">{{ orders|length }} recent order(s)</p></div></div>
-            <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Addresses</h2><p class="mb-0">Manage your saved shipping addresses.</p></div></div>
-            <div class="col-lg-4"><div class="border p-4 h-100"><h2 class="h5">Wishlist</h2><p class="mb-0">{{ wishlist_count }} saved product(s) ready for later checkout.</p></div></div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Member dashboard</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Hi, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Review recent orders, saved products, and account shortcuts from one clean workspace.</p>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="premium-grid-card p-6"><p class="premium-kicker">Orders</p><div class="mt-4 text-4xl font-semibold text-ink">{{ orders|length }}</div><p class="mt-2 text-sm text-stone">Recent order{{ orders|length|pluralize }}</p></div>
+      <div class="premium-grid-card p-6"><p class="premium-kicker">Addresses</p><div class="mt-4 text-2xl font-semibold text-ink">Delivery</div><p class="mt-2 text-sm text-stone">Saved through checkout when available.</p></div>
+      <div class="premium-grid-card p-6"><p class="premium-kicker">Wishlist</p><div class="mt-4 text-4xl font-semibold text-ink">{{ wishlist_count }}</div><p class="mt-2 text-sm text-stone">Saved product{{ wishlist_count|pluralize }}</p></div>
+    </div>
+
+    <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div class="aura-card p-6">
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="premium-kicker">Recent orders</p>
+            <h2 class="mt-2 text-2xl font-semibold text-ink">Order activity</h2>
+          </div>
+          <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary">Track Order</a>
         </div>
-        <div class="mt-4">
-            <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-                <h2 class="h5 fw-bold mb-0">Wishlist</h2>
-                <a href="{% url 'accounts:wishlist' %}" class="btn btn-outline-primary btn-sm">View Wishlist</a>
-            </div>
-            {% if wishlist_items %}
-                <div class="row g-4">
-                    {% for item in wishlist_items %}
-                        <div class="col-md-6 col-xl-3">{% include 'catalog/partials/product_card.html' with product=item.product %}</div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="border p-3">No saved products yet. Add products to your wishlist while browsing.</div>
-            {% endif %}
+        {% if orders %}
+        <div class="grid gap-3">
+          {% for order in orders %}
+          <a href="{{ order.get_absolute_url }}" class="dashboard-order-link">
+            <span class="font-semibold">{{ order.order_number }}</span>
+            <span class="text-sm text-stone">{{ order.get_status_display }}</span>
+            <strong>&#2547;{{ order.total }}</strong>
+          </a>
+          {% endfor %}
         </div>
-        <div class="mt-4">
-            <h2 class="h5 fw-bold mb-3">Recent Orders</h2>
-            {% if orders %}
-                <div class="d-grid gap-2">
-                    {% for order in orders %}
-                        <a href="{{ order.get_absolute_url }}" class="dashboard-order-link">
-                            <span>{{ order.order_number }}</span>
-                            <span>{{ order.get_status_display }}</span>
-                            <strong>&#2547;{{ order.total }}</strong>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="border p-3">No orders yet. Browse the shop and place your first order.</div>
-            {% endif %}
+        {% else %}
+        <div class="rounded-md border border-black/5 bg-[#f1f5f3] p-6">
+          <h3 class="text-lg font-semibold text-ink">No orders yet</h3>
+          <p class="mt-2 text-sm text-stone">Browse the shop and place your first order.</p>
+          <a href="{% url 'catalog:shop' %}" class="btn btn-primary mt-5">Start Shopping</a>
         </div>
+        {% endif %}
+      </div>
+
+      <aside class="aura-card p-6">
+        <div class="mb-6 flex items-center justify-between gap-3">
+          <div>
+            <p class="premium-kicker">Wishlist</p>
+            <h2 class="mt-2 text-2xl font-semibold text-ink">Saved picks</h2>
+          </div>
+          <a href="{% url 'accounts:wishlist' %}" class="text-sm font-bold text-rosewood">View all</a>
+        </div>
+        {% if wishlist_items %}
+        <div class="grid gap-4">
+          {% for item in wishlist_items|slice:":3" %}
+          <a href="{{ item.product.get_absolute_url }}" class="grid grid-cols-[72px_1fr] gap-3 rounded-md border border-black/5 bg-[#f1f5f3] p-3">
+            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="h-20 w-[72px] rounded-md object-cover">
+            <span class="text-sm font-semibold text-ink">{{ item.product.name }}</span>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-stone">No saved products yet. Add products to your wishlist while browsing.</p>
+        {% endif %}
+      </aside>
     </div>
   </div>
 </section>
 {% endblock %}
-

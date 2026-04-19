@@ -2,43 +2,48 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Order Complete | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Order Complete</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="aura-card p-5">
-        <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
-            <div>
-                <h1 class="h3 text-uppercase mb-1">Your order has been placed successfully.</h1>
-                <p class="aura-muted mb-0">Order number: {{ order.order_number }}</p>
-            </div>
-            <div class="text-end">
-                <span class="badge bg-primary px-3 py-2">{{ order.get_status_display }}</span>
-                <div class="small aura-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
-            </div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Order confirmed</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Order Complete</h1>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Your order has been placed successfully. Keep the order number for support and tracking.</p>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="aura-card p-6 md:p-8">
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p class="premium-kicker">Order number</p>
+          <h2 class="mt-2 text-3xl font-semibold text-ink">{{ order.order_number }}</h2>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-7">
-                <h2 class="h5 mb-3">Items</h2>
-                {% for item in order.items.all %}
-                <div class="d-flex justify-content-between order-line {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
-                    <div>{{ item.product_name }} x {{ item.quantity }}</div>
-                    <div>&#2547;{{ item.total_price }}</div>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="col-lg-5">
-                <div class="border p-4">
-                    <div class="d-flex justify-content-between summary-line mb-2"><span>Payment Method</span><span>{{ order.get_payment_method_display }}</span></div>
-                    {% if latest_payment %}<div class="d-flex justify-content-between summary-line mb-2"><span>Reference</span><span>{{ latest_payment.reference }}</span></div>{% endif %}
-                    <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
-                    <div class="d-grid gap-2 mt-4">
-                        <a href="{{ order.get_absolute_url }}" class="btn btn-primary">View Order Details</a>
-                        <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary">Track Order</a>
-                    </div>
-                </div>
-            </div>
+        <div class="sm:text-right">
+          <span class="rounded-md bg-[#eef4f0] px-4 py-2 text-sm font-bold text-[#0f766e]">{{ order.get_status_display }}</span>
+          <div class="mt-3 text-sm text-stone">Payment: {{ order.get_payment_status_display }}</div>
         </div>
+      </div>
+      <h3 class="mb-4 text-xl font-semibold text-ink">Items</h3>
+      <div class="grid gap-3">
+        {% for item in order.items.all %}
+        <div class="flex items-center justify-between gap-4 rounded-md border border-black/5 bg-[#f1f5f3] p-4">
+          <span class="font-semibold text-ink">{{ item.product_name }} x {{ item.quantity }}</span>
+          <strong>&#2547;{{ item.total_price }}</strong>
+        </div>
+        {% endfor %}
+      </div>
     </div>
+    <aside class="aura-card p-6 md:p-8">
+      <h2 class="text-2xl font-semibold text-ink">Payment Summary</h2>
+      <div class="mt-6 grid gap-4 text-sm text-stone">
+        <div class="flex justify-between gap-4"><span>Payment Method</span><strong class="text-ink">{{ order.get_payment_method_display }}</strong></div>
+        {% if latest_payment %}<div class="flex justify-between gap-4"><span>Reference</span><strong class="text-ink">{{ latest_payment.reference }}</strong></div>{% endif %}
+        <div class="flex justify-between gap-4 border-t border-black/5 pt-4 text-base"><span>Total</span><strong class="text-rosewood">&#2547;{{ order.total }}</strong></div>
+      </div>
+      <div class="mt-8 grid gap-3">
+        <a href="{{ order.get_absolute_url }}" class="btn btn-primary">View Order Details</a>
+        <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary">Track Order</a>
+      </div>
+    </aside>
   </div>
 </section>
 {% endblock %}

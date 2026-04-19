@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Page Not Found | Zynvo{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block content %}
+<section class="px-4 py-16 lg:px-8">
+  <div class="mx-auto max-w-3xl rounded-[36px] border border-black/5 bg-white px-6 py-16 text-center shadow-panel md:px-10">
+    <p class="premium-kicker">404</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] text-ink md:text-7xl">Page Not Found</h1>
+    <p class="mx-auto mt-5 max-w-xl text-sm leading-7 text-stone">This page may have moved, expired, or never existed. Continue shopping from a valid storefront page.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'core:home' %}" class="btn btn-primary">Go Home</a>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-outline-primary">Shop Products</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

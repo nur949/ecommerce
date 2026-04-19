@@ -1,32 +1,33 @@
 {% load static %}
-<section id="beauty-banners" class="padding-medium bg-light">
-  <div class="container">
-    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-      <h2 class="display-5 fw-light text-uppercase">Beauty Stories</h2>
+<section id="beauty-banners" class="bg-white px-4 py-16 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8">
+      <p class="premium-kicker">Editorial picks</p>
+      <h2 class="premium-title mt-3 text-4xl text-ink md:text-5xl">Beauty Stories</h2>
     </div>
-    <div class="row">
+    <div class="row g-4">
       {% for banner in gadget_banners %}
-      <div class="col-md-4 my-4">
-        <a href="{{ banner.url }}" class="card position-relative d-block">
+      <div class="col-md-4">
+        <a href="{{ banner.url }}" class="premium-grid-card block overflow-hidden text-decoration-none">
           {% if banner.image %}
-          <img src="{{ banner.image.url }}" class="img-fluid" alt="{{ banner.title }}">
+          <img src="{{ banner.image.url }}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% elif forloop.counter == 1 %}
-          <img src="{% static 'aura/images/category1.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          <img src="{% static 'aura/images/category1.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% elif forloop.counter == 2 %}
-          <img src="{% static 'aura/images/category2.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          <img src="{% static 'aura/images/category2.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% else %}
-          <img src="{% static 'aura/images/category3.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          <img src="{% static 'aura/images/category3.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% endif %}
-          <div class="card-body p-0">
-            <h3 class="pt-4 pb-2 m-0">{{ banner.title }}</h3>
-            {% if banner.subtitle %}<p>{{ banner.subtitle }}</p>{% endif %}
+          <div class="p-5">
+            <h3 class="text-xl font-semibold text-ink">{{ banner.title }}</h3>
+            {% if banner.subtitle %}<p class="mt-3 text-sm leading-7 text-stone">{{ banner.subtitle }}</p>{% endif %}
           </div>
         </a>
       </div>
       {% empty %}
-      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category1.jpg' %}" class="img-fluid" alt="Skincare"><h3 class="pt-4 pb-2 m-0">Skincare Rituals</h3></a></div>
-      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category2.jpg' %}" class="img-fluid" alt="Makeup"><h3 class="pt-4 pb-2 m-0">Makeup Essentials</h3></a></div>
-      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category3.jpg' %}" class="img-fluid" alt="Fragrance"><h3 class="pt-4 pb-2 m-0">Signature Scents</h3></a></div>
+      <div class="col-md-4"><a href="{% url 'catalog:shop' %}" class="premium-grid-card block overflow-hidden text-decoration-none"><img src="{% static 'aura/images/category1.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="Skincare" loading="lazy"><h3 class="p-5 text-xl font-semibold text-ink">Skincare Rituals</h3></a></div>
+      <div class="col-md-4"><a href="{% url 'catalog:shop' %}" class="premium-grid-card block overflow-hidden text-decoration-none"><img src="{% static 'aura/images/category2.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="Makeup" loading="lazy"><h3 class="p-5 text-xl font-semibold text-ink">Makeup Essentials</h3></a></div>
+      <div class="col-md-4"><a href="{% url 'catalog:shop' %}" class="premium-grid-card block overflow-hidden text-decoration-none"><img src="{% static 'aura/images/category3.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="Fragrance" loading="lazy"><h3 class="p-5 text-xl font-semibold text-ink">Signature Scents</h3></a></div>
       {% endfor %}
     </div>
   </div>

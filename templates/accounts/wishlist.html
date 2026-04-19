@@ -2,9 +2,15 @@
 {% block title %}Wishlist | Zynvo{% endblock %}
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Wishlist</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Saved products</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Wishlist</h1>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Keep favorites ready for comparison, gifting, or a faster checkout later.</p>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto max-w-7xl">
     {% if wishlist_items %}
     <div class="row g-4">
       {% for item in wishlist_items %}
@@ -12,11 +18,11 @@
       {% endfor %}
     </div>
     {% else %}
-    <div class="aura-card p-5 text-center">
-      <div class="mini-empty-icon">Love</div>
-      <h2 class="h4">Your wishlist is empty</h2>
-      <p class="aura-muted">Save products while browsing so you can compare and buy later.</p>
-      <a href="{% url 'catalog:shop' %}" class="btn btn-primary">Browse Shop</a>
+    <div class="rounded-[32px] border border-black/5 bg-white px-6 py-20 text-center shadow-soft">
+      <div class="mini-empty-icon mx-auto">Love</div>
+      <h2 class="mt-6 text-3xl font-semibold text-ink">Your wishlist is empty</h2>
+      <p class="mt-3 text-sm text-stone">Save products while browsing so you can compare and buy later.</p>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-primary mt-8">Browse Shop</a>
     </div>
     {% endif %}
   </div>

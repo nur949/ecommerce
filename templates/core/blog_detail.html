@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}{{ post.title }} | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">{{ post.title }}</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <article class="aura-card p-4 p-lg-5">
-        <img src="{{ post.primary_image_url }}" alt="{{ post.title }}" class="w-100 mb-4 blog-hero-image">
-        <p class="aura-muted mb-4">{{ post.excerpt }}</p>
-        {{ post.content|linebreaks }}
-    </article>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Journal</p>
+    <h1 class="mt-4 max-w-5xl font-brand text-5xl font-semibold uppercase tracking-[0.1em] md:text-7xl">{{ post.title }}</h1>
   </div>
 </section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <article class="aura-card mx-auto max-w-5xl overflow-hidden">
+    <img src="{{ post.primary_image_url }}" alt="{{ post.title }}" class="blog-hero-image w-full" loading="lazy" decoding="async">
+    <div class="p-6 md:p-10">
+      <p class="mb-6 text-lg leading-8 text-stone">{{ post.excerpt }}</p>
+      <div class="prose max-w-none text-stone">{{ post.content|linebreaks }}</div>
+    </div>
+  </article>
+</section>
 {% endblock %}
-

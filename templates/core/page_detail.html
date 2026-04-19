@@ -2,10 +2,13 @@
 {% block title %}{{ page.meta_title|default:page.title }}{% endblock %}
 {% block meta_description %}{{ page.meta_description }}{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">{{ page.title }}</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="aura-card p-5">{{ page.body|linebreaks }}</div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Information</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">{{ page.title }}</h1>
   </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="aura-card mx-auto max-w-5xl p-6 text-base leading-8 text-stone md:p-10">{{ page.body|linebreaks }}</div>
 </section>
 {% endblock %}

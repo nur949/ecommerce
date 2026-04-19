@@ -1,12 +1,15 @@
-<section id="signature" class="padding-medium pt-0">
-  <div class="container">
-    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-      <h2 class="display-5 fw-light text-uppercase">Signature Collection</h2>
+<section id="signature" class="px-4 py-16 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="premium-kicker">Curated edit</p>
+        <h2 class="premium-title mt-3 text-4xl text-ink md:text-5xl">Signature Collection</h2>
+      </div>
       <a href="{% url 'catalog:shop' %}" class="btn btn-primary">See More</a>
     </div>
-    <div class="row">
+    <div class="row g-4">
       {% for product in collection_showcase %}
-      <div class="col-md-6 col-lg-3 my-4">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+      <div class="col-md-6 col-lg-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
       {% endfor %}
     </div>
   </div>

@@ -1,29 +1,35 @@
 {% extends 'base.html' %}
 {% block title %}Order Tracking | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Track Order</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="aura-card p-5">
-                <h1 class="h3 text-uppercase mb-4 text-center">Track Your Order</h1>
-                <form method="post" class="d-grid gap-3 mb-4 js-no-empty-submit">
-                    {% csrf_token %}
-                    <input type="text" name="order_number" class="form-control" placeholder="Enter order number" required minlength="4" maxlength="32" autocomplete="off">
-                    <button class="btn btn-primary">Track Order</button>
-                </form>
-                {% if order %}
-                <div class="border p-4">
-                    <div class="fw-semibold">Order: {{ order.order_number }}</div>
-                    <div>Status: {{ order.get_status_display }}</div>
-                    <div>Placed: {{ order.created_at|date:'d M Y, h:i A' }}</div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Order status</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Track Order</h1>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Enter your order number to check the latest fulfillment status.</p>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto grid max-w-4xl gap-6">
+    <div class="aura-card p-6 md:p-8">
+      <form method="post" class="grid gap-4 js-no-empty-submit">
+        {% csrf_token %}
+        <label class="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone" for="orderNumberInput">Order number</label>
+        <input id="orderNumberInput" type="text" name="order_number" class="form-control" placeholder="Enter order number" required minlength="4" maxlength="32" autocomplete="off">
+        <button class="btn btn-primary w-full">Track Order</button>
+      </form>
     </div>
+    {% if order %}
+    <div class="aura-card p-6 md:p-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="premium-kicker">Found order</p>
+          <h2 class="mt-2 text-2xl font-semibold text-ink">{{ order.order_number }}</h2>
+          <p class="mt-2 text-sm text-stone">Placed: {{ order.created_at|date:'d M Y, h:i A' }}</p>
+        </div>
+        <span class="rounded-md bg-[#eef4f0] px-4 py-2 text-sm font-bold text-[#0f766e]">{{ order.get_status_display }}</span>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
-

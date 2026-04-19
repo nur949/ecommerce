@@ -1,15 +1,16 @@
 {% load static %}
-<section id="about" class="padding-medium">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <img src="{% static 'aura/images/banner-img2.jpg' %}" alt="Beauty collection" class="img-fluid">
-      </div>
-      <div class="col-lg-6 ps-lg-5 mt-5 mt-lg-0">
-        <p class="text-uppercase text-primary">Beauty Edit</p>
-        <h2 class="display-5 fw-light text-uppercase">Curated skincare, makeup, and daily rituals</h2>
-        <p class="aura-muted">Build a confident routine with selected products, seasonal offers, and quick checkout.</p>
+<section id="about" class="px-4 py-16 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+    <div class="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-panel">
+      <img src="{% static 'aura/images/banner-img2.jpg' %}" alt="Beauty collection" class="h-full min-h-[420px] w-full object-cover" loading="lazy" decoding="async">
+    </div>
+    <div class="aura-card p-6 md:p-10">
+      <p class="premium-kicker">Beauty Edit</p>
+      <h2 class="premium-title mt-4 text-4xl text-ink md:text-6xl">Curated skincare, makeup, and daily rituals</h2>
+      <p class="mt-5 text-base leading-8 text-stone">Build a confident routine with selected products, seasonal offers, and quick checkout.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
         <a href="{% url 'catalog:shop' %}" class="btn btn-primary">Explore More</a>
+        <a href="{% url 'catalog:shop' %}?sale=1" class="btn btn-outline-primary">View Offers</a>
       </div>
     </div>
   </div>

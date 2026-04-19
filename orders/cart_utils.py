@@ -103,6 +103,15 @@ def get_cart_items(request):
             if variant and variant.price_override:
                 unit_price = variant.price_override
         quantity = max(int(entry.get('quantity') or 1), 1)
+        available_stock = variant.stock if variant else product.stock
+        available_stock = max(int(available_stock or 0), 0)
+        if available_stock <= 0:
+            stale_keys.append(key)
+            continue
+        if quantity > available_stock:
+            quantity = available_stock
+            entry['quantity'] = quantity
+            request.session.modified = True
         total = unit_price * quantity
         subtotal += total
         items.append({

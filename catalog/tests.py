@@ -30,6 +30,17 @@ class CatalogCartTests(TestCase):
             self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['cart_count'], 2)
 
+    def test_cart_items_clamp_stale_session_quantity_to_current_stock(self):
+        self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 2})
+        self.product.stock = 1
+        self.product.save(update_fields=['stock'])
+
+        response = self.client.get(reverse('orders:cart'), HTTP_HOST='testserver')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'value="1"')
+        self.assertNotContains(response, 'value="2"')
+
     def test_shop_supports_sorting(self):
         Product.objects.create(
             category=self.category,
@@ -83,3 +94,19 @@ class CatalogCartTests(TestCase):
         self.assertContains(response, 'detailTotalPrice')
         self.assertContains(response, 'product-qty-controls')
         self.assertContains(response, variant.sku)
+
+    def test_product_detail_disables_initial_out_of_stock_variant(self):
+        ProductVariant.objects.create(
+            product=self.product,
+            attribute_name='Size',
+            value='Sold out',
+            sku='WM-001-SOLD',
+            price_override='900.00',
+            stock=0,
+            is_default=True,
+        )
+
+        response = self.client.get(reverse('catalog:product_detail', args=[self.product.slug]), HTTP_HOST='testserver')
+
+        self.assertContains(response, 'id="addToCartButton" disabled')
+        self.assertContains(response, 'Out of Stock')

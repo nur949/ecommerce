@@ -1,48 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Order {{ order.order_number }} | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Order Details</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="aura-card p-5">
-        <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
-            <div>
-                <h1 class="h3 text-uppercase mb-1">Order details</h1>
-                <p class="aura-muted mb-0">Order number: {{ order.order_number }}</p>
-            </div>
-            <div class="text-end">
-                <span class="badge bg-primary px-3 py-2">{{ order.get_status_display }}</span>
-                <div class="small aura-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
-            </div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Order details</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">{{ order.order_number }}</h1>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Review items, payment status, and order total.</p>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="aura-card p-6 md:p-8">
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p class="premium-kicker">Status</p>
+          <h2 class="mt-2 text-2xl font-semibold text-ink">{{ order.get_status_display }}</h2>
+          <p class="mt-2 text-sm text-stone">Payment: {{ order.get_payment_status_display }}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-7">
-                <h2 class="h5 mb-3">Items</h2>
-                {% for item in order.items.all %}
-                <div class="d-flex justify-content-between order-line {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
-                    <div>
-                        <div>{{ item.product_name }} x {{ item.quantity }}</div>
-                        <div class="aura-muted small">SKU: {{ item.sku }}</div>
-                    </div>
-                    <div>&#2547;{{ item.total_price }}</div>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="col-lg-5">
-                <div class="border p-4 mb-3">
-                    <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><span>&#2547;{{ order.subtotal }}</span></div>
-                    <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><span>&#2547;{{ order.discount }}</span></div>
-                    <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
-                </div>
-                <div class="border p-4">
-                    <div class="fw-semibold mb-2">Payment Details</div>
-                    <div class="small">Method: {{ order.get_payment_method_display }}</div>
-                    <div class="small">Status: {{ order.get_payment_status_display }}</div>
-                    {% if latest_payment %}<div class="small">Reference: {{ latest_payment.reference }}</div>{% endif %}
-                </div>
-            </div>
+      </div>
+      <h3 class="mb-4 text-xl font-semibold text-ink">Items</h3>
+      <div class="grid gap-3">
+        {% for item in order.items.all %}
+        <div class="grid gap-3 rounded-md border border-black/5 bg-[#f1f5f3] p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div>
+            <div class="font-semibold text-ink">{{ item.product_name }} x {{ item.quantity }}</div>
+            <div class="mt-1 text-sm text-stone">SKU: {{ item.sku }}</div>
+          </div>
+          <strong class="text-ink">&#2547;{{ item.total_price }}</strong>
         </div>
+        {% endfor %}
+      </div>
     </div>
+    <aside class="grid gap-4 self-start">
+      <div class="aura-card p-6">
+        <h2 class="text-2xl font-semibold text-ink">Summary</h2>
+        <div class="mt-6 grid gap-4 text-sm text-stone">
+          <div class="flex justify-between"><span>Subtotal</span><span>&#2547;{{ order.subtotal }}</span></div>
+          <div class="flex justify-between"><span>Discount</span><span>&#2547;{{ order.discount }}</span></div>
+          <div class="flex justify-between border-t border-black/5 pt-4 text-base"><span>Total</span><strong class="text-rosewood">&#2547;{{ order.total }}</strong></div>
+        </div>
+      </div>
+      <div class="aura-card p-6">
+        <h2 class="text-xl font-semibold text-ink">Payment Details</h2>
+        <div class="mt-4 grid gap-2 text-sm text-stone">
+          <div>Method: {{ order.get_payment_method_display }}</div>
+          <div>Status: {{ order.get_payment_status_display }}</div>
+          {% if latest_payment %}<div>Reference: {{ latest_payment.reference }}</div>{% endif %}
+        </div>
+      </div>
+    </aside>
   </div>
 </section>
 {% endblock %}

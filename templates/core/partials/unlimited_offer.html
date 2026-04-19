@@ -1,23 +1,24 @@
 {% load static %}
-<section id="offers" class="padding-medium">
-  <div class="container">
-    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-      <h2 class="display-5 fw-light text-uppercase">Unlimited Offer</h2>
+<section id="offers" class="px-4 py-16 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8">
+      <p class="premium-kicker">Seasonal highlights</p>
+      <h2 class="premium-title mt-3 text-4xl text-ink md:text-5xl">Unlimited Offer</h2>
     </div>
-    <div class="row">
+    <div class="row g-4">
       {% for banner in unlimited_banners %}
-      <div class="col-md-6 col-lg-3 my-4">
-        <a href="{{ banner.url }}" class="product-item d-block">
-          <div class="image-holder">
+      <div class="col-md-6 col-lg-4 col-xl-3">
+        <a href="{{ banner.url }}" class="premium-grid-card block overflow-hidden text-decoration-none">
+          <div class="aspect-[4/4.8] overflow-hidden bg-[#f1f5f3]">
             {% if banner.image %}
-            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="product-image img-fluid">
+            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async">
             {% else %}
-            <img src="{% static 'aura/images/product-item' %}{{ forloop.counter }}.jpg" alt="{{ banner.title }}" class="product-image img-fluid">
+            <img src="{% static 'aura/images/product-item' %}{{ forloop.counter }}.jpg" alt="{{ banner.title }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async">
             {% endif %}
           </div>
-          <div class="product-detail mt-2">
-            <h5 class="product-title mb-1">{{ banner.title }}</h5>
-            {% if banner.subtitle %}<p class="aura-muted mb-0">{{ banner.subtitle }}</p>{% endif %}
+          <div class="p-5">
+            <h5 class="text-lg font-semibold text-ink">{{ banner.title }}</h5>
+            {% if banner.subtitle %}<p class="mt-2 text-sm leading-7 text-stone">{{ banner.subtitle }}</p>{% endif %}
           </div>
         </a>
       </div>
