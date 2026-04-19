@@ -1,27 +1,27 @@
-<section id="categories" class="padding-medium">
-  <div class="container">
-    <div class="section-header d-md-flex justify-content-between align-items-end gap-3 mb-4">
+<section id="categories" class="px-4 py-16 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        <p class="text-uppercase aura-muted mb-2">Browse Faster</p>
-        <h2 class="display-5 fw-light text-uppercase mb-0">Popular Categories</h2>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.32em] text-stone">Browse faster</p>
+        <h2 class="mt-3 font-brand text-4xl font-semibold uppercase tracking-[0.16em] text-ink md:text-5xl">Popular Categories</h2>
       </div>
-      <p class="aura-muted mb-0 popular-categories-intro">Start from the department you already know and move straight to the products that fit.</p>
+      <p class="max-w-2xl text-sm leading-7 text-stone">Start with the department you already know and move directly into curated products with clearer navigation and faster discovery.</p>
     </div>
     <div class="row g-4">
       {% for item in popular_categories_data %}
       <div class="col-xl-3 col-lg-4 col-sm-6">
-        <a href="{{ item.category.get_absolute_url }}" class="popular-category-card aura-card d-flex flex-column h-100 text-decoration-none">
+        <a href="{{ item.category.get_absolute_url }}" class="popular-category-card flex h-full flex-col overflow-hidden rounded-[28px] border border-black/5 bg-white text-decoration-none shadow-soft">
           <div class="popular-category-media">
             <img src="{{ item.image_url }}" alt="{{ item.category.name }}" class="img-fluid popular-category-image" loading="lazy" decoding="async">
           </div>
-          <div class="p-4 d-flex flex-column flex-grow-1">
-            <div class="d-flex justify-content-between align-items-center gap-3 mb-2">
-              <h3 class="h5 mb-0">{{ item.category.name }}</h3>
+          <div class="flex flex-1 flex-col p-5">
+            <div class="mb-3 flex items-start justify-between gap-3">
+              <h3 class="text-lg font-semibold text-ink">{{ item.category.name }}</h3>
               <span class="popular-category-pill">{{ item.product_count }} items</span>
             </div>
-            <p class="aura-muted small mb-3 flex-grow-1">{{ item.subtitle }}</p>
-            <div class="d-flex justify-content-between align-items-center small text-uppercase">
-              <span class="aura-muted">{{ item.child_count }} subcategories</span>
+            <p class="mb-4 flex-grow-1 text-sm leading-7 text-stone">{{ item.subtitle }}</p>
+            <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.24em]">
+              <span class="text-stone">{{ item.child_count }} subcategories</span>
               <span class="popular-category-link">Explore</span>
             </div>
           </div>
@@ -29,9 +29,9 @@
       </div>
       {% empty %}
       <div class="col-12">
-        <div class="aura-card p-5 text-center">
-          <h3 class="h5 mb-2">Categories coming soon</h3>
-          <p class="aura-muted mb-0">Feature your main departments to help shoppers reach products faster.</p>
+        <div class="rounded-[32px] border border-black/5 bg-white px-6 py-16 text-center shadow-soft">
+          <h3 class="text-2xl font-semibold text-ink">Categories coming soon</h3>
+          <p class="mt-3 text-sm text-stone">Feature your main departments to help shoppers reach products faster.</p>
         </div>
       </div>
       {% endfor %}

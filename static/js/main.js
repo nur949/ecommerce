@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const refreshLucideIcons = () => {
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  };
   const miniCartToggles = () => document.querySelectorAll('.js-mini-cart-toggle');
   const getMiniCartElements = () => ({
     panel: document.getElementById('miniCartPanel'),
@@ -87,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!incomingPanel) return;
 
     panel.innerHTML = incomingPanel.innerHTML;
+    refreshLucideIcons();
   };
 
   const mobileNavToggle = document.getElementById('mobileNavToggle');
@@ -103,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const closeMobileNav = () => {
     if (mobileNavToggle && mobileNavPanel) {
       mobileNavPanel.classList.remove('is-open');
+      mobileNavPanel.classList.add('hidden');
       mobileNavToggle.classList.remove('is-open');
       mobileNavToggle.setAttribute('aria-expanded', 'false');
     }
@@ -113,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mobileNavToggle.addEventListener('click', function () {
       const nextState = !mobileNavPanel.classList.contains('is-open');
       mobileNavPanel.classList.toggle('is-open', nextState);
+      mobileNavPanel.classList.toggle('hidden', !nextState);
       mobileNavToggle.classList.toggle('is-open', nextState);
       mobileNavToggle.setAttribute('aria-expanded', String(nextState));
     });
@@ -282,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = await response.json();
         if (!data.ok) throw new Error('Invalid shop payload');
         shopGrid.innerHTML = data.html;
+        refreshLucideIcons();
         if (shopCount) {
           shopCount.textContent = `${Number(data.count || 0)} products`;
         }

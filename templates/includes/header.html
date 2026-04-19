@@ -1,92 +1,77 @@
-<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch" aria-labelledby="offcanvasSearchLabel">
-  <div class="offcanvas-header justify-content-center">
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div class="fixed inset-x-0 top-0 z-50 border-b border-white/50 bg-[#1f1720]/95 text-white shadow-soft backdrop-blur">
+  <div class="border-b border-white/10 bg-white/5">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/70 md:px-6 lg:px-8">
+      <span>{{ site_settings.announcement_text|default:"Free delivery on selected orders" }}</span>
+      <div class="hidden items-center gap-4 md:flex">
+        <a href="{% url 'orders:tracking' %}" class="transition hover:text-white">Track Order</a>
+        <a href="{% url 'core:blog_index' %}" class="transition hover:text-white">Journal</a>
+      </div>
+    </div>
   </div>
-  <div class="offcanvas-body">
-    <h4 id="offcanvasSearchLabel" class="text-primary text-uppercase mb-3">Search</h4>
-    <div class="search-bar border rounded-2 border-dark-subtle">
-      <form class="text-center d-flex align-items-center" action="{% url 'catalog:shop' %}" method="get">
-        <input type="search" name="q" class="form-control border-0 bg-transparent" placeholder="Search beauty essentials">
-        <button class="btn p-0 border-0 me-3" type="submit" aria-label="Search"><iconify-icon icon="tabler:search" class="fs-4"></iconify-icon></button>
-      </form>
+
+  <header class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-6 lg:px-8">
+    <a href="{% url 'core:home' %}" class="font-brand text-4xl font-semibold uppercase tracking-[0.28em] text-white" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
+
+    <nav class="hidden items-center gap-6 text-sm font-medium text-white/80 lg:flex">
+      <a href="{% url 'core:home' %}" class="transition hover:text-white">Home</a>
+      <a href="{% url 'catalog:shop' %}" class="transition hover:text-white">Shop</a>
+      <a href="{% url 'catalog:shop' %}?sale=1" class="transition hover:text-white">Sale</a>
+      <a href="{% url 'core:corporate' %}" class="transition hover:text-white">Corporate</a>
+      <a href="{% url 'core:outlets' %}" class="transition hover:text-white">Outlets</a>
+      {% if request.user.is_authenticated and request.user.is_staff %}
+      <a href="{% url 'core:superadmin_dashboard' %}" class="transition hover:text-white">Admin</a>
+      {% endif %}
+    </nav>
+
+    <div class="flex items-center gap-2 md:gap-3">
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex" aria-label="Account">
+        <i data-lucide="user" class="h-4 w-4"></i>
+      </a>
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="relative hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex" aria-label="Wishlist">
+        <i data-lucide="heart" class="h-4 w-4"></i>
+        {% if wishlist_count %}<span class="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-ink">{{ wishlist_count }}</span>{% endif %}
+      </a>
+      <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch" class="hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex">
+        <i data-lucide="search" class="h-4 w-4"></i>
+      </button>
+      <a href="{% url 'orders:cart' %}" class="js-mini-cart-toggle relative inline-flex rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white" id="miniCartToggle" aria-label="Cart" aria-expanded="false" aria-controls="miniCartPanel">
+        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+        {% if cart_count %}<span class="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-ink">{{ cart_count }}</span>{% endif %}
+      </a>
+      <button id="mobileNavToggle" type="button" class="inline-flex rounded-full border border-white/15 bg-white/5 p-2.5 text-white transition hover:border-white/30 hover:bg-white/10 lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
+        <i data-lucide="menu" class="h-4 w-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <div id="mobileNavPanel" class="hidden border-t border-white/10 bg-[#1f1720] px-4 py-4 lg:hidden">
+    <div class="grid gap-2 text-sm font-medium text-white/80">
+      <a href="{% url 'core:home' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Home</a>
+      <a href="{% url 'catalog:shop' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Shop</a>
+      <a href="{% url 'catalog:shop' %}?sale=1" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Sale</a>
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Wishlist</a>
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Account</a>
+      <a href="{% url 'orders:tracking' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Track Order</a>
+      <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch" class="rounded-2xl px-4 py-3 text-left transition hover:bg-white/5 hover:text-white">Search</button>
     </div>
   </div>
 </div>
 
-<nav class="main-menu d-flex navbar fixed-top navbar-expand-lg py-lg-4">
-  <div class="container">
-    <div class="main-logo d-lg-none">
-      <a href="{% url 'core:home' %}" class="brand-wordmark brand-wordmark-light" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
+<div class="offcanvas offcanvas-end !w-full max-w-md border-0 bg-[#120e12] text-white" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch" aria-labelledby="offcanvasSearchLabel">
+  <div class="offcanvas-header border-b border-white/10 px-6 py-5">
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/50">Discover</p>
+      <h4 id="offcanvasSearchLabel" class="mt-2 text-xl font-semibold">Search the collection</h4>
     </div>
-
-    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="offcanvas offcanvas-end bg-black" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header justify-content-center">
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body justify-content-between align-items-center">
-        <div class="main-logo">
-          <a href="{% url 'core:home' %}" class="brand-wordmark brand-wordmark-light" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
-        </div>
-
-        <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 ps-lg-5 mb-0">
-          <li class="nav-item"><a href="{% url 'core:home' %}" class="nav-link mx-2">Home</a></li>
-          <li class="nav-item"><a href="{% url 'catalog:shop' %}" class="nav-link mx-2">Shop</a></li>
-          <li class="nav-item"><a href="{% url 'catalog:shop' %}?sale=1" class="nav-link mx-2">Sale</a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link mx-2 dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
-            <ul class="dropdown-menu p-3 p-lg-0">
-              <li><a href="{% url 'core:blog_index' %}" class="dropdown-item">Blog</a></li>
-              <li><a href="{% url 'core:corporate' %}" class="dropdown-item">Corporate</a></li>
-              <li><a href="{% url 'core:outlets' %}" class="dropdown-item">Outlets</a></li>
-              <li><a href="{% url 'orders:tracking' %}" class="dropdown-item">Track Order</a></li>
-            </ul>
-          </li>
-          {% if request.user.is_authenticated and request.user.is_staff %}
-          <li class="nav-item"><a href="{% url 'core:superadmin_dashboard' %}" class="nav-link mx-2">Admin</a></li>
-          {% endif %}
-        </ul>
-
-        <div class="d-none d-lg-flex justify-content-end">
-          <ul class="d-flex justify-content-end list-unstyled m-0">
-            <li class="lh-1">
-              <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="mx-3" aria-label="Account">
-                <iconify-icon icon="healthicons:person" class="fs-4 text-light"></iconify-icon>
-              </a>
-            </li>
-            <li class="lh-1">
-              <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="mx-3 position-relative" aria-label="Wishlist">
-                <iconify-icon icon="solar:heart-outline" class="fs-4 text-light"></iconify-icon>
-                {% if wishlist_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ wishlist_count }}</span>{% endif %}
-              </a>
-            </li>
-            <li class="lh-1">
-              <a href="{% url 'orders:cart' %}" class="mx-3 position-relative js-mini-cart-toggle" id="miniCartToggle" aria-label="Cart" aria-expanded="false" aria-controls="miniCartPanel">
-                <iconify-icon icon="mdi:cart" class="fs-4 text-light"></iconify-icon>
-                {% if cart_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ cart_count }}</span>{% endif %}
-              </a>
-            </li>
-            <li class="lh-1">
-              <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch" aria-label="Search">
-                <iconify-icon icon="tabler:search" class="fs-4 text-light"></iconify-icon>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <button type="button" class="btn-close btn-close-white opacity-100" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-
-  <div class="container-fluid px-md-5 d-lg-none">
-    <ul class="d-flex justify-content-end list-unstyled m-0 mt-4">
-      <li class="lh-1"><a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="me-4"><iconify-icon icon="healthicons:person" class="fs-4 text-light"></iconify-icon></a></li>
-      <li class="lh-1"><a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="me-4 position-relative"><iconify-icon icon="solar:heart-outline" class="fs-4 text-light"></iconify-icon>{% if wishlist_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ wishlist_count }}</span>{% endif %}</a></li>
-      <li class="lh-1"><a href="{% url 'orders:cart' %}" class="me-4 position-relative js-mini-cart-toggle" aria-label="Cart" aria-expanded="false" aria-controls="miniCartPanel"><iconify-icon icon="mdi:cart" class="fs-4 text-light"></iconify-icon>{% if cart_count %}<span class="position-absolute translate-middle badge rounded-circle text-black bg-light p-1">{{ cart_count }}</span>{% endif %}</a></li>
-      <li class="lh-1"><a href="#" class="me-4" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch"><iconify-icon icon="tabler:search" class="fs-4 text-light"></iconify-icon></a></li>
-    </ul>
+  <div class="offcanvas-body px-6 py-6">
+    <form action="{% url 'catalog:shop' %}" method="get" class="rounded-[28px] border border-white/10 bg-white/5 p-2">
+      <div class="flex items-center gap-3">
+        <i data-lucide="search" class="ml-3 h-4 w-4 text-white/50"></i>
+        <input type="search" name="q" class="h-12 w-full border-0 bg-transparent px-0 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-0" placeholder="Search skincare, fragrance, makeup">
+        <button class="inline-flex h-12 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-ink transition hover:bg-blush" type="submit">Search</button>
+      </div>
+    </form>
   </div>
-  {% include 'includes/minicart.html' %}
-</nav>
+</div>

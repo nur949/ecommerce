@@ -2,67 +2,70 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Payment | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Payment</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="aura-card p-4">
-                <h1 class="h3 text-uppercase mb-2">Choose Payment Method</h1>
-                <p class="aura-muted mb-4">Secure your order {{ order.order_number }}. Sandbox mode is enabled for online methods.</p>
-                <form method="post" class="d-grid gap-4">
-                    {% csrf_token %}
-                    {% if form.non_field_errors %}<div class="alert alert-danger mb-0">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
-                    <div>
-                        {% for choice in form.payment_method %}
-                        <label class="payment-option d-flex gap-3 align-items-start border p-3 mb-3 payment-option-row">
-                            {{ choice.tag }}
-                            <span>
-                                <strong>{{ choice.choice_label }}</strong>
-                                {% if choice.data.value == 'cod' %}<span class="d-block aura-muted small">Pay when the order arrives.</span>{% endif %}
-                                {% if choice.data.value == 'bkash' %}<span class="d-block aura-muted small">Submit mobile number and transaction reference for review.</span>{% endif %}
-                                {% if choice.data.value == 'card' %}<span class="d-block aura-muted small">Instant sandbox approval for demo use.</span>{% endif %}
-                                {% if choice.data.value == 'bank' %}<span class="d-block aura-muted small">Use this for corporate or manual verification orders.</span>{% endif %}
-                            </span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Mobile Number (for bKash)</label>
-                            {{ form.mobile_number }}
-                            {% if form.mobile_number.errors %}<div class="text-danger small mt-1">{{ form.mobile_number.errors|join:', ' }}</div>{% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Transaction ID</label>
-                            {{ form.transaction_id }}
-                            {% if form.transaction_id.errors %}<div class="text-danger small mt-1">{{ form.transaction_id.errors|join:', ' }}</div>{% endif %}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Cardholder Name (for card sandbox)</label>
-                            {{ form.cardholder_name }}
-                            {% if form.cardholder_name.errors %}<div class="text-danger small mt-1">{{ form.cardholder_name.errors|join:', ' }}</div>{% endif %}
-                        </div>
-                    </div>
-                    <button class="btn btn-primary">Complete Order</button>
-                </form>
-            </div>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Payment step</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Choose Payment</h1>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="rounded-[28px] border border-black/5 bg-white p-6 shadow-soft">
+      <h2 class="text-2xl font-semibold text-ink">Complete payment</h2>
+      <p class="mt-3 text-sm leading-7 text-stone">Secure your order {{ order.order_number }}. Demo-friendly payment methods are still preserved from the backend logic.</p>
+      <form method="post" class="mt-8 grid gap-5">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="rounded-[20px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
+        <div class="grid gap-4">
+          {% for choice in form.payment_method %}
+          <label class="payment-option-row flex cursor-pointer gap-4 rounded-[24px] border border-black/8 bg-[#fcfaf7] p-5 transition hover:border-rosewood/40 hover:bg-white">
+            {{ choice.tag }}
+            <span>
+              <strong class="block text-base text-ink">{{ choice.choice_label }}</strong>
+              {% if choice.data.value == 'cod' %}<span class="mt-2 block text-sm text-stone">Pay when the order arrives.</span>{% endif %}
+              {% if choice.data.value == 'bkash' %}<span class="mt-2 block text-sm text-stone">Submit mobile number and transaction reference for review.</span>{% endif %}
+              {% if choice.data.value == 'card' %}<span class="mt-2 block text-sm text-stone">Instant sandbox approval for demo use.</span>{% endif %}
+              {% if choice.data.value == 'bank' %}<span class="mt-2 block text-sm text-stone">Best for corporate or manual verification orders.</span>{% endif %}
+            </span>
+          </label>
+          {% endfor %}
         </div>
-        <div class="col-lg-5">
-            <div class="aura-card p-4 sticky-top" style="top: 7rem;">
-                <h2 class="h4 text-uppercase mb-4">Payment Summary</h2>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Order Number</span><strong>{{ order.order_number }}</strong></div>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong>&#2547;{{ order.subtotal }}</strong></div>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><strong>&#2547;{{ order.discount }}</strong></div>
-                <div class="d-flex justify-content-between summary-line fs-5 fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
-                <div class="mt-4 p-3 border small aura-muted">
-                    <div class="fw-semibold text-dark mb-1">Shipping To</div>
-                    <div>{{ order.address.full_name }}</div>
-                    <div>{{ order.address.phone }}</div>
-                    <div>{{ order.address.address_line }}, {{ order.address.area }}, {{ order.address.city }}</div>
-                </div>
-            </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">Mobile Number</label>
+            {{ form.mobile_number }}
+            {% if form.mobile_number.errors %}<div class="mt-2 text-sm text-rosewood">{{ form.mobile_number.errors|join:', ' }}</div>{% endif %}
+          </div>
+          <div>
+            <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">Transaction ID</label>
+            {{ form.transaction_id }}
+            {% if form.transaction_id.errors %}<div class="mt-2 text-sm text-rosewood">{{ form.transaction_id.errors|join:', ' }}</div>{% endif %}
+          </div>
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">Cardholder Name</label>
+            {{ form.cardholder_name }}
+            {% if form.cardholder_name.errors %}<div class="mt-2 text-sm text-rosewood">{{ form.cardholder_name.errors|join:', ' }}</div>{% endif %}
+          </div>
         </div>
+        <button class="inline-flex w-full items-center justify-center rounded-full bg-rosewood px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#561528]">Complete Order</button>
+      </form>
+    </div>
+    <div>
+      <div class="sticky top-32 rounded-[28px] border border-black/5 bg-white p-6 shadow-panel">
+        <h2 class="text-2xl font-semibold text-ink">Payment Summary</h2>
+        <div class="mt-6 space-y-4 text-sm text-stone">
+          <div class="flex justify-between"><span>Order Number</span><strong class="text-ink">{{ order.order_number }}</strong></div>
+          <div class="flex justify-between"><span>Subtotal</span><strong class="text-ink">&#2547;{{ order.subtotal }}</strong></div>
+          <div class="flex justify-between"><span>Discount</span><strong class="text-ink">&#2547;{{ order.discount }}</strong></div>
+          <div class="flex justify-between border-t border-black/5 pt-4"><span>Total</span><strong class="text-xl text-rosewood">&#2547;{{ order.total }}</strong></div>
+        </div>
+        <div class="mt-6 rounded-[24px] border border-black/5 bg-[#fcfaf7] p-4 text-sm text-stone">
+          <div class="mb-2 font-semibold text-ink">Shipping to</div>
+          <div>{{ order.address.full_name }}</div>
+          <div>{{ order.address.phone }}</div>
+          <div>{{ order.address.address_line }}, {{ order.address.area }}, {{ order.address.city }}</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

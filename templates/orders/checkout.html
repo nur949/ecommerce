@@ -2,49 +2,64 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Checkout | Zynvo{% endblock %}
 {% block content %}
-<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Checkout</h1></div></section>
-<section class="padding-medium pt-5">
-  <div class="container">
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="aura-card p-4">
-                <h1 class="h3 text-uppercase mb-4">Shipping Address</h1>
-                <form method="post" class="row g-3 needs-validation" novalidate>
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="{% if field.name == 'address_line' %}col-12{% else %}col-md-6{% endif %}">
-                            {{ field.label_tag }}
-                            {{ field }}
-                            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:', ' }}</div>{% endif %}
-                        </div>
-                    {% endfor %}
-                    <div class="col-12"><label class="form-label">Note</label><textarea class="form-control" name="note" rows="3" placeholder="Any delivery note or landmark"></textarea></div>
-                    <div class="col-12"><button class="btn btn-primary">Continue to Payment</button></div>
-                </form>
+<section class="px-4 py-6 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Secure checkout</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Delivery Details</h1>
+  </div>
+</section>
+<section class="px-4 pb-16 pt-8 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="space-y-6">
+      <div class="rounded-[28px] border border-black/5 bg-white p-6 shadow-soft">
+        <h2 class="text-2xl font-semibold text-ink">Shipping Address</h2>
+        <form method="post" class="mt-6 grid gap-4 md:grid-cols-2">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="{% if field.name == 'address_line' %}md:col-span-2{% endif %}">
+              <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div class="mt-2 text-sm text-rosewood">{{ field.errors|join:', ' }}</div>{% endif %}
             </div>
-            <div class="aura-card p-4 mt-4">
-                <h2 class="h5 mb-3">Items</h2>
-                {% for item in items %}
-                <div class="d-flex align-items-center gap-3 checkout-line {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
-                    <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold">{{ item.product.name }}</div>
-                        <div class="aura-muted small">Qty: {{ item.quantity }} {% if item.variant %}| {{ item.variant.value }}{% endif %}</div>
-                    </div>
-                    <div class="fw-semibold">&#2547;{{ item.total }}</div>
-                </div>
-                {% endfor %}
-            </div>
+          {% endfor %}
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">Note</label>
+            <textarea class="form-control min-h-[120px] rounded-[24px] border border-black/10 bg-[#fbf8f5] px-5 py-4 text-sm text-ink" name="note" rows="3" placeholder="Any delivery note or landmark"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <button class="inline-flex w-full items-center justify-center rounded-full bg-rosewood px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#561528]">Continue to Payment</button>
+          </div>
+        </form>
+      </div>
+      <div class="rounded-[28px] border border-black/5 bg-white p-6 shadow-soft">
+        <div class="mb-5 flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-ink">Order Items</h2>
+          <span class="rounded-full border border-black/10 px-4 py-2 text-sm text-stone">{{ items|length }} item{{ items|length|pluralize }}</span>
         </div>
-        <div class="col-lg-4">
-            <div class="aura-card p-4 sticky-top" style="top: 7rem;">
-                <h2 class="h4 text-uppercase mb-4">Your Bill</h2>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong>&#2547;{{ subtotal }}</strong></div>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><strong>&#2547;{{ discount }}</strong></div>
-                <div class="d-flex justify-content-between summary-line fs-5 fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ total }}</span></div>
-                <p class="small aura-muted mt-3 mb-0">By continuing, you agree to our delivery, payment, and return terms.</p>
+        <div class="space-y-4">
+          {% for item in items %}
+          <div class="grid gap-4 rounded-[24px] border border-black/5 bg-[#fcfaf7] p-4 md:grid-cols-[96px_minmax(0,1fr)_auto]">
+            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[110px] w-[96px] rounded-[20px] object-cover">
+            <div>
+              <div class="text-base font-semibold text-ink">{{ item.product.name }}</div>
+              <div class="mt-2 text-sm text-stone">Qty: {{ item.quantity }} {% if item.variant %}| {{ item.variant.value }}{% endif %}</div>
             </div>
+            <div class="self-center text-base font-semibold text-ink">&#2547;{{ item.total }}</div>
+          </div>
+          {% endfor %}
         </div>
+      </div>
+    </div>
+    <div>
+      <div class="sticky top-32 rounded-[28px] border border-black/5 bg-white p-6 shadow-panel">
+        <h2 class="text-2xl font-semibold text-ink">Your Bill</h2>
+        <div class="mt-6 space-y-4 text-sm text-stone">
+          <div class="flex justify-between"><span>Subtotal</span><strong class="text-lg font-semibold text-ink">&#2547;{{ subtotal }}</strong></div>
+          <div class="flex justify-between"><span>Discount</span><strong class="text-lg font-semibold text-ink">&#2547;{{ discount }}</strong></div>
+          <div class="flex justify-between border-t border-black/5 pt-4"><span>Total</span><strong class="text-xl font-semibold text-rosewood">&#2547;{{ total }}</strong></div>
+        </div>
+        <p class="mt-6 text-sm leading-7 text-stone">By continuing, you agree to our delivery, payment, and return terms.</p>
+      </div>
     </div>
   </div>
 </section>

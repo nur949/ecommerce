@@ -1,55 +1,47 @@
 {% load static %}
-<section id="hero">
-  <div class="swiper slideshow">
-    <div class="swiper-wrapper">
-      {% for slide in hero_slides %}
-      <div class="swiper-slide" style="background-image:url({% if forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %}); background-repeat:no-repeat; background-position:center; background-size:cover; height:950px;">
-        <div class="container padding-large">
-          <div class="row justify-content-end">
-            <div class="col-lg-6" data-aos="fade-up">
-              <h2 class="display-1 text-uppercase text-white mt-3">{{ slide.title }}</h2>
-              {% if slide.subtitle %}<p class="text-capitalize text-white fs-5 mb-4">{{ slide.subtitle }}</p>{% endif %}
-              <a href="{{ slide.cta_url|default:'#' }}" class="btn btn-light">{{ slide.cta_text|default:'Shop Collection' }}</a>
+<section class="px-4 pt-6 lg:px-8">
+  <div class="mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-white/60 shadow-panel">
+    <div class="swiper slideshow">
+      <div class="swiper-wrapper">
+        {% for slide in hero_slides %}
+        <div class="swiper-slide">
+          <div class="relative min-h-[78vh] overflow-hidden bg-[#1f1720]">
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% if forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %});"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#1f1720]/90 via-[#1f1720]/55 to-[#1f1720]/15"></div>
+            <div class="relative mx-auto flex max-w-7xl items-end px-6 py-14 md:px-10 lg:min-h-[78vh] lg:items-center lg:px-14">
+              <div class="max-w-2xl text-white" data-gsap-fade>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">{{ slide.accent_label|default:"Premium edit" }}</p>
+                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl">{{ slide.title }}</h1>
+                {% if slide.subtitle %}<p class="mt-6 max-w-xl text-base leading-8 text-white/75 md:text-lg">{{ slide.subtitle }}</p>{% endif %}
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a href="{{ slide.cta_url|default:'#' }}" class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-blush">{{ slide.cta_text|default:'Shop Collection' }}</a>
+                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">View Store</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {% empty %}
-      <div class="swiper-slide" style="background-image:url({% static 'aura/images/banner2.jpg' %}); background-repeat:no-repeat; background-position:center; background-size:cover; height:950px;">
-        <div class="container padding-large">
-          <div class="row justify-content-end">
-            <div class="col-lg-6" data-aos="fade-up">
-              <h2 class="display-1 text-uppercase text-white mt-3">Reveal Your Beauty</h2>
-              <p class="text-capitalize text-white fs-5 mb-4">Discover your perfect look with premium cosmetics</p>
-              <a href="{% url 'catalog:shop' %}" class="btn btn-light">Shop Collection</a>
+        {% empty %}
+        <div class="swiper-slide">
+          <div class="relative min-h-[78vh] overflow-hidden bg-[#1f1720]">
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% static 'aura/images/banner2.jpg' %});"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#1f1720]/90 via-[#1f1720]/55 to-[#1f1720]/15"></div>
+            <div class="relative mx-auto flex max-w-7xl items-end px-6 py-14 md:px-10 lg:min-h-[78vh] lg:items-center lg:px-14">
+              <div class="max-w-2xl text-white" data-gsap-fade>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Premium beauty edit</p>
+                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl">Reveal your best daily ritual</h1>
+                <p class="mt-6 max-w-xl text-base leading-8 text-white/75 md:text-lg">Luxury-inspired shopping with cleaner discovery, richer visuals, and fast checkout.</p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-blush">Shop Collection</a>
+                  <a href="{% url 'catalog:shop' %}?sale=1" class="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">See Offers</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        {% endfor %}
       </div>
-      <div class="swiper-slide" style="background-image:url({% static 'aura/images/banner1.jpg' %}); background-repeat:no-repeat; background-position:center; background-size:cover; height:950px;">
-        <div class="container padding-large">
-          <div class="row justify-content-end">
-            <div class="col-lg-6" data-aos="fade-up">
-              <h2 class="display-1 text-uppercase text-white mt-3">Enhance Your Glow</h2>
-              <p class="text-capitalize text-white fs-5 mb-4">Illuminate your beauty with premium skincare</p>
-              <a href="{% url 'catalog:shop' %}?sort=latest" class="btn btn-light">Shop Now</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="swiper-slide" style="background-image:url({% static 'aura/images/banner3.jpg' %}); background-repeat:no-repeat; background-position:center; background-size:cover; height:950px;">
-        <div class="container padding-large">
-          <div class="row justify-content-end">
-            <div class="col-lg-6" data-aos="fade-up">
-              <h2 class="display-1 text-uppercase text-white mt-3">Define Your Beauty</h2>
-              <p class="text-capitalize text-white fs-5 mb-4">Transform your look with luxury cosmetics</p>
-              <a href="{% url 'catalog:shop' %}?sale=1" class="btn btn-light">Explore Products</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+      <div class="swiper-pagination !bottom-8"></div>
     </div>
-    <div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets"></div>
   </div>
 </section>
