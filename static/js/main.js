@@ -1,12 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
   const mobileNavToggle = document.getElementById('mobileNavToggle');
   const mobileNavPanel = document.getElementById('mobileNavPanel');
+  const productsMegaItem = document.getElementById('productsMegaItem');
+  const productsMegaToggle = productsMegaItem ? productsMegaItem.querySelector('.mobile-mega-toggle') : null;
+  const closeProductsMega = () => {
+    if (productsMegaItem && productsMegaToggle) {
+      productsMegaItem.classList.remove('is-open');
+      productsMegaToggle.setAttribute('aria-expanded', 'false');
+    }
+  };
+
   const closeMobileNav = () => {
     if (mobileNavToggle && mobileNavPanel) {
       mobileNavPanel.classList.remove('is-open');
       mobileNavToggle.classList.remove('is-open');
       mobileNavToggle.setAttribute('aria-expanded', 'false');
     }
+    closeProductsMega();
   };
 
   if (mobileNavToggle && mobileNavPanel) {
@@ -26,6 +36,26 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('resize', function () {
       if (window.innerWidth >= 992) {
         closeMobileNav();
+      }
+    });
+  }
+
+  if (productsMegaItem && productsMegaToggle) {
+    productsMegaToggle.addEventListener('click', function () {
+      const nextState = !productsMegaItem.classList.contains('is-open');
+      productsMegaItem.classList.toggle('is-open', nextState);
+      productsMegaToggle.setAttribute('aria-expanded', String(nextState));
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!productsMegaItem.contains(event.target)) {
+        closeProductsMega();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 992) {
+        closeProductsMega();
       }
     });
   }

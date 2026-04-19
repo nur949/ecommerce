@@ -991,3 +991,99 @@ a { color: inherit; }
     max-height: 280px;
   }
 }
+
+/* Header mega menu: robust mobile/tablet behavior */
+@media (max-width: 991px) {
+  .site-header.cos-header .header-nav-panel {
+    display: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+
+  .site-header.cos-header .header-nav-panel.is-open {
+    display: block !important;
+  }
+
+  .site-header.cos-header .header-nav-panel .header-nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .5rem;
+    white-space: normal;
+  }
+
+  .site-header.cos-header .header-nav-panel .nav-mega-item {
+    display: block !important;
+    width: 100%;
+    position: static;
+  }
+
+  .mobile-mega-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+  }
+
+  .mobile-mega-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(154, 35, 86, .18);
+    background: #fff;
+    color: var(--cos-logo);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .mobile-mega-toggle span {
+    position: absolute;
+    width: 14px;
+    height: 2px;
+    border-radius: 99px;
+    background: currentColor;
+    transition: transform .2s ease, opacity .2s ease;
+  }
+
+  .mobile-mega-toggle span:last-child {
+    transform: rotate(90deg);
+  }
+
+  .nav-mega-item.is-open .mobile-mega-toggle span:last-child {
+    transform: rotate(0deg);
+    opacity: 0;
+  }
+
+  .site-header.cos-header .header-nav-panel .mega-menu {
+    display: none !important;
+    position: static !important;
+    width: 100% !important;
+    margin-top: .65rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+
+  .site-header.cos-header .header-nav-panel .nav-mega-item.is-open .mega-menu {
+    display: block !important;
+  }
+
+  .site-header.cos-header .header-nav-panel .nav-mega-item .cos-nav-link {
+    width: 100%;
+    display: block !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .mobile-mega-head {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .mobile-mega-toggle {
+    display: none !important;
+  }
+}

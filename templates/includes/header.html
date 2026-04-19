@@ -10,9 +10,15 @@
                 </button>
                 <nav class="cos-nav header-nav-panel" id="mobileNavPanel" aria-label="Primary">
                     <div class="header-nav-links">
-                        <div class="mega-trigger nav-mega-item">
-                            <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Products</a>
-                            <div class="mega-menu shadow-lg rounded-4 p-4 bg-white">
+                        <div class="mega-trigger nav-mega-item" id="productsMegaItem">
+                            <div class="mobile-mega-head">
+                                <a href="{% url 'catalog:shop' %}" class="cos-nav-link">Products</a>
+                                <button type="button" class="mobile-mega-toggle d-lg-none" aria-label="Toggle product categories" aria-controls="productsMegaMenu" aria-expanded="false">
+                                    <span></span>
+                                    <span></span>
+                                </button>
+                            </div>
+                            <div class="mega-menu shadow-lg rounded-4 p-4 bg-white" id="productsMegaMenu">
                                 <div class="row g-4">
                                     {% for entry in mega_categories %}
                                     <div class="col-lg-4">
