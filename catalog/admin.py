@@ -16,8 +16,8 @@ class ProductImageInline(admin.TabularInline):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;"/>', obj.image.url)
-        return '—'
+            return format_html('<img src="{}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;"/>', obj.image.url)
+        return '-'
 
 
 class ProductVariantInline(admin.TabularInline):
@@ -28,12 +28,15 @@ class ProductVariantInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('thumb', 'name', 'category', 'price', 'stock', 'is_active', 'is_daily_deal', 'is_new', 'is_trending')
+    list_display = ('thumb', 'name', 'sku', 'category', 'price', 'stock', 'is_active', 'is_daily_deal', 'is_new', 'is_trending', 'updated_at')
     prepopulated_fields = {'slug': ('name',)}
     list_filter = ('category', 'is_active', 'is_daily_deal', 'is_new', 'is_trending', 'is_featured')
     search_fields = ('name', 'sku', 'brand', 'collection_label')
     list_editable = ('price', 'stock', 'is_active')
     autocomplete_fields = ('category',)
+    list_select_related = ('category',)
+    date_hierarchy = 'created_at'
+    actions = ('mark_active', 'mark_inactive', 'mark_featured', 'mark_daily_deal')
     inlines = [ProductImageInline, ProductVariantInline]
     fieldsets = (
         ('Core', {'fields': ('category', 'name', 'slug', 'brand', 'sku', 'short_description', 'description', 'featured_image')}),
@@ -45,8 +48,24 @@ class ProductAdmin(admin.ModelAdmin):
 
     def thumb(self, obj):
         if obj.featured_image:
-            return format_html('<img src="{}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;"/>', obj.featured_image.url)
-        return '—'
+            return format_html('<img src="{}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;"/>', obj.featured_image.url)
+        return '-'
+
+    @admin.action(description='Mark selected products active')
+    def mark_active(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Mark selected products inactive')
+    def mark_inactive(self, request, queryset):
+        queryset.update(is_active=False)
+
+    @admin.action(description='Mark selected products featured')
+    def mark_featured(self, request, queryset):
+        queryset.update(is_featured=True)
+
+    @admin.action(description='Mark selected products as daily deals')
+    def mark_daily_deal(self, request, queryset):
+        queryset.update(is_daily_deal=True)
 
 
 @admin.register(Category)
@@ -54,4 +73,5 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'parent', 'is_featured', 'order')
     prepopulated_fields = {'slug': ('name',)}
     list_editable = ('is_featured', 'order')
+    list_filter = ('is_featured', 'parent')
     search_fields = ('name',)

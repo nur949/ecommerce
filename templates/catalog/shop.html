@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Shop | Zynvo{% endblock %}
+{% block meta_description %}Shop Zynvo products by category, price, and latest arrivals with secure checkout and fast delivery.{% endblock %}
 {% block content %}
 <section class="container py-5 page-shell">
     <div class="row g-4">
@@ -7,8 +8,9 @@
             <div class="bg-white rounded-4 p-4 shadow-sm sticky-sidebar theme-panel">
                 <h4 class="h5 mb-3">Categories</h4>
                 <ul class="list-unstyled filter-list">
+                    <li><a href="{% url 'catalog:shop' %}" class="{% if not active_category %}active{% endif %}">All Products</a></li>
                     {% for category in categories %}
-                        <li><a href="?category={{ category.slug }}{% if query %}&q={{ query }}{% endif %}">{{ category.name }}</a></li>
+                        <li><a href="?category={{ category.slug }}{% if query %}&q={{ query }}{% endif %}{% if active_sort %}&sort={{ active_sort }}{% endif %}" class="{% if active_category == category.slug %}active{% endif %}">{{ category.name }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -16,6 +18,17 @@
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4 shop-toolbar">
                 <h1 class="h3 m-0">Shop</h1>
+                <form method="get" class="shop-sort-form">
+                    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                    {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+                    <label class="visually-hidden" for="shopSort">Sort products</label>
+                    <select id="shopSort" name="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="latest" {% if active_sort == 'latest' %}selected{% endif %}>Latest</option>
+                        <option value="price_low" {% if active_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if active_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="name" {% if active_sort == 'name' %}selected{% endif %}>Name</option>
+                    </select>
+                </form>
                 <span class="text-muted">{{ products|length }} products</span>
             </div>
             <div class="row g-3">

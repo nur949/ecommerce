@@ -19,18 +19,18 @@
                 {% for item in order.items.all %}
                 <div class="d-flex justify-content-between order-line {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
                     <div>
-                        <div>{{ item.product_name }} × {{ item.quantity }}</div>
+                        <div>{{ item.product_name }} x {{ item.quantity }}</div>
                         <div class="text-muted small">SKU: {{ item.sku }}</div>
                     </div>
-                    <div>৳{{ item.total_price }}</div>
+                    <div>&#2547;{{ item.total_price }}</div>
                 </div>
                 {% endfor %}
             </div>
             <div class="col-lg-5">
                 <div class="bg-slate-50 rounded-4 p-4 mb-3">
-                    <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><span>৳{{ order.subtotal }}</span></div>
-                    <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><span>৳{{ order.discount }}</span></div>
-                    <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>৳{{ order.total }}</span></div>
+                    <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><span>&#2547;{{ order.subtotal }}</span></div>
+                    <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><span>&#2547;{{ order.discount }}</span></div>
+                    <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
                 </div>
                 <div class="bg-slate-50 rounded-4 p-4 theme-soft">
                     <div class="fw-semibold mb-2">Payment Details</div>
@@ -43,5 +43,3 @@
     </div>
 </section>
 {% endblock %}
-
-

@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}{{ product.meta_title|default:product.name }}{% endblock %}
 {% block meta_description %}{{ product.meta_description|default:product.short_description }}{% endblock %}
+{% block og_type %}product{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
+<section class="container py-5 page-shell product-detail-page">
     <nav class="text-muted small mb-4"><a href="{% url 'core:home' %}">Home</a> / <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a> / {{ product.name }}</nav>
     <div class="row g-4">
         <div class="col-lg-5">
             <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
-                <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-main-image mb-3">
+                <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-main-image mb-3" decoding="async">
                 <div class="d-flex flex-wrap gap-2">
                     {% for image in product.gallery.all %}
                         {% if image.image %}<img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" class="detail-thumb">{% endif %}
                     {% empty %}
-                        <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-thumb">
+                        <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-thumb active-thumb">
                     {% endfor %}
                 </div>
             </div>
@@ -22,10 +23,10 @@
                 <span class="badge bg-primary-subtle text-primary rounded-pill mb-3">Available Online Only</span>
                 <h1 class="h2 fw-bold mb-3">{{ product.name }}</h1>
                 <div class="mb-2">Brand: <strong>{{ product.brand }}</strong></div>
-                <div class="mb-3 d-flex align-items-center gap-2">
-                    <span class="h3 m-0 fw-bold">৳{{ product.price }}</span>
-                    {% if product.compare_at_price %}<span class="text-decoration-line-through text-muted">৳{{ product.compare_at_price }}</span>{% endif %}
-                    {% if product.discount_amount %}<span class="badge bg-danger-subtle text-danger">Save ৳{{ product.discount_amount }}</span>{% endif %}
+                <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
+                    <span class="h3 m-0 fw-bold">&#2547;{{ product.price }}</span>
+                    {% if product.compare_at_price %}<span class="text-decoration-line-through text-muted">&#2547;{{ product.compare_at_price }}</span>{% endif %}
+                    {% if product.discount_amount %}<span class="badge bg-danger-subtle text-danger">Save &#2547;{{ product.discount_amount }}</span>{% endif %}
                 </div>
                 <div class="mb-2"><strong>SKU:</strong> {{ selected_variant.sku|default:product.sku }}</div>
                 <div class="mb-3"><strong>In Stock:</strong> {{ selected_variant.stock|default:product.stock }}</div>
@@ -48,8 +49,10 @@
                         <input type="number" name="quantity" class="form-control" value="1" min="1">
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-primary rounded-pill px-4">Add to Cart</button>
-                        <a href="{% url 'orders:checkout' %}" class="btn btn-outline-primary rounded-pill px-4">Buy Now</a>
+                        <button class="btn btn-primary rounded-pill px-4" {% if not product.in_stock %}disabled{% endif %}>
+                            {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+                        </button>
+                        <button type="submit" name="next" value="{% url 'orders:checkout' %}" class="btn btn-outline-primary rounded-pill px-4" {% if not product.in_stock %}disabled{% endif %}>Buy Now</button>
                     </div>
                 </form>
             </div>
@@ -57,12 +60,12 @@
         <div class="col-lg-2">
             <div class="bg-white rounded-5 p-4 shadow-sm h-100 theme-panel">
                 <h2 class="h5 mb-3">Why buy from Zynvo?</h2>
-                <ul class="list-unstyled small text-muted d-grid gap-2">
-                    <li>✓ Free shipping on selected orders</li>
-                    <li>✓ Home delivery available</li>
-                    <li>✓ Secure payments</li>
-                    <li>✓ Easy return policy</li>
-                    <li>✓ Helpful support team</li>
+                <ul class="list-unstyled small text-muted d-grid gap-2 trust-list">
+                    <li>Free shipping on selected orders</li>
+                    <li>Home delivery available</li>
+                    <li>Secure payments</li>
+                    <li>Easy return policy</li>
+                    <li>Helpful support team</li>
                 </ul>
             </div>
         </div>
@@ -91,4 +94,3 @@
     </div>
 </section>
 {% endblock %}
-

@@ -56,8 +56,8 @@ class HeroSlideAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="width:84px;height:48px;object-fit:cover;border-radius:10px;"/>', obj.image.url)
-        return '—'
+            return format_html('<img src="{}" style="width:84px;height:48px;object-fit:cover;border-radius:8px;"/>', obj.image.url)
+        return '-'
 
 
 @admin.register(PromoBanner)
@@ -68,14 +68,15 @@ class PromoBannerAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="width:84px;height:48px;object-fit:cover;border-radius:10px;"/>', obj.image.url)
-        return '—'
+            return format_html('<img src="{}" style="width:84px;height:48px;object-fit:cover;border-radius:8px;"/>', obj.image.url)
+        return '-'
 
 
 @admin.register(StaticPage)
 class StaticPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'is_published')
     list_editable = ('is_published',)
+    list_filter = ('is_published',)
     prepopulated_fields = {'slug': ('title',)}
     search_fields = ('title', 'body')
 
@@ -83,6 +84,7 @@ class StaticPageAdmin(admin.ModelAdmin):
 @admin.register(BlogCategory)
 class BlogCategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name',)
 
 
 @admin.register(BlogPost)
@@ -92,3 +94,5 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     prepopulated_fields = {'slug': ('title',)}
     search_fields = ('title', 'excerpt', 'content')
+    list_select_related = ('category',)
+    date_hierarchy = 'created_at'

@@ -33,3 +33,15 @@ class RegisterForm(UserCreationForm):
         }
         for name, field in self.fields.items():
             field.widget.attrs.update({'class': 'form-control', 'placeholder': placeholders.get(name, field.label)})
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('An account with this email already exists.')
+        return email
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get('phone') or '').strip()
+        if phone and not phone.replace('+', '', 1).replace('-', '').replace(' ', '').isdigit():
+            raise forms.ValidationError('Enter a valid phone number.')
+        return phone

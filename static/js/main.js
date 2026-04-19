@@ -37,12 +37,30 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.classList.remove('d-none');
     panel.setAttribute('aria-hidden', 'false');
     if (backdrop) {
-      backdrop.classList.remove('d-none');
-      requestAnimationFrame(() => backdrop.classList.add('is-open'));
+      backdrop.classList.add('d-none');
+      backdrop.classList.remove('is-open');
     }
     requestAnimationFrame(() => panel.classList.add('is-open'));
     toggle.setAttribute('aria-expanded', 'true');
-    document.body.classList.add('mini-cart-active');
+    document.body.classList.remove('mini-cart-active');
+  };
+
+  const showCartNotice = (message) => {
+    if (!message) return;
+    let notice = document.getElementById('cartNotice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'cartNotice';
+      notice.className = 'cart-notice';
+      notice.setAttribute('role', 'status');
+      document.body.appendChild(notice);
+    }
+    notice.textContent = message;
+    notice.classList.add('is-visible');
+    window.clearTimeout(notice.hideTimer);
+    notice.hideTimer = window.setTimeout(() => {
+      notice.classList.remove('is-visible');
+    }, 2200);
   };
 
   const updateMiniCartBadge = (count) => {
@@ -148,11 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
         openMiniCart();
       }
     });
-    document.addEventListener('click', function (event) {
-      if (!panel.contains(event.target) && !toggle.contains(event.target)) {
-        closeMiniCart();
-      }
-    });
     if (backdrop) {
       backdrop.addEventListener('click', closeMiniCart);
     }
@@ -172,7 +185,18 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('form.js-add-to-cart-ajax').forEach((form) => {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const submitter = event.submitter || form.querySelector("button[type='submit']");
       const formData = new FormData(form);
+      if (submitter && submitter.name) {
+        formData.set(submitter.name, submitter.value);
+      }
+      const button = submitter && submitter.matches("button[type='submit']") ? submitter : form.querySelector("button[type='submit']");
+      const originalText = button ? button.textContent : '';
+      const nextUrl = String(formData.get('next') || '');
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Adding...';
+      }
 
       try {
         const response = await fetch(form.action, {
@@ -190,9 +214,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         replaceMiniCartPanelFromHtml(data.mini_cart_html);
         updateMiniCartBadge(Number(data.cart_count || 0));
+        showCartNotice(data.message || 'Added to cart.');
+        if (nextUrl.includes('/checkout')) {
+          window.location.href = nextUrl;
+          return;
+        }
         openMiniCart();
       } catch (error) {
         form.submit();
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = originalText;
+        }
       }
     });
   });

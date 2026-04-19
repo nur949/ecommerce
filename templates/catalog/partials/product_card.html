@@ -9,7 +9,7 @@
                 <span class="product-badge">New Arrival</span>
             {% endif %}
             <div class="product-image-shell">
-                <img src="{{ product.primary_image_url }}" class="product-image product-image-fill" alt="{{ product.name }}">
+                <img src="{{ product.primary_image_url }}" class="product-image product-image-fill" alt="{{ product.name }}" loading="lazy" decoding="async">
             </div>
         </div>
         <div class="card-body product-copy pt-3">
@@ -26,13 +26,15 @@
             {% csrf_token %}
             <input type="hidden" name="quantity" value="1">
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn btn-outline-primary btn-sm w-100 product-action-btn">Add to Cart</button>
+            <button type="submit" class="btn btn-outline-primary btn-sm w-100 product-action-btn" {% if not product.in_stock %}disabled{% endif %}>
+                {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+            </button>
         </form>
         <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}">
             {% csrf_token %}
             <input type="hidden" name="quantity" value="1">
             <input type="hidden" name="next" value="{% url 'orders:checkout' %}">
-            <button type="submit" class="btn btn-primary btn-sm w-100 product-action-btn">Buy Now</button>
+            <button type="submit" class="btn btn-primary btn-sm w-100 product-action-btn" {% if not product.in_stock %}disabled{% endif %}>Buy Now</button>
         </form>
     </div>
 </div>

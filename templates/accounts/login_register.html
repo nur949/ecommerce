@@ -13,19 +13,29 @@
                 {% if active_tab == 'register' %}
                     <form method="post" action="{% url 'accounts:register' %}" class="d-grid gap-3">
                         {% csrf_token %}
+                        {% if register_form.non_field_errors %}<div class="alert alert-danger">{{ register_form.non_field_errors|join:', ' }}</div>{% endif %}
                         {{ register_form.first_name }}
+                        {% if register_form.first_name.errors %}<div class="text-danger small">{{ register_form.first_name.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.email }}
+                        {% if register_form.email.errors %}<div class="text-danger small">{{ register_form.email.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.username }}
+                        {% if register_form.username.errors %}<div class="text-danger small">{{ register_form.username.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.phone }}
+                        {% if register_form.phone.errors %}<div class="text-danger small">{{ register_form.phone.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.password1 }}
+                        {% if register_form.password1.errors %}<div class="text-danger small">{{ register_form.password1.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.password2 }}
+                        {% if register_form.password2.errors %}<div class="text-danger small">{{ register_form.password2.errors|join:', ' }}</div>{% endif %}
                         <button class="btn btn-primary rounded-pill">Create Account</button>
                     </form>
                 {% else %}
                     <form method="post" action="{% url 'accounts:login' %}" class="d-grid gap-3">
                         {% csrf_token %}
+                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
                         {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors|join:', ' }}</div>{% endif %}
                         {{ form.password }}
+                        {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|join:', ' }}</div>{% endif %}
                         <button class="btn btn-primary rounded-pill">Login</button>
                     </form>
                 {% endif %}

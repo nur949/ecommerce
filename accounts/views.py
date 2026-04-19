@@ -44,5 +44,5 @@ def register_view(request):
 
 @login_required
 def dashboard(request):
-    orders = request.user.order_set.all()[:5]
+    orders = request.user.order_set.select_related('address').prefetch_related('items').all()[:5]
     return render(request, 'accounts/dashboard.html', {'orders': orders})

@@ -4,9 +4,11 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import NoReverseMatch
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils import timezone
 
 from catalog.models import Category, Product
@@ -137,15 +139,15 @@ def home(request):
         'hero_right_banners': PromoBanner.objects.filter(group='hero_right', is_active=True)[:3],
         'popular_categories': popular_categories,
         'popular_categories_data': popular_categories_data,
-        'daily_deals': Product.objects.filter(is_active=True, is_daily_deal=True).order_by('-created_at')[:8],
-        'new_collection': Product.objects.filter(is_active=True, is_new=True).order_by('-created_at')[:8],
-        'collection_showcase': Product.objects.filter(is_active=True, collection_label__iexact='Signature').order_by('-created_at')[:8] or Product.objects.filter(is_active=True, is_featured=True)[:8],
+        'daily_deals': Product.objects.filter(is_active=True, is_daily_deal=True).select_related('category').order_by('-created_at')[:8],
+        'new_collection': Product.objects.filter(is_active=True, is_new=True).select_related('category').order_by('-created_at')[:8],
+        'collection_showcase': Product.objects.filter(is_active=True, collection_label__iexact='Signature').select_related('category').order_by('-created_at')[:8] or Product.objects.filter(is_active=True, is_featured=True).select_related('category')[:8],
         'gadget_banners': PromoBanner.objects.filter(group='gadget', is_active=True)[:6],
         'unlimited_banners': PromoBanner.objects.filter(group='unlimited', is_active=True)[:4],
         'blog_posts': BlogPost.objects.filter(is_published=True)[:3],
         'deal_now': timezone.now(),
     }
-    context['trending_products'] = Product.objects.filter(is_active=True, is_trending=True)[:4] or Product.objects.filter(is_active=True)[:4]
+    context['trending_products'] = Product.objects.filter(is_active=True, is_trending=True).select_related('category')[:4] or Product.objects.filter(is_active=True).select_related('category')[:4]
     return render(request, 'core/home.html', context)
 
 
@@ -280,3 +282,41 @@ def demo_blog_detail(request, slug):
         if post.slug == slug:
             return render(request, 'core/blog_detail.html', {'post': post})
     raise Http404('Blog post not found.')
+
+
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri(reverse('core:sitemap_xml'))
+    lines = [
+        'User-agent: *',
+        'Disallow: /admin/',
+        'Disallow: /superadmin/',
+        'Disallow: /account/',
+        'Disallow: /orders/checkout/',
+        f'Sitemap: {sitemap_url}',
+    ]
+    return HttpResponse('\n'.join(lines), content_type='text/plain')
+
+
+def sitemap_xml(request):
+    def add_model_urls(queryset):
+        for obj in queryset:
+            try:
+                urls.append(request.build_absolute_uri(obj.get_absolute_url()))
+            except NoReverseMatch:
+                continue
+
+    urls = [
+        request.build_absolute_uri(reverse('core:home')),
+        request.build_absolute_uri(reverse('catalog:shop')),
+        request.build_absolute_uri(reverse('core:blog_index')),
+        request.build_absolute_uri(reverse('orders:tracking')),
+    ]
+    add_model_urls(Category.objects.all())
+    add_model_urls(Product.objects.filter(is_active=True))
+    add_model_urls(StaticPage.objects.filter(is_published=True))
+    add_model_urls(BlogPost.objects.filter(is_published=True))
+    body = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        body.append(f'  <url><loc>{escape(url)}</loc></url>')
+    body.append('</urlset>')
+    return HttpResponse('\n'.join(body), content_type='application/xml')
