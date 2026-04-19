@@ -1,5 +1,5 @@
-<div class="card product-card border-0 shadow-sm h-100 overflow-hidden">
-    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-slate-800">
+<div class="card product-card border-0 shadow-sm h-100 overflow-hidden d-flex flex-column">
+    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-slate-800 d-block">
         <div class="card-top product-media position-relative">
             {% if product.discount_amount %}
                 <span class="product-badge">Save: &#2547;{{ product.discount_amount }} (-{{ product.discount_percentage }}%)</span>
@@ -21,4 +21,18 @@
             {% if show_stock %}<div class="text-muted small mt-2">Available: {{ product.stock }}</div>{% endif %}
         </div>
     </a>
+    <div class="product-actions mt-auto">
+        <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm w-100 product-action-btn">Add to Cart</button>
+        </form>
+        <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="next" value="{% url 'orders:checkout' %}">
+            <button type="submit" class="btn btn-primary btn-sm w-100 product-action-btn">Buy Now</button>
+        </form>
+    </div>
 </div>

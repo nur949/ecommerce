@@ -8,21 +8,21 @@
         <div class="col-lg-8">
             <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
                 {% for item in items %}
-                <div class="d-flex gap-3 align-items-center cart-line {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                <div class="d-flex gap-3 align-items-center cart-line {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}" data-item-key="{{ item.key }}">
                     <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
                     <div class="flex-grow-1">
                         <h3 class="h6 mb-1">{{ item.product.name }}</h3>
                         {% if item.variant %}<div class="text-muted small">{{ item.variant.attribute_name }}: {{ item.variant.value }}</div>{% endif %}
                         <div class="small text-muted">SKU: {{ item.variant.sku|default:item.product.sku }}</div>
                     </div>
-                    <form action="{% url 'catalog:update_cart' %}" method="post" class="d-flex align-items-center gap-2">
+                    <form action="{% url 'catalog:update_cart' %}" method="post" class="d-flex align-items-center gap-2 js-cart-update-form">
                         {% csrf_token %}
                         <input type="hidden" name="item_key" value="{{ item.key }}">
                         <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control cart-qty-input">
                         <button class="btn btn-sm btn-outline-primary rounded-pill">Update</button>
                     </form>
-                    <div class="fw-semibold">৳{{ item.total }}</div>
-                    <a href="{% url 'catalog:remove_cart_item' item.key %}" class="btn btn-sm btn-outline-danger rounded-pill">Remove</a>
+                    <div class="fw-semibold cart-line-total">৳{{ item.total }}</div>
+                    <a href="{% url 'catalog:remove_cart_item' item.key %}" class="btn btn-sm btn-outline-danger rounded-pill js-cart-remove-link" data-item-key="{{ item.key }}">Remove</a>
                 </div>
                 {% endfor %}
             </div>
@@ -30,7 +30,7 @@
         <div class="col-lg-4">
             <div class="bg-white rounded-5 p-4 shadow-sm sticky-sidebar theme-panel">
                 <h2 class="h4 mb-4">Summary</h2>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong>৳{{ subtotal }}</strong></div>
+                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong class="cart-subtotal-value">৳{{ subtotal }}</strong></div>
                 <div class="d-flex justify-content-between summary-line mb-4"><span>Shipping</span><span>Calculated at checkout</span></div>
                 <a href="{% url 'orders:checkout' %}" class="btn btn-primary w-100 rounded-pill">Proceed to Checkout</a>
             </div>
@@ -46,5 +46,6 @@
     {% endif %}
 </section>
 {% endblock %}
+
 
 

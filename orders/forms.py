@@ -25,6 +25,8 @@ class CheckoutForm(forms.ModelForm):
         for field in self.fields.values():
             existing = field.widget.attrs.get('class', '')
             field.widget.attrs['class'] = f'{existing} form-control'.strip()
+            if field.required:
+                field.widget.attrs['required'] = 'required'
 
 
 class PaymentSelectionForm(forms.Form):
@@ -43,3 +45,4 @@ class PaymentSelectionForm(forms.Form):
             if name == 'payment_method':
                 continue
             field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['maxlength'] = str(field.max_length)

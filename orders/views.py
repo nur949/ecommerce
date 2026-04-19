@@ -128,7 +128,10 @@ def order_detail(request, order_number):
 def order_tracking(request):
     order = None
     if request.method == 'POST':
-        order_number = request.POST.get('order_number')
+        order_number = (request.POST.get('order_number') or '').strip()
+        if not order_number:
+            messages.error(request, 'Please enter your order number before tracking.')
+            return render(request, 'orders/order_tracking.html', {'order': None})
         order = Order.objects.filter(order_number__iexact=order_number).first()
         if not order:
             messages.error(request, 'No order found with that tracking number.')

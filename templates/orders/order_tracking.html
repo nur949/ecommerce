@@ -6,9 +6,9 @@
         <div class="col-lg-6">
             <div class="bg-white rounded-5 p-5 shadow-sm theme-panel">
                 <h1 class="h3 fw-bold mb-4 text-center">Track Your Order</h1>
-                <form method="post" class="d-grid gap-3 mb-4">
+                <form method="post" class="d-grid gap-3 mb-4 js-no-empty-submit">
                     {% csrf_token %}
-                    <input type="text" name="order_number" class="form-control" placeholder="Enter order number">
+                    <input type="text" name="order_number" class="form-control" placeholder="Enter order number" required minlength="4" maxlength="32" autocomplete="off">
                     <button class="btn btn-primary rounded-pill">Track Order</button>
                 </form>
                 {% if order %}

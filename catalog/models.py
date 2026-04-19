@@ -79,6 +79,15 @@ class Product(models.Model):
         product_brand = (self.brand or '').lower()
         text = f'{product_name} {product_brand}'
         image_map = [
+            (('lipstick', 'lip gloss', 'lip liner', 'lip tint', 'lip'), 'https://images.pexels.com/photos/2533266/pexels-photo-2533266.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('foundation', 'concealer', 'primer', 'powder'), 'https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('mascara', 'eyeliner', 'eyebrow', 'eye shadow', 'eyeshadow'), 'https://images.pexels.com/photos/2113855/pexels-photo-2113855.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('blush', 'highlighter', 'bronzer'), 'https://images.pexels.com/photos/7290088/pexels-photo-7290088.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('serum', 'moisturizer', 'cleanser', 'toner', 'sunscreen', 'skincare'), 'https://images.pexels.com/photos/6621466/pexels-photo-6621466.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('perfume', 'fragrance', 'body mist', 'cologne'), 'https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('shampoo', 'conditioner', 'hair oil', 'hair mask', 'hair serum'), 'https://images.pexels.com/photos/3738348/pexels-photo-3738348.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('nail polish', 'nail', 'manicure'), 'https://images.pexels.com/photos/939837/pexels-photo-939837.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
+            (('beauty blender', 'makeup sponge', 'brush set', 'makeup brush', 'brush'), 'https://images.pexels.com/photos/2531155/pexels-photo-2531155.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
             (('laptop', 'notebook', 'macbook'), 'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
             (('desktop', 'pc', 'tower', 'computer'), 'https://images.pexels.com/photos/704730/pexels-photo-704730.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),
             (('monitor', 'display'), 'https://images.pexels.com/photos/777001/pexels-photo-777001.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop'),

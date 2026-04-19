@@ -1,10 +1,26 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 from .models import Category, Product, ProductVariant
 from orders.cart_utils import add_to_cart, get_cart_items, update_cart_quantity, remove_from_cart
+
+
+def _ajax_cart_payload(request):
+    cart_items, cart_subtotal = get_cart_items(request)
+    cart_count = sum(item['quantity'] for item in cart_items)
+    mini_cart_html = render_to_string(
+        'includes/minicart.html',
+        {
+            'cart_count': cart_count,
+            'cart_items': cart_items,
+            'cart_subtotal': cart_subtotal,
+        },
+        request=request,
+    )
+    return cart_items, cart_subtotal, cart_count, mini_cart_html
 
 
 def shop(request):
@@ -42,22 +58,61 @@ def add_product_to_cart(request, slug):
     quantity = int(request.POST.get('quantity', 1) or 1)
     if variant_id:
         variant = ProductVariant.objects.filter(product=product, id=variant_id).first()
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     add_to_cart(request, product, quantity=quantity, variant=variant)
+
+    if is_ajax:
+        _, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+        return JsonResponse(
+            {
+                'ok': True,
+                'cart_count': cart_count,
+                'cart_subtotal': str(cart_subtotal),
+                'mini_cart_html': mini_cart_html,
+            }
+        )
+
     messages.success(request, f'{product.name} added to cart.')
     next_url = request.POST.get('next') or reverse('catalog:product_detail', args=[slug])
     return redirect(next_url)
 
 
 def update_cart(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     if request.method == 'POST':
         item_key = request.POST.get('item_key')
         quantity = int(request.POST.get('quantity', 1) or 1)
         update_cart_quantity(request, item_key, quantity)
+        if is_ajax:
+            cart_items, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+            updated_item = next((item for item in cart_items if item['key'] == item_key), None)
+            return JsonResponse(
+                {
+                    'ok': True,
+                    'item_key': item_key,
+                    'item_total': str(updated_item['total']) if updated_item else '0.00',
+                    'item_quantity': updated_item['quantity'] if updated_item else 0,
+                    'cart_subtotal': str(cart_subtotal),
+                    'cart_count': cart_count,
+                    'mini_cart_html': mini_cart_html,
+                }
+            )
         messages.success(request, 'Cart updated successfully.')
     return redirect('orders:cart')
 
 
 def remove_cart_item(request, item_key):
     remove_from_cart(request, item_key)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        _, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+        return JsonResponse(
+            {
+                'ok': True,
+                'item_key': item_key,
+                'cart_subtotal': str(cart_subtotal),
+                'cart_count': cart_count,
+                'mini_cart_html': mini_cart_html,
+            }
+        )
     messages.info(request, 'Item removed from cart.')
     return redirect(request.META.get('HTTP_REFERER', reverse('orders:cart')))

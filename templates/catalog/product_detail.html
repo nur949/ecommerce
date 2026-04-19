@@ -39,9 +39,10 @@
                     </div>
                 </div>
                 {% endif %}
-                <form action="{% url 'catalog:add_to_cart' product.slug %}" method="post" class="d-flex flex-column gap-3">
+                <form action="{% url 'catalog:add_to_cart' product.slug %}" method="post" class="d-flex flex-column gap-3 js-add-to-cart-ajax">
                     {% csrf_token %}
                     {% if selected_variant %}<input type="hidden" name="variant_id" value="{{ selected_variant.id }}">{% endif %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
                     <div>
                         <label class="form-label fw-semibold">Quantity</label>
                         <input type="number" name="quantity" class="form-control" value="1" min="1">
@@ -84,7 +85,7 @@
         <div class="section-header"><h2>Related Products</h2></div>
         <div class="row g-4">
             {% for product in related_products %}
-                <div class="col-lg-3 col-md-4 col-sm-6">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+                <div class="col-6 col-md-4 col-lg-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
             {% endfor %}
         </div>
     </div>
