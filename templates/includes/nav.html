@@ -1,37 +1,6 @@
-<nav class="bg-white border-top border-bottom mega-nav-wrap">
-  <div class="container py-3 d-flex align-items-center position-relative">
-    <div class="d-flex text-sm secondary-nav">
-      <div class="mega-trigger nav-mega-item">
-        <a href="{% url 'catalog:shop' %}" class="text-decoration-none text-primary fw-semibold">Shop By Category</a>
-        <div class="mega-menu shadow-lg rounded-4 p-4 bg-white">
-          <div class="row g-4">
-            {% for entry in mega_categories %}
-            <div class="col-lg-4">
-              <div class="mega-category-card h-100">
-                <a href="{{ entry.category.get_absolute_url }}" class="fw-bold text-decoration-none d-inline-block mb-2">{{ entry.category.name }}</a>
-                {% if entry.children %}
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                  {% for child in entry.children %}
-                  <a href="{{ child.get_absolute_url }}" class="badge text-bg-light text-decoration-none px-3 py-2 rounded-pill">{{ child.name }}</a>
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {% if entry.featured_products %}
-                <div class="small text-muted mb-2">Popular products</div>
-                <div class="d-grid gap-2">
-                  {% for product in entry.featured_products %}
-                  <a href="{{ product.get_absolute_url }}" class="text-decoration-none small text-slate-700 hover-link">{{ product.name }}</a>
-                  {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-muted small">Browse {{ entry.category.name }} collections.</div>
-                {% endif %}
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
+<ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 ps-lg-5 mb-0">
+  <li class="nav-item"><a href="{% url 'core:home' %}" class="nav-link mx-2">Home</a></li>
+  <li class="nav-item"><a href="{% url 'catalog:shop' %}" class="nav-link mx-2">Shop</a></li>
+  <li class="nav-item"><a href="{% url 'catalog:shop' %}?sale=1" class="nav-link mx-2">Sale</a></li>
+  <li class="nav-item"><a href="{% url 'core:blog_index' %}" class="nav-link mx-2">Blog</a></li>
+</ul>

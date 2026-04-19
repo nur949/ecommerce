@@ -1,28 +1,27 @@
-<section class="container py-4">
-  <div class="section-header"><h2>Unlimited Offer</h2></div>
-  <div class="row g-3">
-    {% for banner in unlimited_banners %}
-    <div class="col-xl-3 col-lg-4 col-md-6 col-6">
-      <a href="{{ banner.url }}" class="offer-tile unlimited-offer-card d-block rounded-4 text-decoration-none shadow-sm overflow-hidden">
-        {% if banner.image %}
-        <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% elif 'laptop' in banner.title|lower or 'notebook' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=900&h=680&fit=crop" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% elif 'phone' in banner.title|lower or 'mobile' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=900&h=680&fit=crop" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% elif 'headphone' in banner.title|lower or 'audio' in banner.title|lower or 'earbud' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/3394665/pexels-photo-3394665.jpeg?auto=compress&cs=tinysrgb&w=900&h=680&fit=crop" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% elif 'gaming' in banner.title|lower or 'monitor' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/777001/pexels-photo-777001.jpeg?auto=compress&cs=tinysrgb&w=900&h=680&fit=crop" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% else %}
-        <img src="https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=900&h=680&fit=crop" alt="{{ banner.title }}" class="unlimited-offer-image">
-        {% endif %}
-        <div class="unlimited-offer-overlay">
-          <div class="unlimited-offer-title">{{ banner.title }}</div>
-          {% if banner.subtitle %}<div class="unlimited-offer-subtitle">{{ banner.subtitle }}</div>{% endif %}
-        </div>
-      </a>
+{% load static %}
+<section id="offers" class="padding-medium">
+  <div class="container">
+    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+      <h2 class="display-5 fw-light text-uppercase">Unlimited Offer</h2>
     </div>
-    {% endfor %}
+    <div class="row">
+      {% for banner in unlimited_banners %}
+      <div class="col-md-6 col-lg-3 my-4">
+        <a href="{{ banner.url }}" class="product-item d-block">
+          <div class="image-holder">
+            {% if banner.image %}
+            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="product-image img-fluid">
+            {% else %}
+            <img src="{% static 'aura/images/product-item' %}{{ forloop.counter }}.jpg" alt="{{ banner.title }}" class="product-image img-fluid">
+            {% endif %}
+          </div>
+          <div class="product-detail mt-2">
+            <h5 class="product-title mb-1">{{ banner.title }}</h5>
+            {% if banner.subtitle %}<p class="aura-muted mb-0">{{ banner.subtitle }}</p>{% endif %}
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 </section>

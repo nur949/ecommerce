@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Homepage Builder | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
+<section class="aura-page">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
       <h1 class="fw-bold mb-1">Homepage Drag-and-Drop Builder</h1>
       <p class="text-muted mb-0">Drag sections to reorder them. Toggle visibility and save.</p>
     </div>
-    <a href="{% url 'core:superadmin_dashboard' %}" class="btn btn-outline-dark rounded-pill">Back to Dashboard</a>
+    <a href="{% url 'core:superadmin_dashboard' %}" class="btn btn-outline-dark">Back to Dashboard</a>
   </div>
   <form method="post" id="homepageBuilderForm">
     {% csrf_token %}
     <input type="hidden" name="section_order" id="sectionOrderInput">
-    <div class="dashboard-card">
+    <div class="aura-card p-4">
       <div id="sortableSections" class="d-grid gap-3">
         {% for section in sections %}
         <div class="builder-item d-flex justify-content-between align-items-center flex-wrap gap-3" draggable="true" data-key="{{ section.key }}">
@@ -31,8 +31,8 @@
         {% endfor %}
       </div>
       <div class="mt-4 d-flex gap-2">
-        <button class="btn btn-primary rounded-pill px-4" type="submit">Save Layout</button>
-        <a href="/" class="btn btn-outline-primary rounded-pill px-4">Preview Homepage</a>
+        <button class="btn btn-primary px-4" type="submit">Save Layout</button>
+        <a href="/" class="btn btn-outline-primary px-4">Preview Homepage</a>
       </div>
     </div>
   </form>

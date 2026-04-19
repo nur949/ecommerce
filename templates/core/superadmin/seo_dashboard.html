@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}SEO Dashboard | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
+<section class="aura-page">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
       <h1 class="fw-bold mb-1">SEO Dashboard</h1>
       <p class="text-muted mb-0">Review and fix metadata without leaving the frontend control panel.</p>
     </div>
-    <a href="{% url 'core:superadmin_dashboard' %}" class="btn btn-outline-dark rounded-pill">Back to Dashboard</a>
+    <a href="{% url 'core:superadmin_dashboard' %}" class="btn btn-outline-dark">Back to Dashboard</a>
   </div>
 
   <div class="row g-4 mb-4">
-    <div class="col-md-4"><div class="dashboard-card"><div class="small text-muted">Products missing title</div><div class="display-6 fw-bold">{{ products_missing_title }}</div></div></div>
-    <div class="col-md-4"><div class="dashboard-card"><div class="small text-muted">Categories missing title</div><div class="display-6 fw-bold">{{ categories_missing_title }}</div></div></div>
-    <div class="col-md-4"><div class="dashboard-card"><div class="small text-muted">Pages missing title</div><div class="display-6 fw-bold">{{ pages_missing_title }}</div></div></div>
+    <div class="col-md-4"><div class="aura-card p-4"><div class="small text-muted">Products missing title</div><div class="display-6 fw-bold">{{ products_missing_title }}</div></div></div>
+    <div class="col-md-4"><div class="aura-card p-4"><div class="small text-muted">Categories missing title</div><div class="display-6 fw-bold">{{ categories_missing_title }}</div></div></div>
+    <div class="col-md-4"><div class="aura-card p-4"><div class="small text-muted">Pages missing title</div><div class="display-6 fw-bold">{{ pages_missing_title }}</div></div></div>
   </div>
 
-  <div class="dashboard-card mb-4">
+  <div class="aura-card p-4 mb-4">
     <h3 class="fw-bold mb-3">Product SEO</h3>
     <div class="table-responsive">
       <table class="table align-middle">
@@ -28,7 +28,7 @@
             <td><input form="pseo{{ product.id }}" type="text" name="meta_title" class="form-control" value="{{ product.meta_title }}"></td>
             <td><input form="pseo{{ product.id }}" type="text" name="meta_description" class="form-control" value="{{ product.meta_description }}"></td>
             <td>
-              <form id="pseo{{ product.id }}" method="post" action="{% url 'core:quick_update_product_seo' product.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary rounded-pill">Save</button></form>
+              <form id="pseo{{ product.id }}" method="post" action="{% url 'core:quick_update_product_seo' product.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary">Save</button></form>
             </td>
           </tr>
           {% endfor %}
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div class="dashboard-card mb-4">
+  <div class="aura-card p-4 mb-4">
     <h3 class="fw-bold mb-3">Category SEO</h3>
     <div class="table-responsive">
       <table class="table align-middle">
@@ -49,7 +49,7 @@
             <td><input form="cseo{{ category.id }}" type="text" name="meta_title" class="form-control" value="{{ category.meta_title }}"></td>
             <td><input form="cseo{{ category.id }}" type="text" name="meta_description" class="form-control" value="{{ category.meta_description }}"></td>
             <td>
-              <form id="cseo{{ category.id }}" method="post" action="{% url 'core:quick_update_category_seo' category.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary rounded-pill">Save</button></form>
+              <form id="cseo{{ category.id }}" method="post" action="{% url 'core:quick_update_category_seo' category.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary">Save</button></form>
             </td>
           </tr>
           {% endfor %}
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <div class="dashboard-card">
+  <div class="aura-card p-4">
     <h3 class="fw-bold mb-3">Static Page SEO</h3>
     <div class="table-responsive">
       <table class="table align-middle">
@@ -70,7 +70,7 @@
             <td><input form="pgseo{{ page.id }}" type="text" name="meta_title" class="form-control" value="{{ page.meta_title }}"></td>
             <td><input form="pgseo{{ page.id }}" type="text" name="meta_description" class="form-control" value="{{ page.meta_description }}"></td>
             <td>
-              <form id="pgseo{{ page.id }}" method="post" action="{% url 'core:quick_update_page_seo' page.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary rounded-pill">Save</button></form>
+              <form id="pgseo{{ page.id }}" method="post" action="{% url 'core:quick_update_page_seo' page.id %}">{% csrf_token %}<button class="btn btn-sm btn-primary">Save</button></form>
             </td>
           </tr>
           {% endfor %}

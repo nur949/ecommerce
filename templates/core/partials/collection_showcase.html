@@ -1,9 +1,12 @@
-<section class="container py-4">
-  <div class="showcase-shell rounded-5 p-4">
-    <div class="section-header signature-header"><h2>Signature Collection</h2><a href="{% url 'catalog:shop' %}">See More</a></div>
-    <div class="row g-4">
+<section id="signature" class="padding-medium pt-0">
+  <div class="container">
+    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+      <h2 class="display-5 fw-light text-uppercase">Signature Collection</h2>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-primary">See More</a>
+    </div>
+    <div class="row">
       {% for product in collection_showcase %}
-      <div class="col-6 col-md-4 col-lg-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+      <div class="col-md-6 col-lg-3 my-4">{% include 'catalog/partials/product_card.html' with product=product %}</div>
       {% endfor %}
     </div>
   </div>

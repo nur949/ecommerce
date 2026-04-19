@@ -2,13 +2,15 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Account | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Account</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-5">
-            <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
+            <div class="aura-card p-4">
                 <div class="d-flex gap-2 mb-4">
-                    <a href="{% url 'accounts:login' %}" class="btn {% if active_tab == 'login' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50 rounded-pill">Login</a>
-                    <a href="{% url 'accounts:register' %}" class="btn {% if active_tab == 'register' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50 rounded-pill">Register</a>
+                    <a href="{% url 'accounts:login' %}" class="btn {% if active_tab == 'login' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn {% if active_tab == 'register' %}btn-primary{% else %}btn-outline-primary{% endif %} w-50">Register</a>
                 </div>
                 {% if active_tab == 'register' %}
                     <form method="post" action="{% url 'accounts:register' %}" class="d-grid gap-3">
@@ -26,7 +28,7 @@
                         {% if register_form.password1.errors %}<div class="text-danger small">{{ register_form.password1.errors|join:', ' }}</div>{% endif %}
                         {{ register_form.password2 }}
                         {% if register_form.password2.errors %}<div class="text-danger small">{{ register_form.password2.errors|join:', ' }}</div>{% endif %}
-                        <button class="btn btn-primary rounded-pill">Create Account</button>
+                        <button class="btn btn-primary">Create Account</button>
                     </form>
                 {% else %}
                     <form method="post" action="{% url 'accounts:login' %}" class="d-grid gap-3">
@@ -36,13 +38,14 @@
                         {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors|join:', ' }}</div>{% endif %}
                         {{ form.password }}
                         {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|join:', ' }}</div>{% endif %}
-                        <button class="btn btn-primary rounded-pill">Login</button>
+                        <button class="btn btn-primary">Login</button>
                     </form>
                 {% endif %}
-                <div class="text-center text-muted mt-3 small">Secure access to your Zynvo account.</div>
+                <div class="text-center aura-muted mt-3 small">Secure access to your Zynvo account.</div>
             </div>
         </div>
     </div>
+  </div>
 </section>
 {% endblock %}
 

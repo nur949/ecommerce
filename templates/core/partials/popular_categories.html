@@ -1,15 +1,19 @@
-<section class="container py-4">
-  <div class="section-header"><h2>Popular Categories</h2></div>
+<section id="categories" class="padding-medium">
+  <div class="container">
+  <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+    <h2 class="display-5 fw-light text-uppercase">Popular Categories</h2>
+  </div>
   <div class="row g-3">
     {% for item in popular_categories_data %}
     <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-      <a href="{{ item.category.get_absolute_url }}" class="text-decoration-none text-slate-800 category-grid-card d-block h-100">
-        <div class="category-grid-media">
-          <img src="{{ item.image_url }}" alt="{{ item.category.name }}" class="category-grid-image">
+      <a href="{{ item.category.get_absolute_url }}" class="category-item d-block text-center">
+        <div class="category-img">
+          <img src="{{ item.image_url }}" alt="{{ item.category.name }}" class="img-fluid rounded-circle">
         </div>
-        <div class="category-grid-name">{{ item.category.name }}</div>
+        <h4 class="fs-5 mt-3 mb-0">{{ item.category.name }}</h4>
       </a>
     </div>
     {% endfor %}
+  </div>
   </div>
 </section>

@@ -1,28 +1,33 @@
-<section class="container py-4">
-  <div class="section-header"><h2>Gadget Festive</h2></div>
-  <div class="row g-3">
-    {% for banner in gadget_banners %}
-    <div class="col-lg-4 col-md-6">
-      <a href="{{ banner.url }}" class="wide-banner gadget-festive-card d-block rounded-5 text-decoration-none shadow-sm overflow-hidden" style="background: {{ banner.color }};">
-        {% if banner.image %}
-        <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% elif 'laptop' in banner.title|lower or 'notebook' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% elif 'phone' in banner.title|lower or 'mobile' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% elif 'monitor' in banner.title|lower or 'gaming' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/777001/pexels-photo-777001.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% elif 'headphone' in banner.title|lower or 'audio' in banner.title|lower %}
-        <img src="https://images.pexels.com/photos/3394665/pexels-photo-3394665.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% else %}
-        <img src="https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop" alt="{{ banner.title }}" class="gadget-festive-image">
-        {% endif %}
-        <div class="gadget-festive-overlay">
-          <h4 class="fw-bold mb-2">{{ banner.title }}</h4>
-          {% if banner.subtitle %}<p class="mb-0">{{ banner.subtitle }}</p>{% endif %}
-        </div>
-      </a>
+{% load static %}
+<section id="beauty-banners" class="padding-medium bg-light">
+  <div class="container">
+    <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+      <h2 class="display-5 fw-light text-uppercase">Beauty Stories</h2>
     </div>
-    {% endfor %}
+    <div class="row">
+      {% for banner in gadget_banners %}
+      <div class="col-md-4 my-4">
+        <a href="{{ banner.url }}" class="card position-relative d-block">
+          {% if banner.image %}
+          <img src="{{ banner.image.url }}" class="img-fluid" alt="{{ banner.title }}">
+          {% elif forloop.counter == 1 %}
+          <img src="{% static 'aura/images/category1.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          {% elif forloop.counter == 2 %}
+          <img src="{% static 'aura/images/category2.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          {% else %}
+          <img src="{% static 'aura/images/category3.jpg' %}" class="img-fluid" alt="{{ banner.title }}">
+          {% endif %}
+          <div class="card-body p-0">
+            <h3 class="pt-4 pb-2 m-0">{{ banner.title }}</h3>
+            {% if banner.subtitle %}<p>{{ banner.subtitle }}</p>{% endif %}
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category1.jpg' %}" class="img-fluid" alt="Skincare"><h3 class="pt-4 pb-2 m-0">Skincare Rituals</h3></a></div>
+      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category2.jpg' %}" class="img-fluid" alt="Makeup"><h3 class="pt-4 pb-2 m-0">Makeup Essentials</h3></a></div>
+      <div class="col-md-4 my-4"><a href="{% url 'catalog:shop' %}" class="card"><img src="{% static 'aura/images/category3.jpg' %}" class="img-fluid" alt="Fragrance"><h3 class="pt-4 pb-2 m-0">Signature Scents</h3></a></div>
+      {% endfor %}
+    </div>
   </div>
 </section>

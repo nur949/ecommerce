@@ -1,26 +1,30 @@
-<div class="card product-card border-0 shadow-sm h-100 overflow-hidden d-flex flex-column">
-    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-slate-800 d-block">
-        <div class="card-top product-media position-relative">
-            <div class="product-image-shell">
-                <img src="{{ product.primary_image_url }}" class="product-image product-image-fill" alt="{{ product.name }}" loading="lazy" decoding="async">
-            </div>
-        </div>
-        <div class="card-body product-copy pt-3">
-            <h3 class="h6 product-title mb-2">{{ product.name }}</h3>
-            <div class="price-row">
-                <span class="product-price">&#2547;{{ product.price }}</span>
-                {% if product.compare_at_price %}<small class="product-compare">&#2547;{{ product.compare_at_price }}</small>{% endif %}
-            </div>
-        </div>
-    </a>
-    <div class="product-actions mt-auto">
-        <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
-            {% csrf_token %}
-            <input type="hidden" name="quantity" value="1">
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn btn-outline-primary btn-sm w-100 product-action-btn" {% if not product.in_stock %}disabled{% endif %}>
-                {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
-            </button>
-        </form>
+<div class="product-item position-relative">
+  {% if product.compare_at_price %}
+  <div class="z-1 position-absolute rounded-3 m-3 px-3 bg-primary text-white">Sale</div>
+  {% elif not product.in_stock %}
+  <div class="z-1 position-absolute rounded-3 m-3 px-3 bg-primary text-white">Sold</div>
+  {% endif %}
+  <a href="{{ product.get_absolute_url }}" class="image-holder d-block">
+    <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="product-image img-fluid" loading="lazy" decoding="async">
+  </a>
+  <div class="cart-concern">
+    <div class="cart-button d-flex justify-content-between align-items-center">
+      <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn-wrap cart-link d-flex align-items-center text-capitalize fs-6" {% if not product.in_stock %}disabled{% endif %}>
+          {% if product.in_stock %}add to cart{% else %}out of stock{% endif %} <i class="icon icon-arrow-io pe-1"></i>
+        </button>
+      </form>
+      <a href="{{ product.get_absolute_url }}" class="view-btn mt-1" aria-label="View {{ product.name }}"><i class="icon icon-screen-full"></i></a>
     </div>
+  </div>
+  <div class="product-detail d-flex justify-content-between align-items-start gap-3 mt-2">
+    <a href="{{ product.get_absolute_url }}"><h5 class="product-title mb-0">{{ product.name }}</h5></a>
+    <div class="text-end flex-shrink-0">
+      <p class="m-0 fs-5 fw-normal">&#2547;{{ product.price }}</p>
+      {% if product.compare_at_price %}<small class="text-decoration-line-through aura-muted">&#2547;{{ product.compare_at_price }}</small>{% endif %}
+    </div>
+  </div>
 </div>

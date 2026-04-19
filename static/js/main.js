@@ -37,12 +37,12 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.classList.remove('d-none');
     panel.setAttribute('aria-hidden', 'false');
     if (backdrop) {
-      backdrop.classList.add('d-none');
-      backdrop.classList.remove('is-open');
+      backdrop.classList.remove('d-none');
+      requestAnimationFrame(() => backdrop.classList.add('is-open'));
     }
     requestAnimationFrame(() => panel.classList.add('is-open'));
     toggle.setAttribute('aria-expanded', 'true');
-    document.body.classList.remove('mini-cart-active');
+    document.body.classList.add('mini-cart-active');
   };
 
   const showCartNotice = (message) => {
@@ -158,7 +158,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const backdrop = document.getElementById('miniCartBackdrop');
 
   if (toggle && panel) {
-    toggle.addEventListener('click', function () {
+    toggle.addEventListener('click', function (event) {
+      event.preventDefault();
       const isOpen = panel.classList.contains('is-open');
       if (isOpen) {
         closeMiniCart();

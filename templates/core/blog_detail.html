@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}{{ post.title }} | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
-    <article class="bg-white rounded-5 p-4 p-lg-5 shadow-sm theme-panel">
-        <img src="{{ post.primary_image_url }}" alt="{{ post.title }}" class="w-100 rounded-4 mb-4 blog-hero-image">
-        <h1 class="h2 fw-bold mb-3">{{ post.title }}</h1>
-        <p class="text-muted mb-4">{{ post.excerpt }}</p>
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">{{ post.title }}</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
+    <article class="aura-card p-4 p-lg-5">
+        <img src="{{ post.primary_image_url }}" alt="{{ post.title }}" class="w-100 mb-4 blog-hero-image">
+        <p class="aura-muted mb-4">{{ post.excerpt }}</p>
         {{ post.content|linebreaks }}
     </article>
+  </div>
 </section>
 {% endblock %}
 

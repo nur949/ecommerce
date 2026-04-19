@@ -2,16 +2,18 @@
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 {% block title %}Order Complete | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
-    <div class="bg-white rounded-5 p-5 shadow-sm theme-panel">
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Order Complete</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
+    <div class="aura-card p-5">
         <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
             <div>
-                <h1 class="h3 fw-bold mb-1">Your order has been placed successfully.</h1>
-                <p class="text-muted mb-0">Order number: {{ order.order_number }}</p>
+                <h1 class="h3 text-uppercase mb-1">Your order has been placed successfully.</h1>
+                <p class="aura-muted mb-0">Order number: {{ order.order_number }}</p>
             </div>
             <div class="text-end">
-                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{ order.get_status_display }}</span>
-                <div class="small text-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
+                <span class="badge bg-primary px-3 py-2">{{ order.get_status_display }}</span>
+                <div class="small aura-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
             </div>
         </div>
         <div class="row g-4">
@@ -25,17 +27,18 @@
                 {% endfor %}
             </div>
             <div class="col-lg-5">
-                <div class="bg-slate-50 rounded-4 p-4 theme-soft">
+                <div class="border p-4">
                     <div class="d-flex justify-content-between summary-line mb-2"><span>Payment Method</span><span>{{ order.get_payment_method_display }}</span></div>
                     {% if latest_payment %}<div class="d-flex justify-content-between summary-line mb-2"><span>Reference</span><span>{{ latest_payment.reference }}</span></div>{% endif %}
                     <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
                     <div class="d-grid gap-2 mt-4">
-                        <a href="{{ order.get_absolute_url }}" class="btn btn-primary rounded-pill">View Order Details</a>
-                        <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary rounded-pill">Track Order</a>
+                        <a href="{{ order.get_absolute_url }}" class="btn btn-primary">View Order Details</a>
+                        <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary">Track Order</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+  </div>
 </section>
 {% endblock %}

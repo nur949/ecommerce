@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Order {{ order.order_number }} | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
-    <div class="bg-white rounded-5 p-5 shadow-sm theme-panel">
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Order Details</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
+    <div class="aura-card p-5">
         <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
             <div>
-                <h1 class="h3 fw-bold mb-1">Order details</h1>
-                <p class="text-muted mb-0">Order number: {{ order.order_number }}</p>
+                <h1 class="h3 text-uppercase mb-1">Order details</h1>
+                <p class="aura-muted mb-0">Order number: {{ order.order_number }}</p>
             </div>
             <div class="text-end">
-                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{ order.get_status_display }}</span>
-                <div class="small text-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
+                <span class="badge bg-primary px-3 py-2">{{ order.get_status_display }}</span>
+                <div class="small aura-muted mt-2">Payment: {{ order.get_payment_status_display }}</div>
             </div>
         </div>
         <div class="row g-4">
@@ -20,19 +22,19 @@
                 <div class="d-flex justify-content-between order-line {% if not forloop.last %}border-bottom pb-2 mb-2{% endif %}">
                     <div>
                         <div>{{ item.product_name }} x {{ item.quantity }}</div>
-                        <div class="text-muted small">SKU: {{ item.sku }}</div>
+                        <div class="aura-muted small">SKU: {{ item.sku }}</div>
                     </div>
                     <div>&#2547;{{ item.total_price }}</div>
                 </div>
                 {% endfor %}
             </div>
             <div class="col-lg-5">
-                <div class="bg-slate-50 rounded-4 p-4 mb-3">
+                <div class="border p-4 mb-3">
                     <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><span>&#2547;{{ order.subtotal }}</span></div>
                     <div class="d-flex justify-content-between summary-line mb-2"><span>Discount</span><span>&#2547;{{ order.discount }}</span></div>
                     <div class="d-flex justify-content-between summary-line fw-bold border-top pt-3 mt-3"><span>Total</span><span>&#2547;{{ order.total }}</span></div>
                 </div>
-                <div class="bg-slate-50 rounded-4 p-4 theme-soft">
+                <div class="border p-4">
                     <div class="fw-semibold mb-2">Payment Details</div>
                     <div class="small">Method: {{ order.get_payment_method_display }}</div>
                     <div class="small">Status: {{ order.get_payment_status_display }}</div>
@@ -41,5 +43,6 @@
             </div>
         </div>
     </div>
+  </div>
 </section>
 {% endblock %}

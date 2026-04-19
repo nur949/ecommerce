@@ -1,10 +1,10 @@
 {% for product in products %}
-    <div class="col-6 col-md-6 col-lg-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+    <div class="col-md-6 col-lg-4 col-xl-3 my-4">{% include 'catalog/partials/product_card.html' with product=product %}</div>
 {% empty %}
     <div class="col-12">
-        <div class="empty-products theme-panel text-center p-5">
+        <div class="aura-card text-center p-5">
             <h2 class="h5 mb-2">No products found</h2>
-            <p class="text-muted mb-0">Try another category, search term, or sort option.</p>
+            <p class="aura-muted mb-0">Try another category, search term, or sort option.</p>
         </div>
     </div>
 {% endfor %}

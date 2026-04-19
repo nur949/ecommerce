@@ -1,18 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}{{ category.name }} | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
-    <div class="mb-4">
-        <h1 class="display-6 fw-bold">{{ category.name }}</h1>
-        <p class="text-muted">{{ category.description }}</p>
+<section class="page-hero">
+  <div class="container">
+    <h1 class="display-2 text-uppercase">{{ category.name }}</h1>
+    {% if category.description %}<p class="fs-5">{{ category.description }}</p>{% endif %}
+  </div>
+</section>
+<section class="padding-medium pt-5">
+  <div class="container">
+    <div class="row">
+      {% for product in products %}
+      <div class="col-md-6 col-lg-3 my-4">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+      {% empty %}
+      <div class="col-12"><div class="aura-card p-5 text-center">No products in this category yet.</div></div>
+      {% endfor %}
     </div>
-    <div class="row g-3">
-        {% for product in products %}
-            <div class="col-6 col-md-6 col-lg-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
-        {% empty %}
-            <p>No products in this category yet.</p>
-        {% endfor %}
-    </div>
+  </div>
 </section>
 {% endblock %}
-

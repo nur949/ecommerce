@@ -1,47 +1,47 @@
 {% extends 'base.html' %}
 {% block title %}Cart | Zynvo{% endblock %}
 {% block content %}
-<section class="container py-5 page-shell">
-    <h1 class="h2 fw-bold mb-4">Your Cart</h1>
+<section class="page-hero"><div class="container"><h1 class="display-2 text-uppercase">Your Cart</h1></div></section>
+<section class="padding-medium pt-5">
+  <div class="container">
     {% if items %}
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="bg-white rounded-5 p-4 shadow-sm theme-panel">
-                {% for item in items %}
-                <div class="d-flex gap-3 align-items-center cart-line {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}" data-item-key="{{ item.key }}">
-                    <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
-                    <div class="flex-grow-1">
-                        <h3 class="h6 mb-1">{{ item.product.name }}</h3>
-                        {% if item.variant %}<div class="text-muted small">{{ item.variant.attribute_name }}: {{ item.variant.value }}</div>{% endif %}
-                        <div class="small text-muted">SKU: {{ item.variant.sku|default:item.product.sku }}</div>
-                    </div>
-                    <form action="{% url 'catalog:update_cart' %}" method="post" class="d-flex align-items-center gap-2 js-cart-update-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_key" value="{{ item.key }}">
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control cart-qty-input">
-                    </form>
-                    <div class="fw-semibold cart-line-total">&#2547;{{ item.total }}</div>
-                    <a href="{% url 'catalog:remove_cart_item' item.key %}" class="btn btn-sm btn-outline-danger rounded-pill js-cart-remove-link" data-item-key="{{ item.key }}">Remove</a>
-                </div>
-                {% endfor %}
-            </div>
+    <div class="row g-5">
+      <div class="col-lg-8">
+        {% for item in items %}
+        <div class="cart-line d-flex gap-3 align-items-center border-bottom py-4" data-item-key="{{ item.key }}">
+          <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image">
+          <div class="flex-grow-1">
+            <h3 class="h5 mb-1">{{ item.product.name }}</h3>
+            {% if item.variant %}<div class="aura-muted small">{{ item.variant.attribute_name }}: {{ item.variant.value }}</div>{% endif %}
+            <div class="small aura-muted">SKU: {{ item.variant.sku|default:item.product.sku }}</div>
+          </div>
+          <form action="{% url 'catalog:update_cart' %}" method="post" class="js-cart-update-form">
+            {% csrf_token %}
+            <input type="hidden" name="item_key" value="{{ item.key }}">
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control cart-qty-input">
+          </form>
+          <div class="fw-semibold cart-line-total">&#2547;{{ item.total }}</div>
+          <a href="{% url 'catalog:remove_cart_item' item.key %}" class="btn btn-outline-primary btn-sm js-cart-remove-link" data-item-key="{{ item.key }}">Remove</a>
         </div>
-        <div class="col-lg-4">
-            <div class="bg-white rounded-5 p-4 shadow-sm sticky-sidebar theme-panel">
-                <h2 class="h4 mb-4">Summary</h2>
-                <div class="d-flex justify-content-between summary-line mb-2"><span>Subtotal</span><strong class="cart-subtotal-value">&#2547;{{ subtotal }}</strong></div>
-                <div class="d-flex justify-content-between summary-line mb-4"><span>Shipping</span><span>Calculated at checkout</span></div>
-                <a href="{% url 'orders:checkout' %}" class="btn btn-primary w-100 rounded-pill">Proceed to Checkout</a>
-            </div>
+        {% endfor %}
+      </div>
+      <div class="col-lg-4">
+        <div class="aura-card p-4 sticky-top" style="top: 7rem;">
+          <h2 class="h4 text-uppercase mb-4">Summary</h2>
+          <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><strong class="cart-subtotal-value">&#2547;{{ subtotal }}</strong></div>
+          <div class="d-flex justify-content-between mb-4"><span>Shipping</span><span>Calculated at checkout</span></div>
+          <a href="{% url 'orders:checkout' %}" class="btn btn-primary w-100">Proceed to Checkout</a>
         </div>
+      </div>
     </div>
     {% else %}
-        <div class="bg-white rounded-5 p-5 shadow-sm text-center theme-panel">
-            <div class="mini-empty-icon mx-auto mb-3">Cart</div>
-            <h2 class="fw-bold">Your cart is empty</h2>
-            <p class="text-muted">Start adding products to continue.</p>
-            <a href="{% url 'catalog:shop' %}" class="btn btn-primary rounded-pill px-4">Go to Shop</a>
-        </div>
+    <div class="aura-card p-5 text-center">
+      <div class="mini-empty-icon">Cart</div>
+      <h2>Your cart is empty</h2>
+      <p class="aura-muted">Start adding beauty essentials to continue.</p>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-primary">Go to Shop</a>
+    </div>
     {% endif %}
+  </div>
 </section>
 {% endblock %}
