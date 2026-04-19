@@ -12,6 +12,7 @@
                 <p class="aura-muted mb-4">Secure your order {{ order.order_number }}. Sandbox mode is enabled for online methods.</p>
                 <form method="post" class="d-grid gap-4">
                     {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger mb-0">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
                     <div>
                         {% for choice in form.payment_method %}
                         <label class="payment-option d-flex gap-3 align-items-start border p-3 mb-3 payment-option-row">
@@ -30,14 +31,17 @@
                         <div class="col-md-6">
                             <label class="form-label">Mobile Number (for bKash)</label>
                             {{ form.mobile_number }}
+                            {% if form.mobile_number.errors %}<div class="text-danger small mt-1">{{ form.mobile_number.errors|join:', ' }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Transaction ID</label>
                             {{ form.transaction_id }}
+                            {% if form.transaction_id.errors %}<div class="text-danger small mt-1">{{ form.transaction_id.errors|join:', ' }}</div>{% endif %}
                         </div>
                         <div class="col-12">
                             <label class="form-label">Cardholder Name (for card sandbox)</label>
                             {{ form.cardholder_name }}
+                            {% if form.cardholder_name.errors %}<div class="text-danger small mt-1">{{ form.cardholder_name.errors|join:', ' }}</div>{% endif %}
                         </div>
                     </div>
                     <button class="btn btn-primary">Complete Order</button>

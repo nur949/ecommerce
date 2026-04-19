@@ -1,20 +1,25 @@
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+IS_TEST = 'test' in sys.argv
 
-DEBUG = os.getenv('DEBUG', 'False').lower() in {'1', 'true', 'yes', 'on'}
+debug_env = os.getenv('DEBUG')
+if debug_env is None:
+    DEBUG = True
+else:
+    DEBUG = debug_env.lower() in {'1', 'true', 'yes', 'on'}
+if IS_TEST:
+    DEBUG = True
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = get_random_secret_key()
-    else:
-        SECRET_KEY = 'zynvo-render-demo-fallback-2026-04-19-9xv8q2m5p7r4t6w1c3n8b0k2h5s7d9f4a6j1l3'
+    SECRET_KEY = get_random_secret_key()
 
-default_allowed_hosts = '127.0.0.1,localhost'
+default_allowed_hosts = '127.0.0.1,localhost,testserver'
 if not DEBUG:
     default_allowed_hosts += ',.onrender.com'
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', default_allowed_hosts).split(',') if host.strip()]
@@ -101,11 +106,15 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'core:home'
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
+)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -120,7 +129,7 @@ SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', '1209600'))
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() in {'1', 'true', 'yes', 'on'} and not DEBUG
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() in {'1', 'true', 'yes', 'on'} and not DEBUG and not IS_TEST
 
 if not DEBUG:
     SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000'))

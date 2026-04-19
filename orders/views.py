@@ -3,11 +3,38 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .cart_utils import clear_cart, get_cart_items
 from .forms import CheckoutForm, PaymentSelectionForm
 from .models import Order, OrderItem, PaymentTransaction
+
+
+def _remember_order_access(request, order_number):
+    recent_orders = request.session.get('recent_order_numbers', [])
+    recent_orders = [value for value in recent_orders if value != order_number]
+    recent_orders.insert(0, order_number)
+    request.session['recent_order_numbers'] = recent_orders[:5]
+    request.session.modified = True
+
+
+def _can_access_order(request, order):
+    if request.user.is_staff:
+        return True
+    if request.user.is_authenticated:
+        return order.user_id == request.user.id
+    return order.order_number in request.session.get('recent_order_numbers', [])
+
+
+def _get_accessible_order(request, order_number, *, include_payments=False):
+    queryset = Order.objects.select_related('address').prefetch_related('items')
+    if include_payments:
+        queryset = queryset.prefetch_related('payments')
+    order = get_object_or_404(queryset, order_number=order_number)
+    if not _can_access_order(request, order):
+        raise Http404('Order not found.')
+    return order
 
 
 def cart_view(request):
@@ -83,6 +110,7 @@ def checkout_view(request):
                 messages.error(request, str(exc))
             else:
                 clear_cart(request)
+                _remember_order_access(request, order.order_number)
                 messages.success(request, 'Shipping information saved. Choose a payment method to complete your order.')
                 return redirect('orders:payment', order_number=order.order_number)
     else:
@@ -102,7 +130,7 @@ def checkout_view(request):
 
 
 def payment_view(request, order_number):
-    order = get_object_or_404(Order.objects.select_related('address').prefetch_related('items'), order_number=order_number)
+    order = _get_accessible_order(request, order_number)
     if request.method == 'POST':
         form = PaymentSelectionForm(request.POST)
         if form.is_valid():
@@ -148,12 +176,12 @@ def payment_view(request, order_number):
 
 
 def payment_complete(request, order_number):
-    order = get_object_or_404(Order.objects.select_related('address').prefetch_related('payments', 'items'), order_number=order_number)
+    order = _get_accessible_order(request, order_number, include_payments=True)
     return render(request, 'orders/payment_complete.html', {'order': order, 'latest_payment': order.payments.first()})
 
 
 def order_detail(request, order_number):
-    order = get_object_or_404(Order.objects.select_related('address').prefetch_related('items', 'payments'), order_number=order_number)
+    order = _get_accessible_order(request, order_number, include_payments=True)
     return render(request, 'orders/order_detail.html', {'order': order, 'latest_payment': order.payments.first()})
 
 

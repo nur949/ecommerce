@@ -40,6 +40,9 @@
                         {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|join:', ' }}</div>{% endif %}
                         <button class="btn btn-primary">Login</button>
                     </form>
+                    <div class="text-end mt-3">
+                        <a href="{% url 'accounts:password_reset' %}" class="small text-primary">Forgot password?</a>
+                    </div>
                 {% endif %}
                 <div class="text-center aura-muted mt-3 small">Secure access to your Zynvo account.</div>
             </div>

@@ -12,6 +12,7 @@ from django.utils.html import escape
 from django.utils import timezone
 
 from catalog.models import Category, Product
+from orders.models import Order
 from .forms import SearchForm
 from .models import BlogPost, HeroSlide, HomeSection, PromoBanner, SiteSettings, StaticPage
 
@@ -162,7 +163,7 @@ def superadmin_dashboard(request):
         'section_count': HomeSection.objects.count(),
         'product_count': Product.objects.count(),
         'category_count': Category.objects.count(),
-        'order_count': 0,
+        'order_count': Order.objects.count(),
         'seo_summary': seo_summary,
         'top_categories': Category.objects.annotate(product_total=Count('products')).order_by('-product_total', 'name')[:6],
     }

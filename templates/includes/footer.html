@@ -86,9 +86,9 @@
         <div class="footer-menu">
           <h6 class="text-uppercase fw-bold text-light mb-4">Contact</h6>
           <ul class="menu-list list-unstyled">
-            <li class="footer-link">support@zynvo.com</li>
-            <li class="footer-link">+880 1700-000000</li>
-            <li class="footer-link">Dhaka, Bangladesh</li>
+            <li class="footer-link">{{ site_settings.support_email }}</li>
+            <li class="footer-link">{{ site_settings.support_phone }}</li>
+            <li class="footer-link">{{ site_settings.address }}</li>
           </ul>
         </div>
       </div>
@@ -100,7 +100,7 @@
   <hr class="text-light m-0">
   <div class="container text-light pt-3">
     <div class="row">
-      <div class="col-md-6 copyright"><p>&copy; {% now "Y" %} {{ site_settings.site_name }}. All rights reserved.</p></div>
+      <div class="col-md-6 copyright"><p>{{ site_settings.copyright_text|default:"© Zynvo. All rights reserved." }}</p></div>
       <div class="col-md-6 text-md-end"><p>Beauty ecommerce by {{ site_settings.site_name }}.</p></div>
     </div>
   </div>

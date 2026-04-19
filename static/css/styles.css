@@ -864,6 +864,7 @@ Styles page style start
 .detail-main-image { width: 100%; aspect-ratio: 1 / 1.05; object-fit: cover; background: #fff7f4; }
 .detail-thumb { width: 86px; height: 86px; object-fit: cover; border: 1px solid rgba(95, 11, 24, .15); cursor: pointer; opacity: .72; }
 .detail-thumb.active-thumb, .detail-thumb:hover { opacity: 1; border-color: var(--accent-color); }
+.js-variant-option.active { background: var(--accent-color); color: var(--light-color); border-color: var(--accent-color); }
 .cart-image { width: 96px; height: 110px; object-fit: cover; background: #fff7f4; }
 .cart-qty-input { width: 86px; }
 .mini-cart-backdrop { position: fixed; inset: 0; z-index: 1050; background: rgba(34, 34, 34, .35); opacity: 0; transition: opacity .24s ease; }

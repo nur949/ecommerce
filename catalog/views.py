@@ -9,6 +9,13 @@ from .models import Category, Product, ProductVariant
 from orders.cart_utils import add_to_cart, get_cart_items, update_cart_quantity, remove_from_cart
 
 
+def _category_tree_ids(category):
+    ids = [category.id]
+    for child in category.children.all():
+        ids.extend(_category_tree_ids(child))
+    return ids
+
+
 def _ajax_cart_payload(request):
     cart_items, cart_subtotal = get_cart_items(request)
     cart_count = sum(item['quantity'] for item in cart_items)
@@ -31,7 +38,11 @@ def shop(request):
         products = products.filter(name__icontains=q)
     category_slug = request.GET.get('category')
     if category_slug:
-        products = products.filter(category__slug=category_slug)
+        active_category = Category.objects.filter(slug=category_slug).prefetch_related('children').first()
+        if active_category:
+            products = products.filter(category_id__in=_category_tree_ids(active_category))
+        else:
+            products = products.none()
     sale = request.GET.get('sale') in {'1', 'true', 'yes'}
     if sale:
         products = products.filter(compare_at_price__gt=F('price'))
@@ -65,8 +76,11 @@ def shop(request):
 
 
 def category_detail(request, slug):
-    category = get_object_or_404(Category, slug=slug)
-    products = category.products.filter(is_active=True).select_related('category').prefetch_related('variants')
+    category = get_object_or_404(Category.objects.prefetch_related('children'), slug=slug)
+    products = Product.objects.filter(
+        category_id__in=_category_tree_ids(category),
+        is_active=True,
+    ).select_related('category').prefetch_related('variants')
     return render(request, 'catalog/category_detail.html', {'category': category, 'products': products})
 
 

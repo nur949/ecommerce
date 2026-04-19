@@ -45,3 +45,23 @@ class CatalogCartTests(TestCase):
         self.assertEqual(response.status_code, 200)
         products = list(response.context['products'])
         self.assertEqual(products[0].name, 'Budget Keyboard')
+
+    def test_parent_category_pages_include_child_products(self):
+        parent = Category.objects.create(name='Beauty', slug='beauty')
+        child = Category.objects.create(name='Serums', slug='serums', parent=parent)
+        product = Product.objects.create(
+            category=child,
+            name='Glow Serum',
+            slug='glow-serum',
+            description='Brightening serum.',
+            price='999.00',
+            sku='GS-001',
+            stock=4,
+            is_active=True,
+        )
+
+        category_response = self.client.get(reverse('catalog:category_detail', args=[parent.slug]), HTTP_HOST='testserver')
+        shop_response = self.client.get(reverse('catalog:shop'), {'category': parent.slug}, HTTP_HOST='testserver')
+
+        self.assertContains(category_response, product.name)
+        self.assertContains(shop_response, product.name)

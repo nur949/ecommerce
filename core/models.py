@@ -21,7 +21,10 @@ class SiteSettings(SingletonModel):
     address = models.CharField(max_length=255, default='Dhaka, Bangladesh')
     copyright_text = models.CharField(max_length=255, default='© 2026 Zynvo Ltd. All Rights Reserved')
     hero_title = models.CharField(max_length=140, default='Elevate your everyday with Zynvo')
-    hero_subtitle = models.CharField(max_length=255, default='Discover hand-picked lifestyle, fashion, and gadget essentials with fast delivery.')
+    hero_subtitle = models.CharField(
+        max_length=255,
+        default='Discover hand-picked lifestyle, fashion, and gadget essentials with fast delivery.',
+    )
     announcement_text = models.CharField(max_length=255, default='Free shipping on orders over ৳3000')
     corporate_cta_title = models.CharField(max_length=140, default='Become Our Corporate Partner')
     corporate_cta_url = models.CharField(max_length=255, default='/corporate/')

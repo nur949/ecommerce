@@ -481,6 +481,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  const variantInput = document.getElementById('variantIdInput');
+  const variantPrice = document.getElementById('detailPrice');
+  const variantStockLabel = document.getElementById('variantStockLabel');
+  const addToCartButton = document.getElementById('addToCartButton');
+  if (variantInput && variantPrice && addToCartButton) {
+    document.querySelectorAll('.js-variant-option').forEach((option) => {
+      option.addEventListener('click', () => {
+        const nextId = option.dataset.variantId || '';
+        const nextPrice = option.dataset.price || variantPrice.textContent.replace(/[^\d.]/g, '');
+        const nextStock = Number(option.dataset.stock || 0);
+
+        variantInput.value = nextId;
+        variantPrice.textContent = `৳${nextPrice}`;
+        if (variantStockLabel) {
+          variantStockLabel.textContent = nextStock > 0 ? `${nextStock} available` : 'Out of stock';
+          variantStockLabel.classList.toggle('text-success', nextStock > 0);
+          variantStockLabel.classList.toggle('text-danger', nextStock <= 0);
+        }
+        addToCartButton.disabled = nextStock <= 0;
+        addToCartButton.textContent = nextStock > 0 ? 'Add to Cart' : 'Out of Stock';
+        document.querySelectorAll('.js-variant-option').forEach((item) => {
+          item.classList.remove('active');
+          item.setAttribute('aria-pressed', 'false');
+        });
+        option.classList.add('active');
+        option.setAttribute('aria-pressed', 'true');
+      });
+    });
+  }
+
   const builderList = document.getElementById('sortableSections');
   const builderInput = document.getElementById('sectionOrderInput');
   if (builderList && builderInput) {
