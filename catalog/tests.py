@@ -169,3 +169,20 @@ class CatalogCartTests(TestCase):
 
         self.assertContains(response, 'Choose Options')
         self.assertNotContains(response, f'action="{reverse("catalog:add_to_cart", args=[self.product.slug])}"')
+
+    def test_products_api_handles_invalid_page_size(self):
+        response = self.client.get(reverse('catalog:api_products'), {'page_size': 'bad'}, HTTP_HOST='testserver')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['ok'])
+
+    def test_review_api_rejects_invalid_json(self):
+        response = self.client.post(
+            reverse('catalog:api_submit_review', args=[self.product.slug]),
+            data='not-json',
+            content_type='application/json',
+            HTTP_HOST='testserver',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['ok'])

@@ -174,12 +174,22 @@ def get_cart_coupon(request):
 
 
 def set_cart_reward_points(request, points):
-    request.session['cart_reward_points'] = max(int(points or 0), 0)
+    try:
+        points = int(points or 0)
+    except (TypeError, ValueError):
+        points = 0
+    request.session['cart_reward_points'] = max(points, 0)
     request.session.modified = True
 
 
 def get_cart_reward_points(request):
-    return max(int(request.session.get('cart_reward_points') or 0), 0)
+    try:
+        points = int(request.session.get('cart_reward_points') or 0)
+    except (TypeError, ValueError):
+        request.session.pop('cart_reward_points', None)
+        request.session.modified = True
+        return 0
+    return max(points, 0)
 
 
 def calculate_discount(subtotal, coupon=None):
@@ -200,7 +210,11 @@ def calculate_discount(subtotal, coupon=None):
 def build_cart_totals(subtotal, coupon=None, reward_points=0):
     subtotal = Decimal(subtotal or 0)
     coupon_discount = calculate_discount(subtotal, coupon)
-    reward_discount = min(Decimal(max(int(reward_points or 0), 0)), max(subtotal - coupon_discount, Decimal('0.00')))
+    try:
+        reward_points = int(reward_points or 0)
+    except (TypeError, ValueError):
+        reward_points = 0
+    reward_discount = min(Decimal(max(reward_points, 0)), max(subtotal - coupon_discount, Decimal('0.00')))
     total_discount = coupon_discount + reward_discount
     total = max(subtotal - total_discount, Decimal('0.00'))
     free_delivery_remaining = max(FREE_DELIVERY_THRESHOLD - subtotal, Decimal('0.00'))

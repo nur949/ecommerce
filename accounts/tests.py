@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from catalog.models import Category, Product
-from .models import WishlistItem
+from .models import UserProfile, WishlistItem
 
 
 class PasswordResetTests(TestCase):
@@ -101,3 +101,29 @@ class WishlistTests(TestCase):
     def test_wishlist_page_requires_login(self):
         response = self.client.get(reverse('accounts:wishlist'), HTTP_HOST='testserver')
         self.assertEqual(response.status_code, 302)
+
+
+class AccountApiTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='apiuser', email='api@example.com', password='StrongPass123')
+
+    def test_profile_api_rejects_invalid_birthday(self):
+        login_response = self.client.post(
+            reverse('accounts:api_login'),
+            data='{"username": "apiuser", "password": "StrongPass123"}',
+            content_type='application/json',
+            HTTP_HOST='testserver',
+        )
+        token = login_response.json()['token']
+
+        response = self.client.patch(
+            reverse('accounts:api_profile'),
+            data='{"birthday": "20-04-2026"}',
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {token}',
+            HTTP_HOST='testserver',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['ok'])
+        self.assertFalse(UserProfile.objects.filter(user=self.user, birthday__isnull=False).exists())

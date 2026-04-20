@@ -18,6 +18,24 @@ from .models import Category, Product, ProductReview, ProductVariant, StockAlert
 PAGE_SIZE = 16
 
 
+def _json_body(request):
+    try:
+        return json.loads(request.body.decode('utf-8') or '{}')
+    except json.JSONDecodeError:
+        return None
+
+
+def _bounded_int(value, default, minimum=1, maximum=None):
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        value = default
+    value = max(value, minimum)
+    if maximum is not None:
+        value = min(value, maximum)
+    return value
+
+
 def _category_tree_ids(category):
     ids = [category.id]
     for child in category.children.all():
@@ -288,7 +306,7 @@ def api_products(request):
     products, _, _ = _apply_shop_filters(request, products)
     sort = request.GET.get('sort') or 'latest'
     products = _sort_shop_products(products, sort)
-    paginator = Paginator(products, int(request.GET.get('page_size') or 20))
+    paginator = Paginator(products, _bounded_int(request.GET.get('page_size'), 20, maximum=100))
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     return JsonResponse(
@@ -422,8 +440,10 @@ def notify_stock(request, slug):
 @require_POST
 def api_submit_review(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
-    payload = json.loads(request.body.decode('utf-8') or '{}')
-    rating = int(payload.get('rating') or 0)
+    payload = _json_body(request)
+    if payload is None:
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON payload.'}, status=400)
+    rating = _bounded_int(payload.get('rating'), 0, minimum=0, maximum=5)
     reviewer_name = (payload.get('reviewer_name') or '').strip()
     comment = (payload.get('comment') or '').strip()
     if not reviewer_name or rating not in {1, 2, 3, 4, 5} or not comment:

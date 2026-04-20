@@ -252,7 +252,13 @@ def api_profile(request):
         profile.phone = (payload.get('phone') or '').strip()
     if 'birthday' in payload:
         birthday_raw = (payload.get('birthday') or '').strip()
-        profile.birthday = datetime.strptime(birthday_raw, '%Y-%m-%d').date() if birthday_raw else None
+        if birthday_raw:
+            try:
+                profile.birthday = datetime.strptime(birthday_raw, '%Y-%m-%d').date()
+            except ValueError:
+                return JsonResponse({'ok': False, 'error': 'Birthday must be in YYYY-MM-DD format.'}, status=400)
+        else:
+            profile.birthday = None
     if 'beauty_preferences' in payload:
         profile.beauty_preferences = (payload.get('beauty_preferences') or '').strip()
     if 'preferred_brands' in payload:

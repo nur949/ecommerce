@@ -87,3 +87,20 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(PaymentTransaction.objects.filter(order=order).count(), 1)
         order.refresh_from_db()
         self.assertEqual(order.payment_method, 'cod')
+
+    def test_cart_ignores_invalid_reward_points_input(self):
+        response = self.client.post(reverse('orders:cart'), {'reward_points': 'not-a-number'}, HTTP_HOST='testserver')
+
+        self.assertRedirects(response, reverse('orders:cart'), fetch_redirect_response=False)
+        self.assertEqual(self.client.session.get('cart_reward_points'), 0)
+
+    def test_coupon_api_rejects_invalid_json(self):
+        response = self.client.post(
+            reverse('orders:api_coupon_validate'),
+            data='not-json',
+            content_type='application/json',
+            HTTP_HOST='testserver',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['ok'])

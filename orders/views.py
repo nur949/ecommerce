@@ -1,6 +1,6 @@
 import json
 import uuid
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -24,6 +24,13 @@ from .cart_utils import (
 )
 from .forms import CheckoutForm, PaymentSelectionForm
 from .models import Coupon, Order, OrderItem, PaymentTransaction
+
+
+def _json_body(request):
+    try:
+        return json.loads(request.body.decode('utf-8') or '{}')
+    except json.JSONDecodeError:
+        return None
 
 
 def _remember_order_access(request, order_number):
@@ -95,7 +102,7 @@ def cart_view(request):
             else:
                 messages.error(request, 'Invalid or expired coupon code.')
         if reward_points is not None:
-            set_cart_reward_points(request, int(reward_points or 0))
+            set_cart_reward_points(request, reward_points)
             messages.success(request, 'Reward points updated.')
         return redirect('orders:cart')
     coupon = get_cart_coupon(request)
@@ -288,9 +295,14 @@ def order_tracking(request):
 @csrf_exempt
 @require_POST
 def api_coupon_validate(request):
-    payload = json.loads(request.body.decode('utf-8') or '{}')
+    payload = _json_body(request)
+    if payload is None:
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON payload.'}, status=400)
     code = (payload.get('code') or '').strip().upper()
-    subtotal = Decimal(str(payload.get('subtotal') or '0'))
+    try:
+        subtotal = Decimal(str(payload.get('subtotal') or '0'))
+    except (InvalidOperation, TypeError, ValueError):
+        return JsonResponse({'ok': False, 'error': 'Invalid subtotal.'}, status=400)
     coupon = Coupon.objects.filter(code__iexact=code, is_active=True).first()
     if not coupon:
         return JsonResponse({'ok': False, 'error': 'Coupon not found.'}, status=404)
@@ -373,7 +385,9 @@ def api_order_status_update(request, order_number):
     if not request.user.is_staff:
         return JsonResponse({'ok': False, 'error': 'Unauthorized'}, status=403)
     order = get_object_or_404(Order, order_number=order_number)
-    payload = json.loads(request.body.decode('utf-8') or '{}')
+    payload = _json_body(request)
+    if payload is None:
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON payload.'}, status=400)
     next_status = (payload.get('status') or '').strip()
     if next_status not in dict(Order.STATUS_CHOICES):
         return JsonResponse({'ok': False, 'error': 'Invalid status'}, status=400)
