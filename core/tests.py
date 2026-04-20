@@ -26,7 +26,8 @@ class HomeSectionTests(TestCase):
         response = self.client.get(reverse('core:home'), HTTP_HOST='testserver')
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Popular Categories')
+        self.assertContains(response, 'Top Categories')
         self.assertContains(response, 'Skincare')
-        self.assertContains(response, '1 items')
-        self.assertContains(response, 'Explore')
+        self.assertContains(response, 'See All')
+        self.assertContains(response, 'top-category-item')
+        self.assertNotContains(response, 'popular-category-card')
