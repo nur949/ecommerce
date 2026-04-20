@@ -1,5 +1,11 @@
 from decimal import Decimal
 
+from django.utils import timezone
+
+from .models import Coupon
+
+FREE_DELIVERY_THRESHOLD = Decimal('3000.00')
+
 
 def _cart(request, create=False):
     cart = request.session.get('cart')
@@ -71,6 +77,8 @@ def remove_from_cart(request, item_key):
 
 def clear_cart(request):
     request.session['cart'] = {}
+    request.session.pop('cart_coupon_code', None)
+    request.session.pop('cart_reward_points', None)
     request.session.modified = True
 
 
@@ -127,3 +135,81 @@ def get_cart_items(request):
     if stale_keys:
         request.session.modified = True
     return items, subtotal
+
+
+def set_cart_coupon(request, code):
+    code = (code or '').strip().upper()
+    if not code:
+        request.session.pop('cart_coupon_code', None)
+        request.session.modified = True
+        return None
+    coupon = Coupon.objects.filter(code__iexact=code, is_active=True).first()
+    if not coupon:
+        return None
+    now = timezone.now()
+    if coupon.starts_at and coupon.starts_at > now:
+        return None
+    if coupon.ends_at and coupon.ends_at < now:
+        return None
+    request.session['cart_coupon_code'] = coupon.code
+    request.session.modified = True
+    return coupon
+
+
+def get_cart_coupon(request):
+    code = request.session.get('cart_coupon_code')
+    if not code:
+        return None
+    coupon = Coupon.objects.filter(code__iexact=code, is_active=True).first()
+    if not coupon:
+        request.session.pop('cart_coupon_code', None)
+        request.session.modified = True
+        return None
+    now = timezone.now()
+    if (coupon.starts_at and coupon.starts_at > now) or (coupon.ends_at and coupon.ends_at < now):
+        request.session.pop('cart_coupon_code', None)
+        request.session.modified = True
+        return None
+    return coupon
+
+
+def set_cart_reward_points(request, points):
+    request.session['cart_reward_points'] = max(int(points or 0), 0)
+    request.session.modified = True
+
+
+def get_cart_reward_points(request):
+    return max(int(request.session.get('cart_reward_points') or 0), 0)
+
+
+def calculate_discount(subtotal, coupon=None):
+    subtotal = Decimal(subtotal or 0)
+    if not coupon:
+        return Decimal('0.00')
+    if subtotal < coupon.min_subtotal:
+        return Decimal('0.00')
+    if coupon.discount_type == 'percent':
+        discount = (subtotal * coupon.discount_value) / Decimal('100')
+    else:
+        discount = coupon.discount_value
+    if coupon.max_discount_amount:
+        discount = min(discount, coupon.max_discount_amount)
+    return max(min(discount, subtotal), Decimal('0.00'))
+
+
+def build_cart_totals(subtotal, coupon=None, reward_points=0):
+    subtotal = Decimal(subtotal or 0)
+    coupon_discount = calculate_discount(subtotal, coupon)
+    reward_discount = min(Decimal(max(int(reward_points or 0), 0)), max(subtotal - coupon_discount, Decimal('0.00')))
+    total_discount = coupon_discount + reward_discount
+    total = max(subtotal - total_discount, Decimal('0.00'))
+    free_delivery_remaining = max(FREE_DELIVERY_THRESHOLD - subtotal, Decimal('0.00'))
+    return {
+        'subtotal': subtotal,
+        'coupon_discount': coupon_discount,
+        'reward_discount': reward_discount,
+        'discount_total': total_discount,
+        'total': total,
+        'free_delivery_threshold': FREE_DELIVERY_THRESHOLD,
+        'free_delivery_remaining': free_delivery_remaining,
+    }

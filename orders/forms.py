@@ -68,6 +68,6 @@ class PaymentSelectionForm(forms.Form):
                 self.add_error('mobile_number', 'Mobile number is required for bKash payments.')
             if not cleaned_data.get('transaction_id'):
                 self.add_error('transaction_id', 'Transaction ID is required for bKash payments.')
-        if method == 'card' and not cleaned_data.get('cardholder_name'):
+        if method == 'stripe' and not cleaned_data.get('cardholder_name'):
             self.add_error('cardholder_name', 'Cardholder name is required for card payments.')
         return cleaned_data

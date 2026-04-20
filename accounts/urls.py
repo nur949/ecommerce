@@ -2,7 +2,19 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.urls import reverse_lazy
 
-from .views import UserLoginView, UserLogoutView, add_to_wishlist, dashboard, register_view, remove_from_wishlist, wishlist_view
+from .views import (
+    UserLoginView,
+    UserLogoutView,
+    add_to_wishlist,
+    api_dashboard,
+    api_login,
+    api_profile,
+    api_register,
+    dashboard,
+    register_view,
+    remove_from_wishlist,
+    wishlist_view,
+)
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
@@ -28,4 +40,8 @@ urlpatterns = [
     path('wishlist/', wishlist_view, name='wishlist'),
     path('wishlist/add/<slug:slug>/', add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/remove/<slug:slug>/', remove_from_wishlist, name='remove_from_wishlist'),
+    path('api/auth/register/', api_register, name='api_register'),
+    path('api/auth/login/', api_login, name='api_login'),
+    path('api/profile/', api_profile, name='api_profile'),
+    path('api/dashboard/', api_dashboard, name='api_dashboard'),
 ]

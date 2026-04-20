@@ -1,23 +1,19 @@
-{% for group in product_groups %}
-  <section id="shop-category-{% if group.category %}{{ group.category.slug }}{% else %}uncategorized{% endif %}" class="shop-category-section" data-shop-category="{% if group.category %}{{ group.category.slug }}{% else %}uncategorized{% endif %}">
-    <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">{{ group.count }} product{{ group.count|pluralize }}</p>
-        <h3 class="mt-2 text-2xl font-semibold text-ink">{% if group.category %}{{ group.category.name }}{% else %}More Products{% endif %}</h3>
-      </div>
-      {% if group.category %}
-      <a href="{{ group.category.get_absolute_url }}" class="text-sm font-bold text-rosewood">Open category</a>
-      {% endif %}
-    </div>
-    <div class="row g-4">
-      {% for product in group.products %}
-      <div class="col-6 col-md-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
-      {% endfor %}
-    </div>
-  </section>
-{% empty %}
-  <div class="rounded-[32px] border border-black/5 bg-white px-6 py-16 text-center shadow-soft">
-    <h2 class="text-2xl font-semibold text-ink">No products found</h2>
-    <p class="mt-3 text-sm text-stone">Try another search term or sort option.</p>
+{% if products %}
+<section class="shop-category-section">
+  <div class="row g-4" id="shopProductsGrid">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+    {% endfor %}
   </div>
-{% endfor %}
+</section>
+{% if page_obj.has_next %}
+<div class="mt-8 text-center">
+  <button type="button" class="js-load-more-products rounded-full border border-black/10 bg-white px-6 py-3 text-sm font-semibold text-ink" data-next-page="{{ page_obj.next_page_number }}">Load more</button>
+</div>
+{% endif %}
+{% else %}
+<div class="rounded-[24px] border border-black/5 bg-white px-6 py-16 text-center shadow-soft">
+  <h2 class="text-2xl font-semibold text-ink">No products found</h2>
+  <p class="mt-3 text-sm text-stone">Try a different filter or keyword.</p>
+</div>
+{% endif %}

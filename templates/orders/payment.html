@@ -25,7 +25,8 @@
               <strong class="block text-base text-ink">{{ choice.choice_label }}</strong>
               {% if choice.data.value == 'cod' %}<span class="mt-2 block text-sm text-stone">Pay when the order arrives.</span>{% endif %}
               {% if choice.data.value == 'bkash' %}<span class="mt-2 block text-sm text-stone">Submit mobile number and transaction reference for review.</span>{% endif %}
-              {% if choice.data.value == 'card' %}<span class="mt-2 block text-sm text-stone">Instant sandbox approval for demo use.</span>{% endif %}
+              {% if choice.data.value == 'stripe' %}<span class="mt-2 block text-sm text-stone">Instant Stripe-style card processing in sandbox mode.</span>{% endif %}
+              {% if choice.data.value == 'paypal' %}<span class="mt-2 block text-sm text-stone">PayPal account checkout flow simulation.</span>{% endif %}
               {% if choice.data.value == 'bank' %}<span class="mt-2 block text-sm text-stone">Best for corporate or manual verification orders.</span>{% endif %}
             </span>
           </label>

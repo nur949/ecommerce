@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Address, Order, OrderItem, PaymentTransaction
+from .models import Address, Coupon, Order, OrderItem, PaymentTransaction
 
 
 class OrderItemInline(admin.TabularInline):
@@ -62,3 +62,10 @@ class PaymentTransactionAdmin(admin.ModelAdmin):
     list_filter = ('provider', 'status', 'created_at')
     search_fields = ('reference', 'order__order_number')
     list_select_related = ('order',)
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_type', 'discount_value', 'min_subtotal', 'is_active', 'starts_at', 'ends_at')
+    list_filter = ('discount_type', 'is_active')
+    search_fields = ('code', 'description')

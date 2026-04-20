@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Category, Product, ProductImage, ProductVariant
+from .models import Category, Product, ProductFAQ, ProductImage, ProductReview, ProductVariant, StockAlert
 
 admin.site.site_header = 'Zynvo Administration'
 admin.site.site_title = 'Zynvo Admin'
@@ -26,20 +26,26 @@ class ProductVariantInline(admin.TabularInline):
     fields = ('attribute_name', 'value', 'color_hex', 'sku', 'price_override', 'stock', 'image', 'is_default')
 
 
+class ProductFAQInline(admin.TabularInline):
+    model = ProductFAQ
+    extra = 0
+    fields = ('question', 'answer', 'order')
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('thumb', 'name', 'sku', 'category', 'price', 'stock', 'is_active', 'is_daily_deal', 'is_new', 'is_trending', 'updated_at')
+    list_display = ('thumb', 'name', 'sku', 'ean', 'category', 'price', 'stock', 'is_active', 'is_daily_deal', 'is_new', 'is_trending', 'updated_at')
     prepopulated_fields = {'slug': ('name',)}
     list_filter = ('category', 'is_active', 'is_daily_deal', 'is_new', 'is_trending', 'is_featured')
-    search_fields = ('name', 'sku', 'brand', 'collection_label')
+    search_fields = ('name', 'sku', 'ean', 'brand', 'collection_label')
     list_editable = ('price', 'stock', 'is_active')
     autocomplete_fields = ('category',)
     list_select_related = ('category',)
     date_hierarchy = 'created_at'
     actions = ('mark_active', 'mark_inactive', 'mark_featured', 'mark_daily_deal')
-    inlines = [ProductImageInline, ProductVariantInline]
+    inlines = [ProductImageInline, ProductVariantInline, ProductFAQInline]
     fieldsets = (
-        ('Core', {'fields': ('category', 'name', 'slug', 'brand', 'sku', 'short_description', 'description', 'featured_image')}),
+        ('Core', {'fields': ('category', 'name', 'slug', 'brand', 'sku', 'ean', 'short_description', 'description', 'featured_image')}),
         ('Pricing & Inventory', {'fields': ('price', 'compare_at_price', 'stock', 'badge_text')}),
         ('Merchandising', {'fields': ('is_active', 'is_featured', 'is_new', 'is_daily_deal', 'is_trending', 'collection_label', 'trending_group', 'deal_ends_at')}),
         ('Content', {'fields': ('specifications', 'return_policy')}),
@@ -75,3 +81,18 @@ class CategoryAdmin(admin.ModelAdmin):
     list_editable = ('is_featured', 'order')
     list_filter = ('is_featured', 'parent')
     search_fields = ('name',)
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'reviewer_name', 'rating', 'is_verified_purchase', 'is_approved', 'created_at')
+    list_filter = ('rating', 'is_verified_purchase', 'is_approved', 'created_at')
+    search_fields = ('product__name', 'reviewer_name', 'reviewer_email', 'title', 'comment')
+    list_editable = ('is_approved',)
+
+
+@admin.register(StockAlert)
+class StockAlertAdmin(admin.ModelAdmin):
+    list_display = ('product', 'variant', 'email', 'notified', 'created_at')
+    list_filter = ('notified', 'created_at')
+    search_fields = ('product__name', 'email')

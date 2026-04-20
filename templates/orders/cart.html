@@ -1,56 +1,79 @@
 {% extends 'base.html' %}
-{% block title %}Cart | Zynvo{% endblock %}
+{% block title %}Cart | {{ site_settings.site_name }}{% endblock %}
 {% block content %}
 <section class="px-4 py-6 lg:px-8">
-  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Shopping bag</p>
-    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Your Cart</h1>
+  <div class="mx-auto max-w-7xl rounded-[28px] bg-[#111827] px-6 py-10 text-white shadow-panel md:px-10">
+    <p class="text-xs font-semibold uppercase tracking-[0.26em] text-white/55">Cart Drawer + Summary</p>
+    <h1 class="mt-3 font-brand text-5xl font-semibold uppercase tracking-[0.1em] md:text-6xl">Shopping Bag</h1>
+    <p class="mt-3 text-sm text-white/75">Track savings, delivery threshold, and reward redemption before checkout.</p>
   </div>
 </section>
 <section class="px-4 pb-16 pt-8 lg:px-8">
   <div class="mx-auto max-w-7xl">
     {% if items %}
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div class="space-y-4">
         {% for item in items %}
-        <div class="cart-line grid gap-4 rounded-[28px] border border-black/5 bg-white p-5 shadow-soft md:grid-cols-[110px_minmax(0,1fr)_90px_auto_auto]" data-item-key="{{ item.key }}">
-          <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[120px] w-[96px] rounded-[24px] object-cover">
-          <div class="min-w-0">
+        <div class="cart-line grid gap-4 rounded-[20px] border border-black/5 bg-white p-5 shadow-soft md:grid-cols-[110px_minmax(0,1fr)_90px_auto_auto]" data-item-key="{{ item.key }}">
+          <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[120px] w-[96px] rounded-[16px] object-cover">
+          <div>
             <h3 class="text-lg font-semibold text-ink">{{ item.product.name }}</h3>
-            {% if item.variant %}<div class="mt-2 text-sm text-stone">{{ item.variant.attribute_name }}: {{ item.variant.value }}</div>{% endif %}
-            <div class="mt-1 text-xs uppercase tracking-[0.24em] text-stone">SKU: {{ item.variant.sku|default:item.product.sku }}</div>
+            <p class="mt-1 text-xs uppercase tracking-[0.16em] text-stone">{{ item.variant.value|default:"Default" }} | SKU {{ item.variant.sku|default:item.product.sku }}</p>
           </div>
           <form action="{% url 'catalog:update_cart' %}" method="post" class="js-cart-update-form">
             {% csrf_token %}
             <input type="hidden" name="item_key" value="{{ item.key }}">
-            <label class="sr-only" for="cart-quantity-{{ forloop.counter }}">Quantity for {{ item.product.name }}</label>
-            <input id="cart-quantity-{{ forloop.counter }}" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}" class="form-control cart-qty-input h-12 rounded-full border border-black/10 bg-[#fbf8f5] px-4 text-center text-sm text-ink">
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}" class="form-control cart-qty-input text-center">
           </form>
           <div class="self-center text-base font-semibold text-ink cart-line-total">&#2547;{{ item.total }}</div>
           <form action="{% url 'catalog:remove_cart_item' item.key %}" method="post" class="js-cart-remove-form self-center">
             {% csrf_token %}
-            <button type="submit" class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink transition hover:border-rosewood hover:text-rosewood" data-item-key="{{ item.key }}">Remove</button>
+            <button type="submit" class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink" data-item-key="{{ item.key }}">Remove</button>
           </form>
         </div>
         {% endfor %}
       </div>
-      <div>
-        <div class="sticky top-32 rounded-[28px] border border-black/5 bg-white p-6 shadow-panel">
-          <h2 class="text-2xl font-semibold text-ink">Summary</h2>
-          <div class="mt-6 space-y-4 text-sm text-stone">
-            <div class="flex justify-between"><span>Subtotal</span><strong class="cart-subtotal-value text-lg font-semibold text-ink">&#2547;{{ subtotal }}</strong></div>
-            <div class="flex justify-between"><span>Shipping</span><span>Calculated at checkout</span></div>
+      <aside>
+        <div class="sticky top-32 rounded-[24px] border border-black/5 bg-white p-6 shadow-panel">
+          <h2 class="text-2xl font-semibold text-ink">Order Summary</h2>
+          <div class="mt-4 rounded-[16px] bg-[#f8fafc] p-3 text-sm text-stone">
+            {% if totals.free_delivery_remaining > 0 %}
+            Add <strong>&#2547;{{ totals.free_delivery_remaining }}</strong> more for free delivery.
+            {% else %}
+            You unlocked free delivery.
+            {% endif %}
           </div>
-          <a href="{% url 'orders:checkout' %}" class="mt-8 inline-flex w-full items-center justify-center rounded-full bg-rosewood px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#561528]">Proceed to Checkout</a>
+          <form method="post" class="mt-4 space-y-3">
+            {% csrf_token %}
+            <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Coupon code</label>
+            <div class="flex gap-2">
+              <input type="text" name="coupon_code" value="{{ coupon.code|default:'' }}" class="form-control" placeholder="BEAUTY10">
+              <button class="btn btn-outline-primary" type="submit">Apply</button>
+            </div>
+            {% if coupon %}
+            <button type="submit" name="remove_coupon" value="1" class="text-xs font-semibold text-rosewood">Remove {{ coupon.code }}</button>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+            <label class="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-stone">Reward points</label>
+            <input type="number" name="reward_points" min="0" max="{{ reward_account.points_balance|default:0 }}" value="{{ reward_points }}" class="form-control" placeholder="Use points">
+            <p class="text-xs text-stone">Available: {{ reward_account.points_balance|default:0 }} points</p>
+            {% endif %}
+          </form>
+          <div class="mt-5 space-y-3 text-sm text-stone">
+            <div class="flex justify-between"><span>Subtotal</span><strong class="cart-subtotal-value text-ink">&#2547;{{ totals.subtotal }}</strong></div>
+            <div class="flex justify-between"><span>Coupon discount</span><strong class="text-ink">-&#2547;{{ totals.coupon_discount }}</strong></div>
+            <div class="flex justify-between"><span>Reward discount</span><strong class="text-ink">-&#2547;{{ totals.reward_discount }}</strong></div>
+            <div class="flex justify-between border-t border-black/10 pt-3"><span>Total</span><strong class="text-xl text-ink">&#2547;{{ totals.total }}</strong></div>
+          </div>
+          <a href="{% url 'orders:checkout' %}" class="btn btn-primary mt-6 w-full">Proceed to Checkout</a>
         </div>
-      </div>
+      </aside>
     </div>
     {% else %}
-    <div class="rounded-[32px] border border-black/5 bg-white px-6 py-20 text-center shadow-soft">
-      <div class="mini-empty-icon mx-auto">Cart</div>
-      <h2 class="mt-6 text-3xl font-semibold text-ink">Your cart is empty</h2>
-      <p class="mt-3 text-sm text-stone">Start adding beauty essentials to continue.</p>
-      <a href="{% url 'catalog:shop' %}" class="mt-8 inline-flex items-center justify-center rounded-full bg-rosewood px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#561528]">Go to Shop</a>
+    <div class="rounded-[24px] border border-black/5 bg-white px-6 py-20 text-center shadow-soft">
+      <h2 class="text-3xl font-semibold text-ink">Your cart is empty</h2>
+      <p class="mt-3 text-sm text-stone">Start adding products from the beauty catalog.</p>
+      <a href="{% url 'catalog:shop' %}" class="btn btn-primary mt-7">Go to Shop</a>
     </div>
     {% endif %}
   </div>

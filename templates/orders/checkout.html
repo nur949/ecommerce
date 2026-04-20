@@ -1,66 +1,69 @@
 {% extends 'base.html' %}
 {% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
-{% block title %}Checkout | Zynvo{% endblock %}
+{% block title %}Checkout | {{ site_settings.site_name }}{% endblock %}
 {% block content %}
 <section class="px-4 py-6 lg:px-8">
-  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Secure checkout</p>
-    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Delivery Details</h1>
+  <div class="mx-auto max-w-7xl rounded-[28px] bg-[#111827] px-6 py-10 text-white shadow-panel md:px-10">
+    <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+      <span class="rounded-full bg-white/15 px-3 py-1">Step 1 Address</span>
+      <span class="rounded-full border border-white/20 px-3 py-1">Step 2 Payment</span>
+      <span class="rounded-full border border-white/20 px-3 py-1">Step 3 Confirm</span>
+    </div>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.1em] md:text-6xl">Checkout</h1>
+    <p class="mt-3 text-sm text-white/75">{% if request.user.is_authenticated %}Logged in as {{ request.user.email }}{% else %}Guest checkout is active{% endif %}</p>
   </div>
 </section>
 <section class="px-4 pb-16 pt-8 lg:px-8">
   <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
     <div class="space-y-6">
-      <div class="rounded-[28px] border border-black/5 bg-white p-6 shadow-soft">
-        <h2 class="text-2xl font-semibold text-ink">Shipping Address</h2>
+      <div class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+        <h2 class="text-2xl font-semibold text-ink">Address Information</h2>
         <form method="post" class="mt-6 grid gap-4 md:grid-cols-2">
           {% csrf_token %}
           {% for field in form %}
-            <div class="{% if field.name == 'address_line' %}md:col-span-2{% endif %}">
-              <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone" for="{{ field.id_for_label }}">{{ field.label }}</label>
-              {{ field }}
-              {% if field.errors %}<div class="mt-2 text-sm text-rosewood">{{ field.errors|join:', ' }}</div>{% endif %}
-            </div>
+          <div class="{% if field.name == 'address_line' %}md:col-span-2{% endif %}">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-stone" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="mt-1 text-xs text-red-600">{{ field.errors|join:", " }}</div>{% endif %}
+          </div>
           {% endfor %}
           <div class="md:col-span-2">
-            <label class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-stone" for="checkoutNote">Note</label>
-            <textarea id="checkoutNote" class="form-control min-h-[120px] rounded-[24px] border border-black/10 bg-[#fbf8f5] px-5 py-4 text-sm text-ink" name="note" rows="3" placeholder="Any delivery note or landmark"></textarea>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-stone" for="checkoutNote">Delivery note</label>
+            <textarea id="checkoutNote" name="note" rows="3" class="form-control" placeholder="Landmark, gate code, or timing"></textarea>
           </div>
           <div class="md:col-span-2">
-            <button class="inline-flex w-full items-center justify-center rounded-full bg-rosewood px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#561528]">Continue to Payment</button>
+            <button class="btn btn-primary w-full">Continue to Payment</button>
           </div>
         </form>
       </div>
-      <div class="rounded-[28px] border border-black/5 bg-white p-6 shadow-soft">
-        <div class="mb-5 flex items-center justify-between">
-          <h2 class="text-2xl font-semibold text-ink">Order Items</h2>
-          <span class="rounded-full border border-black/10 px-4 py-2 text-sm text-stone">{{ items|length }} item{{ items|length|pluralize }}</span>
-        </div>
-        <div class="space-y-4">
+      <div class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+        <h2 class="text-2xl font-semibold text-ink">Order Items</h2>
+        <div class="mt-5 space-y-3">
           {% for item in items %}
-          <div class="grid gap-4 rounded-[24px] border border-black/5 bg-[#fcfaf7] p-4 md:grid-cols-[96px_minmax(0,1fr)_auto]">
-            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[110px] w-[96px] rounded-[20px] object-cover">
+          <div class="grid gap-3 rounded-[16px] border border-black/5 bg-[#f8fafc] p-3 md:grid-cols-[84px_minmax(0,1fr)_auto]">
+            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="h-20 w-[84px] rounded-[12px] object-cover">
             <div>
-              <div class="text-base font-semibold text-ink">{{ item.product.name }}</div>
-              <div class="mt-2 text-sm text-stone">Qty: {{ item.quantity }} {% if item.variant %}| {{ item.variant.value }}{% endif %}</div>
+              <h3 class="text-sm font-semibold text-ink">{{ item.product.name }}</h3>
+              <p class="text-xs text-stone">Qty {{ item.quantity }} {% if item.variant %}| {{ item.variant.value }}{% endif %}</p>
             </div>
-            <div class="self-center text-base font-semibold text-ink">&#2547;{{ item.total }}</div>
+            <strong class="self-center text-sm text-ink">&#2547;{{ item.total }}</strong>
           </div>
           {% endfor %}
         </div>
       </div>
     </div>
-    <div>
-      <div class="sticky top-32 rounded-[28px] border border-black/5 bg-white p-6 shadow-panel">
-        <h2 class="text-2xl font-semibold text-ink">Your Bill</h2>
-        <div class="mt-6 space-y-4 text-sm text-stone">
-          <div class="flex justify-between"><span>Subtotal</span><strong class="text-lg font-semibold text-ink">&#2547;{{ subtotal }}</strong></div>
-          <div class="flex justify-between"><span>Discount</span><strong class="text-lg font-semibold text-ink">&#2547;{{ discount }}</strong></div>
-          <div class="flex justify-between border-t border-black/5 pt-4"><span>Total</span><strong class="text-xl font-semibold text-rosewood">&#2547;{{ total }}</strong></div>
+    <aside>
+      <div class="sticky top-32 rounded-[24px] border border-black/5 bg-white p-6 shadow-panel">
+        <h2 class="text-2xl font-semibold text-ink">Order Summary</h2>
+        <div class="mt-5 space-y-3 text-sm text-stone">
+          <div class="flex justify-between"><span>Subtotal</span><strong class="text-ink">&#2547;{{ subtotal }}</strong></div>
+          <div class="flex justify-between"><span>Discount</span><strong class="text-ink">-&#2547;{{ discount }}</strong></div>
+          {% if coupon %}<div class="flex justify-between"><span>Coupon</span><strong class="text-ink">{{ coupon.code }}</strong></div>{% endif %}
+          {% if reward_points %}<div class="flex justify-between"><span>Reward points</span><strong class="text-ink">{{ reward_points }}</strong></div>{% endif %}
+          <div class="flex justify-between border-t border-black/10 pt-3"><span>Total</span><strong class="text-xl text-ink">&#2547;{{ total }}</strong></div>
         </div>
-        <p class="mt-6 text-sm leading-7 text-stone">By continuing, you agree to our delivery, payment, and return terms.</p>
       </div>
-    </div>
+    </aside>
   </div>
 </section>
 {% endblock %}

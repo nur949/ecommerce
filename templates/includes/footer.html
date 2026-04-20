@@ -1,69 +1,62 @@
 <section class="border-y border-black/5 bg-white">
   <div class="mx-auto grid max-w-7xl gap-4 px-4 py-8 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-    <div class="rounded-[28px] border border-black/5 bg-[#fcfaf7] p-6 shadow-soft" data-aos="fade-up">
-      <div class="mb-4 inline-flex rounded-full bg-[#f3ebe6] p-3 text-rosewood"><i data-lucide="truck" class="h-5 w-5"></i></div>
-      <h3 class="text-lg font-semibold text-ink">Fast Delivery</h3>
-      <p class="mt-2 text-sm text-stone">Reliable nationwide delivery with live order tracking.</p>
+    <div class="rounded-[20px] border border-black/5 bg-[#f8fafc] p-5">
+      <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-ink">Free Delivery</h3>
+      <p class="mt-2 text-sm text-stone">Free shipping on orders over ৳{{ cart_totals.free_delivery_threshold }}.</p>
     </div>
-    <div class="rounded-[28px] border border-black/5 bg-[#fcfaf7] p-6 shadow-soft" data-aos="fade-up" data-aos-delay="80">
-      <div class="mb-4 inline-flex rounded-full bg-[#f3ebe6] p-3 text-rosewood"><i data-lucide="shield-check" class="h-5 w-5"></i></div>
-      <h3 class="text-lg font-semibold text-ink">Secure Payment</h3>
-      <p class="mt-2 text-sm text-stone">Card, mobile banking, bank transfer, and cash on delivery.</p>
+    <div class="rounded-[20px] border border-black/5 bg-[#f8fafc] p-5">
+      <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-ink">Authenticity</h3>
+      <p class="mt-2 text-sm text-stone">Only genuine beauty and skincare products from trusted sources.</p>
     </div>
-    <div class="rounded-[28px] border border-black/5 bg-[#fcfaf7] p-6 shadow-soft" data-aos="fade-up" data-aos-delay="160">
-      <div class="mb-4 inline-flex rounded-full bg-[#f3ebe6] p-3 text-rosewood"><i data-lucide="sparkles" class="h-5 w-5"></i></div>
-      <h3 class="text-lg font-semibold text-ink">Curated Quality</h3>
-      <p class="mt-2 text-sm text-stone">Premium beauty and lifestyle products selected with care.</p>
+    <div class="rounded-[20px] border border-black/5 bg-[#f8fafc] p-5">
+      <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-ink">Rewards</h3>
+      <p class="mt-2 text-sm text-stone">Earn and redeem points with every eligible purchase.</p>
     </div>
-    <div class="rounded-[28px] border border-black/5 bg-[#fcfaf7] p-6 shadow-soft" data-aos="fade-up" data-aos-delay="240">
-      <div class="mb-4 inline-flex rounded-full bg-[#f3ebe6] p-3 text-rosewood"><i data-lucide="badge-percent" class="h-5 w-5"></i></div>
-      <h3 class="text-lg font-semibold text-ink">Seasonal Offers</h3>
-      <p class="mt-2 text-sm text-stone">Fresh edits, savings, and featured collections every week.</p>
+    <div class="rounded-[20px] border border-black/5 bg-[#f8fafc] p-5">
+      <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-ink">Support</h3>
+      <p class="mt-2 text-sm text-stone">{{ site_settings.support_email }}<br>{{ site_settings.support_phone }}</p>
     </div>
   </div>
 </section>
 
-<footer class="bg-[#140f14] text-white">
-  <div class="mx-auto grid max-w-7xl gap-12 px-4 py-16 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:px-8">
-    <div data-aos="fade-up">
-      <a href="{% url 'core:home' %}" class="font-brand text-4xl font-semibold uppercase tracking-[0.28em] text-white">{{ site_settings.site_name }}</a>
-      <p class="mt-6 max-w-md text-sm leading-7 text-white/65">A premium ecommerce experience for beauty, fashion, and curated essentials. Clean product discovery, secure checkout, and a calm, modern shopping flow.</p>
-      <div class="mt-6 flex flex-wrap gap-3">
-        <a href="{{ site_settings.facebook_url|default:'#' }}" class="inline-flex rounded-full border border-white/10 bg-white/5 p-3 text-white/70 transition hover:bg-white/10 hover:text-white"><i data-lucide="facebook" class="h-4 w-4"></i></a>
-        <a href="{{ site_settings.instagram_url|default:'#' }}" class="inline-flex rounded-full border border-white/10 bg-white/5 p-3 text-white/70 transition hover:bg-white/10 hover:text-white"><i data-lucide="instagram" class="h-4 w-4"></i></a>
-        <a href="{{ site_settings.youtube_url|default:'#' }}" class="inline-flex rounded-full border border-white/10 bg-white/5 p-3 text-white/70 transition hover:bg-white/10 hover:text-white"><i data-lucide="youtube" class="h-4 w-4"></i></a>
-      </div>
+<footer class="bg-[#111827] text-white">
+  <div class="mx-auto grid max-w-7xl gap-12 px-4 py-14 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr] lg:px-8">
+    <div>
+      <a href="{% url 'core:home' %}" class="font-brand text-4xl font-semibold uppercase tracking-[0.24em]">{{ site_settings.site_name }}</a>
+      <p class="mt-4 max-w-md text-sm text-white/70">A premium beauty catalog experience with personalized routines, secure checkout, wishlist sync, and real-time stock visibility.</p>
     </div>
-    <div data-aos="fade-up" data-aos-delay="80">
-      <h3 class="text-sm font-semibold uppercase tracking-[0.28em] text-white/50">Shop</h3>
-      <div class="mt-5 grid gap-3 text-sm text-white/70">
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-white/50">Shop</h3>
+      <div class="mt-4 grid gap-3 text-sm text-white/75">
         <a href="{% url 'catalog:shop' %}" class="transition hover:text-white">All Products</a>
-        <a href="{% url 'catalog:shop' %}?sort=latest" class="transition hover:text-white">New Arrivals</a>
-        <a href="{% url 'orders:cart' %}" class="transition hover:text-white">Cart</a>
+        <a href="{% url 'catalog:shop' %}?sort=rating" class="transition hover:text-white">Top Rated</a>
+        <a href="{% url 'catalog:shop' %}?sort=latest" class="transition hover:text-white">New In</a>
       </div>
     </div>
-    <div data-aos="fade-up" data-aos-delay="160">
-      <h3 class="text-sm font-semibold uppercase tracking-[0.28em] text-white/50">Support</h3>
-      <div class="mt-5 grid gap-3 text-sm text-white/70">
-        <a href="{% url 'orders:tracking' %}" class="transition hover:text-white">Track Order</a>
-        <a href="{% url 'orders:checkout' %}" class="transition hover:text-white">Checkout</a>
-        <a href="{% url 'accounts:login' %}" class="transition hover:text-white">Login</a>
-        <a href="{% url 'accounts:register' %}" class="transition hover:text-white">Create Account</a>
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-white/50">Account</h3>
+      <div class="mt-4 grid gap-3 text-sm text-white/75">
+        <a href="{% url 'accounts:dashboard' %}" class="transition hover:text-white">Dashboard</a>
+        <a href="{% url 'accounts:wishlist' %}" class="transition hover:text-white">Wishlist</a>
+        <a href="{% url 'orders:tracking' %}" class="transition hover:text-white">Order Tracking</a>
       </div>
     </div>
-    <div data-aos="fade-up" data-aos-delay="240">
-      <h3 class="text-sm font-semibold uppercase tracking-[0.28em] text-white/50">Contact</h3>
-      <div class="mt-5 grid gap-3 text-sm text-white/70">
-        <span>{{ site_settings.support_email }}</span>
-        <span>{{ site_settings.support_phone }}</span>
-        <span>{{ site_settings.address }}</span>
-      </div>
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-white/50">Newsletter</h3>
+      <p class="mt-4 text-sm text-white/70">Get product drops, beauty tips, and member-only discounts.</p>
+      <form action="{% url 'core:newsletter_subscribe' %}" method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 p-1">
+          <input type="email" name="email" required class="h-10 w-full border-0 bg-transparent px-3 text-sm text-white placeholder:text-white/55 focus:outline-none focus:ring-0" placeholder="Email address">
+          <button type="submit" class="rounded-full bg-white px-4 py-2 text-xs font-bold text-ink">Join</button>
+        </div>
+      </form>
     </div>
   </div>
   <div class="border-t border-white/10">
-    <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs uppercase tracking-[0.24em] text-white/45 md:flex-row md:items-center md:justify-between lg:px-8">
-      <p>{{ site_settings.copyright_text|default:"© Zynvo. All rights reserved." }}</p>
-      <p>Modern ecommerce by {{ site_settings.site_name }}</p>
+    <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs uppercase tracking-[0.2em] text-white/45 md:flex-row md:items-center md:justify-between lg:px-8">
+      <p>{{ site_settings.copyright_text }}</p>
+      <p>Beauty commerce experience</p>
     </div>
   </div>
 </footer>

@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -42,6 +43,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     compare_at_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     sku = models.CharField(max_length=50, unique=True)
+    ean = models.CharField(max_length=32, blank=True, db_index=True)
     stock = models.PositiveIntegerField(default=0)
     featured_image = models.ImageField(upload_to='products/', blank=True, null=True)
     brand = models.CharField(max_length=80, default='Zynvo')
@@ -178,3 +180,51 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f'{self.product.name} - {self.attribute_name}: {self.value}'
+
+
+class ProductFAQ(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='faqs')
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f'{self.product.name} FAQ'
+
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='product_reviews')
+    reviewer_name = models.CharField(max_length=120)
+    reviewer_email = models.EmailField(blank=True)
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    title = models.CharField(max_length=140, blank=True)
+    comment = models.TextField()
+    is_verified_purchase = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.product.name} ({self.rating})'
+
+
+class StockAlert(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock_alerts')
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, null=True, blank=True, related_name='stock_alerts')
+    user = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='stock_alerts')
+    email = models.EmailField()
+    notified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('product', 'variant', 'email')
+
+    def __str__(self):
+        return f'{self.product.name} -> {self.email}'

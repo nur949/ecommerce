@@ -1,58 +1,56 @@
-<article class="product-card-daraz group relative flex h-full flex-col overflow-hidden bg-white transition duration-200 hover:shadow-panel" data-product-id="{{ product.id }}" data-aos="fade-up">
-  <div class="relative overflow-hidden bg-[#f1f5f3]">
-    {% if product.compare_at_price %}
-    <div class="absolute left-2 top-2 z-10 rounded bg-[#f85606] px-2 py-0.5 text-[10px] font-bold uppercase text-white">Sale</div>
-    {% elif not product.is_orderable %}
-    <div class="absolute left-2 top-2 z-10 rounded bg-ink px-2 py-0.5 text-[10px] font-bold uppercase text-white">Sold out</div>
+<article class="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-soft" data-product-id="{{ product.id }}">
+  <a href="{{ product.get_absolute_url }}" class="relative block aspect-square overflow-hidden bg-[#f8fafc]">
+    {% if product.discount_percentage %}
+    <span class="absolute left-3 top-3 z-10 rounded-full bg-[#ef4444] px-2 py-1 text-[10px] font-bold uppercase text-white">-{{ product.discount_percentage }}%</span>
     {% endif %}
-    <a href="{{ product.get_absolute_url }}" class="block aspect-square overflow-hidden" aria-label="View {{ product.name }}">
-      <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
-    </a>
-    {% if request.user.is_authenticated %}
-    <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax absolute right-2 top-2 z-10" data-product-id="{{ product.id }}">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <button type="submit" class="js-wishlist-button inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606] {% if product.id in wishlist_product_ids %}is-active text-[#f85606]{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}" data-add-label="Add {{ product.name }} to wishlist" data-remove-label="Remove {{ product.name }} from wishlist">
-        <i data-lucide="heart" class="h-4 w-4"></i>
-      </button>
-    </form>
-    {% else %}
-    <a href="{% url 'accounts:login' %}" class="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606]" aria-label="Login to save {{ product.name }}">
-      <i data-lucide="heart" class="h-4 w-4"></i>
-    </a>
-    {% endif %}
-  </div>
+    <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
+  </a>
   <div class="flex flex-1 flex-col p-3">
-    <a href="{{ product.get_absolute_url }}" class="product-card-title block text-sm font-medium leading-5 text-ink transition hover:text-[#f85606]">{{ product.name }}</a>
-    <div class="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-      <p class="text-lg font-bold leading-none text-[#f85606]">&#2547;{{ product.price }}</p>
-      {% if product.compare_at_price %}
-      <small class="text-xs text-stone line-through">&#2547;{{ product.compare_at_price }}</small>
-      {% endif %}
+    <a href="{{ product.get_absolute_url }}" class="product-card-title text-sm font-semibold leading-5 text-ink transition hover:text-rosewood">{{ product.name }}</a>
+    <div class="mt-2 flex items-center gap-1 text-[11px] text-amber-500">
+      {% with rating=product.average_rating|default:0 %}
+      {% for _ in "12345" %}
+        {% if forloop.counter <= rating|floatformat:0|add:0 %}
+        <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i>
+        {% else %}
+        <i data-lucide="star" class="h-3.5 w-3.5"></i>
+        {% endif %}
+      {% endfor %}
+      {% endwith %}
+      <span class="ml-1 text-stone">({{ product.reviews.count }})</span>
     </div>
-    <div class="mt-2 flex items-center justify-between gap-2 text-xs text-stone">
-      <span class="product-card-meta">{{ product.category.name|default:"Collection" }}</span>
-      {% if product.discount_percentage %}
-      <span class="font-semibold text-[#f85606]">-{{ product.discount_percentage }}%</span>
-      {% endif %}
+    <div class="mt-2 flex items-baseline gap-2">
+      <strong class="text-lg text-ink">&#2547;{{ product.price }}</strong>
+      {% if product.compare_at_price %}<span class="text-xs text-stone line-through">&#2547;{{ product.compare_at_price }}</span>{% endif %}
     </div>
-    <div class="mt-3 grid grid-cols-[minmax(0,1fr)_36px] gap-2">
+    <div class="mt-3 grid grid-cols-[1fr_36px_36px] gap-2">
       {% if product.variants.exists %}
-      <a href="{{ product.get_absolute_url }}" class="product-card-action inline-flex min-h-9 items-center justify-center rounded bg-[#f85606] px-2 text-xs font-bold text-white transition hover:bg-[#df4d05]">
-        Choose Options
-      </a>
+      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded bg-ink px-2 text-xs font-bold text-white">Choose Options</a>
       {% else %}
       <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
         {% csrf_token %}
         <input type="hidden" name="quantity" value="1">
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="product-card-action inline-flex min-h-9 w-full items-center justify-center rounded bg-[#f85606] px-2 text-xs font-bold text-white transition hover:bg-[#df4d05] disabled:cursor-not-allowed disabled:bg-stone/40" {% if not product.is_orderable %}disabled{% endif %}>
-          {% if product.is_orderable %}Add Cart{% else %}Sold Out{% endif %}
+        <button type="submit" class="inline-flex min-h-9 w-full items-center justify-center rounded bg-ink px-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-stone/40" {% if not product.is_orderable %}disabled{% endif %}>
+          {% if product.is_orderable %}Add{% else %}Sold{% endif %}
         </button>
       </form>
       {% endif %}
-      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink transition hover:border-[#f85606] hover:text-[#f85606]" aria-label="View details for {{ product.name }}">
-        <i data-lucide="eye" class="h-4 w-4"></i>
+      {% if request.user.is_authenticated %}
+      <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax" data-product-id="{{ product.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="js-wishlist-button inline-flex min-h-9 w-full items-center justify-center rounded border border-black/10 bg-white text-ink {% if product.id in wishlist_product_ids %}is-active text-rosewood{% endif %}" data-add-label="Save" data-remove-label="Saved">
+          <i data-lucide="heart" class="h-4 w-4"></i>
+        </button>
+      </form>
+      {% else %}
+      <a href="{% url 'accounts:login' %}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink">
+        <i data-lucide="heart" class="h-4 w-4"></i>
+      </a>
+      {% endif %}
+      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink" aria-label="Quick bag access">
+        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
       </a>
     </div>
   </div>

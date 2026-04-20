@@ -1,32 +1,29 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard | Zynvo{% endblock %}
+{% block title %}Dashboard | {{ site_settings.site_name }}{% endblock %}
 {% block content %}
 <section class="px-4 py-6 lg:px-8">
-  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Member dashboard</p>
-    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Hi, {{ request.user.first_name|default:request.user.username }}</h1>
-    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/70">Review recent orders, saved products, and account shortcuts from one clean workspace.</p>
+  <div class="mx-auto max-w-7xl rounded-[28px] bg-[#111827] px-6 py-10 text-white shadow-panel md:px-10">
+    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">Personal Account</p>
+    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.1em] md:text-6xl">Hi, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p class="mt-3 text-sm text-white/75">Order history, wishlist, account preferences, and rewards in one place.</p>
   </div>
 </section>
 <section class="px-4 pb-16 pt-8 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <div class="grid gap-4 md:grid-cols-3">
-      <div class="premium-grid-card p-6"><p class="premium-kicker">Orders</p><div class="mt-4 text-4xl font-semibold text-ink">{{ orders|length }}</div><p class="mt-2 text-sm text-stone">Recent order{{ orders|length|pluralize }}</p></div>
-      <div class="premium-grid-card p-6"><p class="premium-kicker">Addresses</p><div class="mt-4 text-2xl font-semibold text-ink">Delivery</div><p class="mt-2 text-sm text-stone">Saved through checkout when available.</p></div>
-      <div class="premium-grid-card p-6"><p class="premium-kicker">Wishlist</p><div class="mt-4 text-4xl font-semibold text-ink">{{ wishlist_count }}</div><p class="mt-2 text-sm text-stone">Saved product{{ wishlist_count|pluralize }}</p></div>
+    <div class="grid gap-4 md:grid-cols-4">
+      <div class="rounded-[20px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Orders</p><p class="mt-3 text-3xl font-semibold text-ink">{{ orders|length }}</p></div>
+      <div class="rounded-[20px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Wishlist</p><p class="mt-3 text-3xl font-semibold text-ink">{{ wishlist_count }}</p></div>
+      <div class="rounded-[20px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Reward Points</p><p class="mt-3 text-3xl font-semibold text-ink">{{ reward_account.points_balance }}</p></div>
+      <div class="rounded-[20px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Tier</p><p class="mt-3 text-3xl font-semibold text-ink">{{ reward_account.tier }}</p></div>
     </div>
-
     <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div class="aura-card p-6">
-        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p class="premium-kicker">Recent orders</p>
-            <h2 class="mt-2 text-2xl font-semibold text-ink">Order activity</h2>
-          </div>
-          <a href="{% url 'orders:tracking' %}" class="btn btn-outline-primary">Track Order</a>
+      <div class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+        <div class="mb-5 flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-ink">Order History</h2>
+          <a href="{% url 'orders:tracking' %}" class="text-sm font-bold text-rosewood">Track order</a>
         </div>
         {% if orders %}
-        <div class="grid gap-3">
+        <div class="space-y-3">
           {% for order in orders %}
           <a href="{{ order.get_absolute_url }}" class="dashboard-order-link">
             <span class="font-semibold">{{ order.order_number }}</span>
@@ -36,34 +33,32 @@
           {% endfor %}
         </div>
         {% else %}
-        <div class="rounded-md border border-black/5 bg-[#f1f5f3] p-6">
-          <h3 class="text-lg font-semibold text-ink">No orders yet</h3>
-          <p class="mt-2 text-sm text-stone">Browse the shop and place your first order.</p>
-          <a href="{% url 'catalog:shop' %}" class="btn btn-primary mt-5">Start Shopping</a>
-        </div>
+        <p class="text-sm text-stone">No orders yet.</p>
         {% endif %}
       </div>
-
-      <aside class="aura-card p-6">
-        <div class="mb-6 flex items-center justify-between gap-3">
-          <div>
-            <p class="premium-kicker">Wishlist</p>
-            <h2 class="mt-2 text-2xl font-semibold text-ink">Saved picks</h2>
+      <aside class="space-y-6">
+        <div class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+          <h2 class="text-2xl font-semibold text-ink">Account Preferences</h2>
+          <div class="mt-4 space-y-2 text-sm text-stone">
+            <p>Email: {{ request.user.email }}</p>
+            <p>Phone: {{ profile.phone|default:"Not set" }}</p>
+            <p>Birthday: {{ profile.birthday|default:"Not set" }}</p>
+            <p>Preferred brands: {{ profile.preferred_brands|default:"Not set" }}</p>
           </div>
-          <a href="{% url 'accounts:wishlist' %}" class="text-sm font-bold text-rosewood">View all</a>
         </div>
-        {% if wishlist_items %}
-        <div class="grid gap-4">
-          {% for item in wishlist_items|slice:":3" %}
-          <a href="{{ item.product.get_absolute_url }}" class="grid grid-cols-[72px_1fr] gap-3 rounded-md border border-black/5 bg-[#f1f5f3] p-3">
-            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="h-20 w-[72px] rounded-md object-cover">
-            <span class="text-sm font-semibold text-ink">{{ item.product.name }}</span>
-          </a>
-          {% endfor %}
+        <div class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+          <h2 class="text-2xl font-semibold text-ink">Recent Rewards</h2>
+          <div class="mt-4 space-y-2 text-sm">
+            {% for tx in reward_transactions %}
+            <div class="flex items-center justify-between rounded-[12px] border border-black/5 px-3 py-2">
+              <span class="text-stone">{{ tx.reason|default:tx.get_transaction_type_display }}</span>
+              <strong class="{% if tx.points > 0 %}text-green-600{% else %}text-red-600{% endif %}">{{ tx.points }}</strong>
+            </div>
+            {% empty %}
+            <p class="text-stone">No transactions yet.</p>
+            {% endfor %}
+          </div>
         </div>
-        {% else %}
-        <p class="text-sm text-stone">No saved products yet. Add products to your wishlist while browsing.</p>
-        {% endif %}
       </aside>
     </div>
   </div>

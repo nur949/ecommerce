@@ -11,6 +11,7 @@ from .models import (
     PromoBanner,
     SiteSettings,
     StaticPage,
+    NewsletterSubscriber,
 )
 
 
@@ -96,3 +97,10 @@ class BlogPostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'excerpt', 'content')
     list_select_related = ('category',)
     date_hierarchy = 'created_at'
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'is_active', 'created_at')
+    list_editable = ('is_active',)
+    search_fields = ('email',)

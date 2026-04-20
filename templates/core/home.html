@@ -1,17 +1,79 @@
 {% extends 'base.html' %}
-{% block title %}Zynvo | Home{% endblock %}
+{% block title %}{{ site_settings.site_name }} | Premium Beauty Catalog{% endblock %}
 {% block content %}
-{% for section in home_sections %}
-  {% if section.is_active %}
-    {% if section.key == 'hero' %}{% include 'core/partials/hero_section.html' %}{% endif %}
-    {% if section.key == 'popular_categories' %}{% include 'core/partials/popular_categories.html' %}{% endif %}
-    {% if section.key == 'daily_deals' %}{% include 'core/partials/daily_deals.html' %}{% endif %}
-    {% if section.key == 'new_collection' %}{% include 'core/partials/new_collection.html' %}{% endif %}
-    {% if section.key == 'collection_showcase' %}{% include 'core/partials/collection_showcase.html' %}{% endif %}
-    {% if section.key == 'gadget_banners' %}{% include 'core/partials/gadget_banners.html' %}{% endif %}
-    {% if section.key == 'trending_now' %}{% include 'core/partials/trending_now.html' %}{% endif %}
-    {% if section.key == 'unlimited_offer' %}{% include 'core/partials/unlimited_offer.html' %}{% endif %}
-    {% if section.key == 'corporate_cta' %}{% include 'core/partials/corporate_cta.html' %}{% endif %}
-  {% endif %}
-{% endfor %}
+<section class="px-4 pb-10 pt-6 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[1.9fr_1fr]">
+    <div class="rounded-[28px] bg-gradient-to-br from-[#111827] to-[#1f2937] p-7 text-white shadow-panel md:p-10">
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">Glow Essentials</p>
+      <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.08em] md:text-7xl">{{ site_settings.hero_title }}</h1>
+      <p class="mt-4 max-w-2xl text-sm leading-7 text-white/75">{{ site_settings.hero_subtitle }}</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="{% url 'catalog:shop' %}" class="rounded-full bg-white px-6 py-3 text-sm font-bold text-ink transition hover:bg-[#e2e8f0]">Shop Now</a>
+        <a href="{% url 'catalog:shop' %}?sort=latest" class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">New Arrivals</a>
+      </div>
+    </div>
+    <div class="grid gap-4">
+      {% for banner in hero_right_banners %}
+      <a href="{{ banner.url }}" class="rounded-[24px] border border-black/5 bg-white p-5 shadow-soft transition hover:-translate-y-0.5">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">{{ banner.subtitle|default:"Promotion" }}</p>
+        <h2 class="mt-2 text-xl font-semibold text-ink">{{ banner.title }}</h2>
+      </a>
+      {% empty %}
+      <a href="{% url 'catalog:shop' %}?sort=price_low" class="rounded-[24px] border border-black/5 bg-white p-5 shadow-soft">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Offer</p>
+        <h2 class="mt-2 text-xl font-semibold text-ink">Save up to 30% on skincare sets</h2>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="px-4 pb-14 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex items-center justify-between">
+      <h2 class="font-brand text-4xl font-semibold uppercase tracking-[0.1em] text-ink">Top Categories</h2>
+      <a href="{% url 'catalog:shop' %}" class="text-sm font-bold text-rosewood">See All</a>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {% for item in popular_categories_data %}
+      <a href="{{ item.category.get_absolute_url }}" class="top-category-item rounded-[24px] border border-black/5 bg-white p-4 shadow-soft transition hover:-translate-y-0.5">
+        <img src="{{ item.image_url }}" alt="{{ item.category.name }}" class="h-48 w-full rounded-[18px] object-cover">
+        <h3 class="mt-4 text-lg font-semibold text-ink">{{ item.category.name }}</h3>
+        <p class="mt-2 text-sm text-stone">{{ item.subtitle }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="px-4 pb-14 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex items-center justify-between">
+      <h2 class="font-brand text-4xl font-semibold uppercase tracking-[0.1em] text-ink">Trending Products</h2>
+      <a href="{% url 'catalog:shop' %}" class="text-sm font-bold text-rosewood">Browse catalog</a>
+    </div>
+    <div class="row g-4">
+      {% for product in trending_products %}
+      <div class="col-6 col-md-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="px-4 pb-16 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-3">
+    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+      <h3 class="text-lg font-semibold text-ink">Brand Story</h3>
+      <p class="mt-3 text-sm leading-7 text-stone">We curate beauty products around performance, ingredient safety, and genuine sourcing. Every product page highlights usage and suitability.</p>
+    </article>
+    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+      <h3 class="text-lg font-semibold text-ink">Product Benefits</h3>
+      <p class="mt-3 text-sm leading-7 text-stone">Compare formulas, coverage, finish, and skin compatibility. Filter quickly by brand, budget, and user rating to find your best match.</p>
+    </article>
+    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+      <h3 class="text-lg font-semibold text-ink">Top Shopping Paths</h3>
+      <p class="mt-3 text-sm leading-7 text-stone">Discover by category, jump to EAN search for exact products, or save favorites in wishlist for a personalized checkout flow.</p>
+    </article>
+  </div>
+</section>
 {% endblock %}

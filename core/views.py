@@ -14,7 +14,7 @@ from django.utils import timezone
 from catalog.models import Category, Product
 from orders.models import Order
 from .forms import SearchForm
-from .models import BlogPost, HeroSlide, HomeSection, PromoBanner, SiteSettings, StaticPage
+from .models import BlogPost, HeroSlide, HomeSection, NewsletterSubscriber, PromoBanner, SiteSettings, StaticPage
 
 DEFAULT_HOME_SECTIONS = [
     ('hero', 'Hero Slider'),
@@ -331,3 +331,18 @@ def sitemap_xml(request):
         body.append(f'  <url><loc>{escape(url)}</loc></url>')
     body.append('</urlset>')
     return HttpResponse('\n'.join(body), content_type='application/xml')
+
+
+def newsletter_subscribe(request):
+    if request.method != 'POST':
+        return redirect('core:home')
+    email = (request.POST.get('email') or '').strip().lower()
+    if not email:
+        messages.error(request, 'Please enter a valid email address.')
+        return redirect(request.META.get('HTTP_REFERER', reverse('core:home')))
+    subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email, defaults={'is_active': True})
+    if not created and not subscriber.is_active:
+        subscriber.is_active = True
+        subscriber.save(update_fields=['is_active'])
+    messages.success(request, 'Thanks for subscribing to beauty updates.')
+    return redirect(request.META.get('HTTP_REFERER', reverse('core:home')))

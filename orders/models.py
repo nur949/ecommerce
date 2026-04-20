@@ -36,7 +36,8 @@ class Order(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('cod', 'Cash on Delivery'),
         ('bkash', 'bKash / Mobile Banking'),
-        ('card', 'Card / Stripe Sandbox'),
+        ('stripe', 'Stripe'),
+        ('paypal', 'PayPal'),
         ('bank', 'Bank Transfer'),
     ]
     PAYMENT_STATUS_CHOICES = [
@@ -52,6 +53,9 @@ class Order(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    coupon_code = models.CharField(max_length=40, blank=True)
+    reward_points_used = models.PositiveIntegerField(default=0)
+    reward_points_earned = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='cod')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
@@ -103,3 +107,27 @@ class PaymentTransaction(models.Model):
 
     def __str__(self):
         return f'{self.order.order_number} - {self.provider}'
+
+
+class Coupon(models.Model):
+    DISCOUNT_TYPE_CHOICES = [
+        ('percent', 'Percent'),
+        ('fixed', 'Fixed Amount'),
+    ]
+
+    code = models.CharField(max_length=40, unique=True)
+    description = models.CharField(max_length=140, blank=True)
+    discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPE_CHOICES, default='percent')
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2)
+    min_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    max_discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['code']
+
+    def __str__(self):
+        return self.code

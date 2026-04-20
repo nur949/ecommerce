@@ -1649,3 +1649,39 @@ main .page-hero:first-child {
     font-size: 1rem;
   }
 }
+
+#searchOverlay.hidden {
+  display: none !important;
+}
+
+#searchOverlay:not(.hidden) {
+  display: block;
+}
+
+#mobileNavPanel.hidden {
+  display: none !important;
+}
+
+#mobileNavPanel.is-open {
+  display: block;
+}
+
+.mini-cart-item {
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+}
+
+.mini-cart-item img {
+  width: 64px;
+  height: 78px;
+  border-radius: var(--radius);
+}
+
+.dashboard-order-link {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+@media screen and (max-width: 991px) {
+  .dashboard-order-link {
+    grid-template-columns: 1fr;
+  }
+}
