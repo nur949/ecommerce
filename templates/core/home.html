@@ -1,32 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}{{ site_settings.site_name }} | Premium Beauty Catalog{% endblock %}
 {% block content %}
-<section class="px-4 pb-10 pt-6 lg:px-8">
-  <div class="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[1.9fr_1fr]">
-    <div class="rounded-[28px] bg-gradient-to-br from-[#111827] to-[#1f2937] p-7 text-white shadow-panel md:p-10">
-      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">Glow Essentials</p>
-      <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.08em] md:text-7xl">{{ site_settings.hero_title }}</h1>
-      <p class="mt-4 max-w-2xl text-sm leading-7 text-white/75">{{ site_settings.hero_subtitle }}</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="{% url 'catalog:shop' %}" class="rounded-full bg-white px-6 py-3 text-sm font-bold text-ink transition hover:bg-[#e2e8f0]">Shop Now</a>
-        <a href="{% url 'catalog:shop' %}?sort=latest" class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">New Arrivals</a>
-      </div>
-    </div>
-    <div class="grid gap-4">
-      {% for banner in hero_right_banners %}
-      <a href="{{ banner.url }}" class="rounded-[24px] border border-black/5 bg-white p-5 shadow-soft transition hover:-translate-y-0.5">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">{{ banner.subtitle|default:"Promotion" }}</p>
-        <h2 class="mt-2 text-xl font-semibold text-ink">{{ banner.title }}</h2>
-      </a>
-      {% empty %}
-      <a href="{% url 'catalog:shop' %}?sort=price_low" class="rounded-[24px] border border-black/5 bg-white p-5 shadow-soft">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Offer</p>
-        <h2 class="mt-2 text-xl font-semibold text-ink">Save up to 30% on skincare sets</h2>
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+{% include 'core/partials/hero_section.html' %}
 
 <section class="px-4 pb-14 lg:px-8">
   <div class="mx-auto max-w-7xl">

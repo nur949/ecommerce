@@ -4,6 +4,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) window.lucide.createIcons();
   };
 
+  if (window.Swiper) {
+    document.querySelectorAll('[data-hero-slider]').forEach((slider) => {
+      if (slider.swiper) return;
+      new window.Swiper(slider, {
+        loop: slider.querySelectorAll('.swiper-slide').length > 1,
+        speed: 850,
+        effect: 'fade',
+        fadeEffect: {crossFade: true},
+        autoplay: {
+          delay: 5200,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: slider.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        navigation: {
+          prevEl: slider.querySelector('.hero-slider-prev'),
+          nextEl: slider.querySelector('.hero-slider-next'),
+        },
+      });
+    });
+  }
+
   const miniCartPanel = document.getElementById('miniCartPanel');
   const miniCartBackdrop = document.getElementById('miniCartBackdrop');
   const miniCartToggles = () => document.querySelectorAll('.js-mini-cart-toggle');

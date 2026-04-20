@@ -1,21 +1,21 @@
 {% load static %}
-<section class="px-4 pt-6 lg:px-8">
-  <div class="mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-white/60 shadow-panel">
-    <div class="swiper slideshow">
+<section class="home-hero-slider relative -mt-6 w-full overflow-hidden">
+  <div class="w-full overflow-hidden shadow-panel">
+    <div class="swiper slideshow" data-hero-slider>
       <div class="swiper-wrapper">
         {% for slide in hero_slides %}
         <div class="swiper-slide">
-          <div class="relative min-h-[78vh] overflow-hidden bg-[#1f1720]">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% if forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %});"></div>
+          <div class="relative min-h-[620px] overflow-hidden bg-[#1f1720] md:min-h-[760px] xl:min-h-[calc(100vh-120px)]">
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% if slide.image %}{{ slide.image.url }}{% elif forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %});"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#1f1720]/90 via-[#1f1720]/55 to-[#1f1720]/15"></div>
-            <div class="relative mx-auto flex max-w-7xl items-end px-6 py-14 md:px-10 lg:min-h-[78vh] lg:items-center lg:px-14">
-              <div class="max-w-2xl text-white" data-gsap-fade>
+            <div class="relative mx-auto flex min-h-[620px] max-w-7xl items-end px-5 pb-20 pt-16 md:min-h-[760px] md:px-8 lg:items-center lg:px-10 lg:py-24 xl:min-h-[calc(100vh-120px)]">
+              <div class="max-w-3xl text-white" data-gsap-fade>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">{{ slide.accent_label|default:"Premium edit" }}</p>
-                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl">{{ slide.title }}</h1>
-                {% if slide.subtitle %}<p class="mt-6 max-w-xl text-base leading-8 text-white/75 md:text-lg">{{ slide.subtitle }}</p>{% endif %}
+                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl lg:text-8xl">{{ slide.title }}</h1>
+                {% if slide.subtitle %}<p class="mt-6 max-w-2xl text-base leading-8 text-white/75 md:text-xl">{{ slide.subtitle }}</p>{% endif %}
                 <div class="mt-8 flex flex-wrap gap-3">
-                  <a href="{{ slide.cta_url|default:'#' }}" class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-blush">{{ slide.cta_text|default:'Shop Collection' }}</a>
-                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">View Store</a>
+                  <a href="{{ slide.cta_url|default:'#' }}" class="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-ink transition hover:bg-blush">{{ slide.cta_text|default:'Shop Collection' }}</a>
+                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10">View Store</a>
                 </div>
               </div>
             </div>
@@ -23,17 +23,17 @@
         </div>
         {% empty %}
         <div class="swiper-slide">
-          <div class="relative min-h-[78vh] overflow-hidden bg-[#1f1720]">
+          <div class="relative min-h-[620px] overflow-hidden bg-[#1f1720] md:min-h-[760px] xl:min-h-[calc(100vh-120px)]">
             <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% static 'aura/images/banner2.jpg' %});"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#1f1720]/90 via-[#1f1720]/55 to-[#1f1720]/15"></div>
-            <div class="relative mx-auto flex max-w-7xl items-end px-6 py-14 md:px-10 lg:min-h-[78vh] lg:items-center lg:px-14">
-              <div class="max-w-2xl text-white" data-gsap-fade>
+            <div class="relative mx-auto flex min-h-[620px] max-w-7xl items-end px-5 pb-20 pt-16 md:min-h-[760px] md:px-8 lg:items-center lg:px-10 lg:py-24 xl:min-h-[calc(100vh-120px)]">
+              <div class="max-w-3xl text-white" data-gsap-fade>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Premium beauty edit</p>
-                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl">Reveal your best daily ritual</h1>
-                <p class="mt-6 max-w-xl text-base leading-8 text-white/75 md:text-lg">Luxury-inspired shopping with cleaner discovery, richer visuals, and fast checkout.</p>
+                <h1 class="mt-4 font-brand text-5xl font-semibold leading-[0.95] tracking-[0.08em] md:text-7xl lg:text-8xl">Reveal your best daily ritual</h1>
+                <p class="mt-6 max-w-2xl text-base leading-8 text-white/75 md:text-xl">Luxury-inspired shopping with cleaner discovery, richer visuals, and fast checkout.</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-blush">Shop Collection</a>
-                  <a href="{% url 'catalog:shop' %}?sale=1" class="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">See Offers</a>
+                  <a href="{% url 'catalog:shop' %}" class="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-ink transition hover:bg-blush">Shop Collection</a>
+                  <a href="{% url 'catalog:shop' %}?sale=1" class="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10">See Offers</a>
                 </div>
               </div>
             </div>
@@ -41,6 +41,12 @@
         </div>
         {% endfor %}
       </div>
+      <button type="button" class="hero-slider-prev absolute left-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 md:flex" aria-label="Previous slide">
+        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+      </button>
+      <button type="button" class="hero-slider-next absolute right-4 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:bg-white/20 md:flex" aria-label="Next slide">
+        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+      </button>
       <div class="swiper-pagination !bottom-8"></div>
     </div>
   </div>
