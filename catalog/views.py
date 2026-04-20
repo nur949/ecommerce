@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.cache import cache_page
 
 from orders.cart_utils import (
     add_to_cart,
@@ -317,6 +318,7 @@ def remove_cart_item(request, item_key):
 
 
 @require_GET
+@cache_page(60)
 def api_products(request):
     products = _product_queryset()
     products, _, _ = _apply_shop_filters(request, products)
@@ -337,6 +339,7 @@ def api_products(request):
 
 
 @require_GET
+@cache_page(60 * 10)
 def api_categories(request):
     categories = Category.objects.filter(parent__isnull=True).prefetch_related('children')
     return JsonResponse(
@@ -357,6 +360,7 @@ def api_categories(request):
 
 
 @require_GET
+@cache_page(60)
 def api_search_suggest(request):
     q = (request.GET.get('q') or '').strip()
     if not q:

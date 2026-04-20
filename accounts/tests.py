@@ -37,6 +37,56 @@ class LoginTests(TestCase):
         self.assertRedirects(response, reverse('accounts:dashboard'), fetch_redirect_response=False)
 
 
+class DashboardProfileTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='nur', email='nur@example.com', password='StrongPass123')
+
+    def test_user_can_update_full_profile_from_dashboard(self):
+        self.client.login(username='nur', password='StrongPass123')
+
+        response = self.client.post(
+            reverse('accounts:dashboard'),
+            {
+                'action': 'profile',
+                'name': 'Nur Customer',
+                'email': 'customer@example.com',
+                'phone': '+880 1711 111111',
+                'birthday': '1995-04-21',
+                'preferred_brands': 'COSRX, Fenty Beauty',
+                'beauty_preferences': 'Sensitive skin and fragrance free products.',
+            },
+            HTTP_HOST='testserver',
+        )
+
+        self.assertRedirects(response, reverse('accounts:dashboard'), fetch_redirect_response=False)
+        self.user.refresh_from_db()
+        profile = UserProfile.objects.get(user=self.user)
+        self.assertEqual(self.user.first_name, 'Nur Customer')
+        self.assertEqual(self.user.email, 'customer@example.com')
+        self.assertEqual(profile.phone, '+880 1711 111111')
+        self.assertEqual(profile.birthday.isoformat(), '1995-04-21')
+        self.assertEqual(profile.preferred_brands, 'COSRX, Fenty Beauty')
+        self.assertEqual(profile.beauty_preferences, 'Sensitive skin and fragrance free products.')
+        self.assertFalse(profile.marketing_opt_in)
+
+    def test_password_errors_are_rendered_on_dashboard(self):
+        self.client.login(username='nur', password='StrongPass123')
+
+        response = self.client.post(
+            reverse('accounts:dashboard'),
+            {
+                'action': 'password',
+                'old_password': 'wrong-password',
+                'new_password1': 'NewStrongPass123',
+                'new_password2': 'NewStrongPass123',
+            },
+            HTTP_HOST='testserver',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Your old password was entered incorrectly.')
+
+
 class WishlistTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='nur', email='nur@example.com', password='StrongPass123')

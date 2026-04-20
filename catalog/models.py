@@ -10,6 +10,7 @@ class Category(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    external_image_url = models.URLField(blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     is_featured = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
@@ -46,6 +47,7 @@ class Product(models.Model):
     ean = models.CharField(max_length=32, blank=True, db_index=True)
     stock = models.PositiveIntegerField(default=0)
     featured_image = models.ImageField(upload_to='products/', blank=True, null=True)
+    external_image_url = models.URLField(blank=True)
     brand = models.CharField(max_length=80, default='Zynvo')
     badge_text = models.CharField(max_length=30, blank=True)
     is_active = models.BooleanField(default=True)
@@ -120,6 +122,8 @@ class Product(models.Model):
     def primary_image_url(self):
         if self.featured_image:
             return self.featured_image.url
+        if self.external_image_url:
+            return self.external_image_url
         return self.demo_image_url
 
     @property

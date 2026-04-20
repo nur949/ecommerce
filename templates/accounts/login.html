@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Login | {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<section class="px-4 py-8 lg:px-8">
+  <div class="mx-auto grid max-w-6xl overflow-hidden rounded-[8px] border border-black/5 bg-white shadow-panel lg:grid-cols-[0.95fr_1.05fr]">
+    <aside class="bg-[#111827] p-8 text-white md:p-10">
+      <p class="text-xs font-bold uppercase text-white/60">Secure account</p>
+      <h1 class="mt-4 text-4xl font-semibold">Welcome back</h1>
+      <p class="mt-4 max-w-md text-sm leading-7 text-white/70">Sign in to manage your profile, saved items, addresses, and order history.</p>
+      <div class="mt-8 grid gap-3 text-sm text-white/80">
+        <div class="rounded-[8px] bg-white/10 p-4">Profile and contact details</div>
+        <div class="rounded-[8px] bg-white/10 p-4">Orders, rewards, and wishlist</div>
+        <div class="rounded-[8px] bg-white/10 p-4">Faster checkout across devices</div>
+      </div>
+    </aside>
+
+    <div class="p-6 md:p-10">
+      <div class="mb-6">
+        <p class="text-xs font-bold uppercase text-rosewood">Login</p>
+        <h2 class="mt-1 text-3xl font-semibold text-ink">Access your dashboard</h2>
+      </div>
+      <form method="post" class="grid gap-4" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-ink" for="{{ form.username.id_for_label }}">Email</label>
+          {{ form.username }}
+          {% if form.username.errors %}<p class="mt-1 text-sm text-red-700">{{ form.username.errors|join:', ' }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-ink" for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+          {% if form.password.errors %}<p class="mt-1 text-sm text-red-700">{{ form.password.errors|join:', ' }}</p>{% endif %}
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <a href="{% url 'accounts:password_reset' %}" class="text-sm font-semibold text-rosewood">Forgot password?</a>
+          <a href="{% url 'accounts:register' %}" class="text-sm font-semibold text-stone hover:text-rosewood">Create account</a>
+        </div>
+        <button class="btn btn-primary w-full">Login</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

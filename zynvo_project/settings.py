@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'catalog',
     'accounts',
+    'profiles',
     'orders',
 ]
 
@@ -116,11 +117,13 @@ JAZZMIN_SETTINGS = {
         'catalog.Product',
         'orders.Cart',
         'accounts.UserProfile',
+        'profiles.UserProfile',
         'accounts.WishlistItem',
     ],
     'icons': {
         'auth.User': 'fas fa-users',
         'accounts.UserProfile': 'fas fa-id-card',
+        'profiles.UserProfile': 'fas fa-user-circle',
         'accounts.WishlistItem': 'fas fa-heart',
         'orders.Order': 'fas fa-box',
         'orders.Cart': 'fas fa-shopping-bag',
@@ -171,6 +174,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
+LOGIN_URL = 'accounts:login'
 LOGOUT_REDIRECT_URL = 'core:home'
 EMAIL_BACKEND = os.getenv(
     'EMAIL_BACKEND',

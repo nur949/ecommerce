@@ -1,4 +1,4 @@
-Django>=5.2,<6.0
+Django>=6.0.4,<6.1
 Pillow>=10.0,<13.0
 whitenoise>=6.0,<7.0
 gunicorn>=23.0,<26.0

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Register | {{ site_settings.site_name }}{% endblock %}
+{% block content %}
+<section class="px-4 py-8 lg:px-8">
+  <div class="mx-auto grid max-w-6xl overflow-hidden rounded-[8px] border border-black/5 bg-white shadow-panel lg:grid-cols-[0.95fr_1.05fr]">
+    <aside class="bg-[#111827] p-8 text-white md:p-10">
+      <p class="text-xs font-bold uppercase text-white/60">New account</p>
+      <h1 class="mt-4 text-4xl font-semibold">Create your profile</h1>
+      <p class="mt-4 max-w-md text-sm leading-7 text-white/70">Build a customer profile for faster checkout, saved products, and cleaner order management.</p>
+      <div class="mt-8 grid gap-3 text-sm text-white/80">
+        <div class="rounded-[8px] bg-white/10 p-4">Saved profile and delivery details</div>
+        <div class="rounded-[8px] bg-white/10 p-4">Wishlist and cart sync</div>
+        <div class="rounded-[8px] bg-white/10 p-4">Rewards and birthday offers</div>
+      </div>
+    </aside>
+
+    <div class="p-6 md:p-10">
+      <div class="mb-6">
+        <p class="text-xs font-bold uppercase text-rosewood">Register</p>
+        <h2 class="mt-1 text-3xl font-semibold text-ink">Start your account</h2>
+      </div>
+      <form method="post" action="{% url 'accounts:register' %}" class="grid gap-4" novalidate>
+        {% csrf_token %}
+        {% if register_form.non_field_errors %}<div class="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ register_form.non_field_errors|join:', ' }}</div>{% endif %}
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-ink" for="{{ register_form.first_name.id_for_label }}">Full name</label>
+          {{ register_form.first_name }}
+          {% if register_form.first_name.errors %}<p class="mt-1 text-sm text-red-700">{{ register_form.first_name.errors|join:', ' }}</p>{% endif %}
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-semibold text-ink" for="{{ register_form.email.id_for_label }}">Email</label>
+            {{ register_form.email }}
+            {% if register_form.email.errors %}<p class="mt-1 text-sm text-red-700">{{ register_form.email.errors|join:', ' }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-semibold text-ink" for="{{ register_form.phone.id_for_label }}">Phone</label>
+            {{ register_form.phone }}
+            {% if register_form.phone.errors %}<p class="mt-1 text-sm text-red-700">{{ register_form.phone.errors|join:', ' }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-semibold text-ink" for="{{ register_form.password1.id_for_label }}">Password</label>
+            {{ register_form.password1 }}
+            {% if register_form.password1.errors %}<p class="mt-1 text-sm text-red-700">{{ register_form.password1.errors|join:', ' }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-semibold text-ink" for="{{ register_form.password2.id_for_label }}">Confirm password</label>
+            {{ register_form.password2 }}
+            {% if register_form.password2.errors %}<p class="mt-1 text-sm text-red-700">{{ register_form.password2.errors|join:', ' }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <a href="{% url 'accounts:login' %}" class="text-sm font-semibold text-stone hover:text-rosewood">Already have an account?</a>
+        </div>
+        <button class="btn btn-primary w-full">Create account</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -9,8 +9,8 @@
       {% for banner in gadget_banners %}
       <div class="col-md-4">
         <a href="{{ banner.url }}" class="premium-grid-card block overflow-hidden text-decoration-none">
-          {% if banner.image %}
-          <img src="{{ banner.image.url }}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
+          {% if banner.primary_image_url %}
+          <img src="{{ banner.primary_image_url }}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% elif forloop.counter == 1 %}
           <img src="{% static 'aura/images/category1.jpg' %}" class="aspect-[4/3] w-full object-cover" alt="{{ banner.title }}" loading="lazy" decoding="async">
           {% elif forloop.counter == 2 %}
