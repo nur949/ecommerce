@@ -33,22 +33,13 @@
     <div class="mx-auto flex max-w-7xl items-center gap-8 px-4 py-3 lg:px-8">
       <a href="{% url 'core:home' %}" class="text-sm font-semibold text-ink transition hover:text-rosewood">Home</a>
       <a href="{% url 'catalog:shop' %}" class="text-sm font-semibold text-ink transition hover:text-rosewood">Shop</a>
-      <div class="group relative">
+      <div class="group relative" id="megaMenuWrap">
         <button class="inline-flex items-center gap-2 text-sm font-semibold text-ink transition hover:text-rosewood">
           Categories <i data-lucide="chevron-down" class="h-4 w-4"></i>
         </button>
         <div class="pointer-events-none absolute left-0 top-full z-30 mt-2 w-[min(980px,92vw)] rounded-[24px] border border-black/10 bg-white p-6 opacity-0 shadow-panel transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
-          <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {% for item in mega_categories %}
-              <div>
-                <a href="{{ item.category.get_absolute_url }}" class="text-sm font-bold uppercase tracking-[0.16em] text-ink">{{ item.category.name }}</a>
-                <div class="mt-3 grid gap-2">
-                  {% for child in item.children %}
-                    <a href="{{ child.get_absolute_url }}" class="text-sm text-stone transition hover:text-rosewood">{{ child.name }}</a>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endfor %}
+          <div id="megaCategoriesList" data-url="{% url 'catalog:api_categories' %}" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div class="text-sm text-stone">Loading categories...</div>
           </div>
         </div>
       </div>

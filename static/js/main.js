@@ -232,6 +232,47 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 
+  const megaMenuWrap = document.getElementById('megaMenuWrap');
+  const megaCategoriesList = document.getElementById('megaCategoriesList');
+  let megaMenuLoaded = false;
+  let megaMenuLoading = false;
+  const loadMegaCategories = async () => {
+    if (!megaCategoriesList || megaMenuLoaded || megaMenuLoading) return;
+    const apiUrl = megaCategoriesList.dataset.url;
+    if (!apiUrl) return;
+    megaMenuLoading = true;
+    try {
+      const res = await fetch(apiUrl, {credentials: 'same-origin'});
+      const data = await res.json();
+      if (!data.ok) throw new Error('Category load failed');
+      const items = data.results || [];
+      if (!items.length) {
+        megaCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
+        megaMenuLoaded = true;
+        return;
+      }
+      megaCategoriesList.innerHTML = items.map((category) => {
+        const children = (category.children || []).map((child) => (
+          `<a href="/category/${child.slug}/" class="text-sm text-stone transition hover:text-rosewood">${child.name}</a>`
+        )).join('');
+        return `
+          <div>
+            <a href="/category/${category.slug}/" class="text-sm font-bold uppercase tracking-[0.16em] text-ink">${category.name}</a>
+            <div class="mt-3 grid gap-2">
+              ${children || '<span class="text-sm text-stone">No sub-categories</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+      megaMenuLoaded = true;
+    } catch (_) {
+      megaCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
+    } finally {
+      megaMenuLoading = false;
+    }
+  };
+  megaMenuWrap?.addEventListener('mouseenter', loadMegaCategories);
+
   const searchOverlay = document.getElementById('searchOverlay');
   const searchToggle = document.getElementById('searchOverlayToggle');
   const mobileSearchToggle = document.getElementById('mobileSearchToggle');
