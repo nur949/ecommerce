@@ -17,27 +17,72 @@ from core.models import (
 )
 
 
+IMG = {
+    'lipstick': 'https://images.pexels.com/photos/2533266/pexels-photo-2533266.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'lip_gloss': 'https://images.pexels.com/photos/3373746/pexels-photo-3373746.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'foundation': 'https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'palette': 'https://images.pexels.com/photos/2253834/pexels-photo-2253834.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'mascara': 'https://images.pexels.com/photos/2113855/pexels-photo-2113855.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'brush': 'https://images.pexels.com/photos/2531155/pexels-photo-2531155.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'skincare': 'https://images.pexels.com/photos/6621466/pexels-photo-6621466.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'serum': 'https://images.pexels.com/photos/6724465/pexels-photo-6724465.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'sunscreen': 'https://images.pexels.com/photos/6621461/pexels-photo-6621461.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'haircare': 'https://images.pexels.com/photos/3738348/pexels-photo-3738348.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'perfume': 'https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'grooming': 'https://images.pexels.com/photos/3992874/pexels-photo-3992874.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'earbuds': 'https://images.pexels.com/photos/3394665/pexels-photo-3394665.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'watch': 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'fashion': 'https://images.pexels.com/photos/994523/pexels-photo-994523.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+    'kids': 'https://images.pexels.com/photos/3933030/pexels-photo-3933030.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&fit=crop',
+}
+
+
+def product(name, category, price, compare, sku, brand, image_key, group, **flags):
+    return {
+        'name': name,
+        'category': category,
+        'price': price,
+        'compare': compare,
+        'sku': sku,
+        'brand': brand,
+        'image': IMG[image_key],
+        'group': group,
+        **flags,
+    }
+
+
 class Command(BaseCommand):
-    help = 'Seed demo data for Zynvo'
+    help = 'Recreate realistic demo data for Zynvo'
 
     def handle(self, *args, **options):
         settings = SiteSettings.load()
         settings.site_name = 'Zynvo'
         settings.tagline = 'Beauty, fashion, and smart essentials in one place.'
-        settings.hero_title = 'Glow Every Day With Curated Beauty Picks'
-        settings.hero_subtitle = 'Shop trending cosmetics, skincare, haircare, fragrance, and daily essentials with fast delivery.'
-        settings.announcement_text = 'Free delivery on beauty orders over 3000 BDT'
+        settings.hero_title = 'Real Beauty Picks, Faster Checkout'
+        settings.hero_subtitle = 'Shop popular skincare, makeup, fragrance, grooming, fashion, and smart essentials with a modern catalog experience.'
+        settings.announcement_text = 'Free delivery on orders over 3000 BDT'
         settings.save()
 
+        self._seed_nav()
+        Product.objects.all().delete()
+        Category.objects.all().delete()
+        HeroSlide.objects.all().delete()
+        cats = self._seed_categories()
+        self._seed_home_media()
+        self._replace_products(cats)
+        self._seed_pages_and_blog()
+        self._seed_admin()
+        self.stdout.write(self.style.SUCCESS('Demo data recreated with real-brand product names, more products, and updated banner imagery.'))
+
+    def _seed_nav(self):
         nav_items = [
             ('Home', '/'),
-            ('Cosmetics', '/category/cosmetics/'),
+            ('Makeup', '/category/makeup/'),
             ('Skincare', '/category/skincare/'),
             ('Haircare', '/category/haircare/'),
             ('Fragrance', '/category/fragrance/'),
-            ('Women', '/category/women/'),
             ('Men', '/category/men/'),
-            ('Kids', '/category/kids/'),
+            ('Fashion', '/category/fashion/'),
             ('Electronics', '/category/electronics/'),
             ('Shop', '/shop/'),
         ]
@@ -61,60 +106,58 @@ class Command(BaseCommand):
                     defaults={'url': '/pages/%s/' % title.lower().replace(' ', '-'), 'order': i, 'is_active': True},
                 )
 
+    def _seed_categories(self):
         category_specs = [
-            ('cosmetics', 'Cosmetics', None, 1, 'Complete makeup essentials for daily and glam looks.'),
-            ('skincare', 'Skincare', None, 2, 'Daily skincare routines for healthy and balanced skin.'),
-            ('haircare', 'Haircare', None, 3, 'Shampoo, treatments, and styling essentials.'),
-            ('fragrance', 'Fragrance', None, 4, 'Long-lasting perfume and body mist collections.'),
-            ('women', 'Women', None, 5, 'Women fashion and lifestyle picks.'),
-            ('men', 'Men', None, 6, 'Men fashion and daily essentials.'),
-            ('kids', 'Kids', None, 7, 'Kids clothing, care, and accessories.'),
-            ('electronics', 'Electronics', None, 8, 'Smart gadgets and personal devices.'),
-            ('cos_lips', 'Lips', 'cosmetics', 1, 'Lipstick, gloss, tint, and liner picks.'),
-            ('cos_face', 'Face Base', 'cosmetics', 2, 'Foundation, powder, and concealer products.'),
-            ('cos_eyes', 'Eye Makeup', 'cosmetics', 3, 'Mascara, eyeliner, brows, and palettes.'),
-            ('cos_nails', 'Nails', 'cosmetics', 4, 'Nail polish and manicure essentials.'),
-            ('cos_tools', 'Beauty Tools', 'cosmetics', 5, 'Brushes, blenders, and makeup tools.'),
-            ('skin_cleanser', 'Cleansers', 'skincare', 1, 'Face wash and cleansing care products.'),
-            ('skin_serum', 'Serums', 'skincare', 2, 'Targeted serum formulas for daily glow.'),
-            ('skin_moisturizer', 'Moisturizers', 'skincare', 3, 'Hydration creams and gels.'),
-            ('skin_suncare', 'Sun Care', 'skincare', 4, 'Sunscreen and UV protection products.'),
-            ('hair_wash', 'Hair Wash', 'haircare', 1, 'Shampoo and conditioner essentials.'),
-            ('hair_treatment', 'Hair Treatments', 'haircare', 2, 'Hair mask, oil, and serum care.'),
-            ('hair_style', 'Hair Styling', 'haircare', 3, 'Styling creams and finishing products.'),
-            ('frag_women', 'Women Perfume', 'fragrance', 1, 'Women fragrances and signature scents.'),
-            ('frag_men', 'Men Perfume', 'fragrance', 2, 'Men fragrances for daily and evening wear.'),
-            ('frag_mist', 'Body Mist', 'fragrance', 3, 'Fresh body mists and spray collections.'),
-            ('men_groom', 'Men Grooming', 'men', 1, 'Shaving and grooming tools for men.'),
-            ('elec_audio', 'Audio', 'electronics', 1, 'Headphones, earbuds, and speakers.'),
-            ('elec_wearable', 'Wearables', 'electronics', 2, 'Smartwatch and wearable gadgets.'),
+            ('makeup', 'Makeup', None, 1, 'Popular face, lip, eye, and tool picks.', IMG['palette']),
+            ('skincare', 'Skincare', None, 2, 'Cleansers, serums, moisturizers, and sun care.', IMG['skincare']),
+            ('haircare', 'Haircare', None, 3, 'Shampoo, treatments, oils, and styling essentials.', IMG['haircare']),
+            ('fragrance', 'Fragrance', None, 4, 'Women, men, and unisex perfume collections.', IMG['perfume']),
+            ('men', 'Men', None, 5, 'Men grooming and lifestyle essentials.', IMG['grooming']),
+            ('fashion', 'Fashion', None, 6, 'Bags, apparel, and style accessories.', IMG['fashion']),
+            ('kids', 'Kids', None, 7, 'Kids fashion and care picks.', IMG['kids']),
+            ('electronics', 'Electronics', None, 8, 'Wearables, audio, and everyday gadgets.', IMG['earbuds']),
+            ('lip-makeup', 'Lip Makeup', 'makeup', 1, 'Lipstick, gloss, tint, and liner.', IMG['lipstick']),
+            ('face-makeup', 'Face Makeup', 'makeup', 2, 'Foundation, concealer, primer, and blush.', IMG['foundation']),
+            ('eye-makeup', 'Eye Makeup', 'makeup', 3, 'Mascara, eyeliner, brow, and palettes.', IMG['mascara']),
+            ('beauty-tools', 'Beauty Tools', 'makeup', 4, 'Brushes, sponges, and applicators.', IMG['brush']),
+            ('cleanser', 'Cleansers', 'skincare', 1, 'Daily face wash and cleansing balms.', IMG['skincare']),
+            ('serum', 'Serums', 'skincare', 2, 'Targeted treatment serums.', IMG['serum']),
+            ('moisturizer', 'Moisturizers', 'skincare', 3, 'Cream, gel, and barrier repair moisturizers.', IMG['skincare']),
+            ('suncare', 'Sun Care', 'skincare', 4, 'SPF and UV protection products.', IMG['sunscreen']),
+            ('hair-wash', 'Hair Wash', 'haircare', 1, 'Shampoo and conditioner.', IMG['haircare']),
+            ('hair-treatment', 'Hair Treatments', 'haircare', 2, 'Hair masks, oil, and serum.', IMG['haircare']),
+            ('women-perfume', 'Women Perfume', 'fragrance', 1, 'Signature scents for women.', IMG['perfume']),
+            ('men-perfume', 'Men Perfume', 'fragrance', 2, 'Daily and evening men fragrances.', IMG['perfume']),
+            ('men-grooming', 'Men Grooming', 'men', 1, 'Shaving, beard, and grooming products.', IMG['grooming']),
+            ('audio', 'Audio', 'electronics', 1, 'Earbuds, headphones, and speakers.', IMG['earbuds']),
+            ('wearables', 'Wearables', 'electronics', 2, 'Smart watches and trackers.', IMG['watch']),
         ]
-
         cats = {}
-        for key, name, parent_key, order, description in category_specs:
-            parent = cats.get(parent_key)
-            cat, _ = Category.objects.update_or_create(
-                name=name,
+        for slug, name, parent_slug, order, description, image_url in category_specs:
+            parent = cats.get(parent_slug)
+            category, _ = Category.objects.update_or_create(
+                slug=slug,
                 defaults={
+                    'name': name,
                     'parent': parent,
                     'description': description,
+                    'external_image_url': image_url,
                     'is_featured': parent is None,
                     'order': order,
                     'meta_title': f'{name} | Zynvo',
                     'meta_description': description,
                 },
             )
-            if cat.parent_id != (parent.id if parent else None):
-                cat.parent = parent
-                cat.save(update_fields=['parent'])
-            cats[key] = cat
+            cats[slug] = category
+        return cats
 
+    def _seed_home_media(self):
         hero_slides = [
-            ('Glow & Go Makeup', 'Discover trending lipstick, base, and eye looks for every day.', '/category/cosmetics/', 'Top Beauty Picks', '#fde7ef'),
-            ('Skincare Routine Builder', 'Layer cleanser, serum, moisturizer, and SPF the right way.', '/category/skincare/', 'Daily Care', '#e7f7f4'),
-            ('Fragrance Wardrobe', 'Choose signature perfume and mist for work, date, and travel.', '/category/fragrance/', 'Long Lasting', '#efe8ff'),
+            ('Sephora-Inspired Beauty Shelf', 'Shop cult skincare, gloss, mascara, and perfume picks in one fast catalog.', '/category/makeup/', 'New Beauty Drop', 'https://images.pexels.com/photos/3373746/pexels-photo-3373746.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&fit=crop', '#f8fafc'),
+            ('Skincare Routine Refresh', 'Cleanser, niacinamide, barrier cream, and SPF for daily glow.', '/category/skincare/', 'Routine Ready', 'https://images.pexels.com/photos/6621435/pexels-photo-6621435.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&fit=crop', '#ecfeff'),
+            ('Fragrance & Grooming Edit', 'Signature scents and grooming staples for every day.', '/category/fragrance/', 'Long Lasting', 'https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&fit=crop', '#f5f3ff'),
         ]
-        for i, (title, subtitle, url, accent, color) in enumerate(hero_slides, start=1):
+        for i, (title, subtitle, url, accent, image_url, color) in enumerate(hero_slides, start=1):
             HeroSlide.objects.update_or_create(
                 title=title,
                 defaults={
@@ -122,6 +165,7 @@ class Command(BaseCommand):
                     'cta_text': 'Shop Now',
                     'cta_url': url,
                     'accent_label': accent,
+                    'external_image_url': image_url,
                     'bg_color': color,
                     'order': i,
                     'is_active': True,
@@ -129,133 +173,127 @@ class Command(BaseCommand):
             )
 
         banners = [
-            ('Lip & Cheek Edit', 'New shades this week', '/category/cosmetics/', '#ffe4ef', 'hero_right'),
-            ('Serum Spotlight', 'Hydrate and brighten', '/category/skincare/', '#dff7f2', 'hero_right'),
-            ('Perfume Bestsellers', 'Fresh and floral tones', '/category/fragrance/', '#efe7ff', 'hero_right'),
-            ('Beauty Blender Set', 'Soft finish tools', '/category/cosmetics/', '#fce7f3', 'gadget'),
-            ('Vitamin C Serum', 'Daily glow formula', '/category/skincare/', '#ecfeff', 'gadget'),
-            ('Hair Oil Treatment', 'Smooth and repair', '/category/haircare/', '#fef9c3', 'gadget'),
-            ('Matte Lipstick Kit', '', '/category/cosmetics/', '#fbcfe8', 'unlimited'),
-            ('SPF50 Sunscreen', '', '/category/skincare/', '#d9f99d', 'unlimited'),
-            ('Night Repair Serum', '', '/category/skincare/', '#bae6fd', 'unlimited'),
-            ('Woody Men Perfume', '', '/category/fragrance/', '#e9d5ff', 'unlimited'),
-            ('Keratin Hair Mask', '', '/category/haircare/', '#fef3c7', 'unlimited'),
-            ('Wireless Earbuds', '', '/category/electronics/', '#dbeafe', 'unlimited'),
+            ('Lip Gloss Icons', 'Fenty, Maybelline, NYX style picks', '/category/lip-makeup/', '#ffe4ef', 'hero_right', IMG['lip_gloss']),
+            ('The Ordinary Routine', 'Serums and barrier care', '/category/skincare/', '#dff7f2', 'hero_right', IMG['serum']),
+            ('Signature Perfumes', 'Fresh, floral, woody', '/category/fragrance/', '#efe7ff', 'hero_right', IMG['perfume']),
+            ('Brush & Sponge Set', 'Blend faster', '/category/beauty-tools/', '#fce7f3', 'gadget', IMG['brush']),
+            ('SPF Bestsellers', 'Daily sun care', '/category/suncare/', '#ecfeff', 'gadget', IMG['sunscreen']),
+            ('Hair Repair Shelf', 'Mask, oil, serum', '/category/hair-treatment/', '#fef9c3', 'gadget', IMG['haircare']),
+            ('Gloss Bomb Edit', '', '/category/lip-makeup/', '#fbcfe8', 'unlimited', IMG['lip_gloss']),
+            ('Niacinamide Serums', '', '/category/serum/', '#d9f99d', 'unlimited', IMG['serum']),
+            ('Fragrance Shelf', '', '/category/fragrance/', '#bae6fd', 'unlimited', IMG['perfume']),
+            ('Smart Audio Deals', '', '/category/audio/', '#dbeafe', 'unlimited', IMG['earbuds']),
         ]
-        for i, (title, subtitle, url, color, group) in enumerate(banners, start=1):
-            PromoBanner.objects.update_or_create(
+        PromoBanner.objects.all().delete()
+        for i, (title, subtitle, url, color, group, image_url) in enumerate(banners, start=1):
+            PromoBanner.objects.create(
                 title=title,
+                subtitle=subtitle,
+                url=url,
+                color=color,
                 group=group,
-                defaults={'subtitle': subtitle, 'url': url, 'color': color, 'order': i, 'is_active': True},
+                external_image_url=image_url,
+                order=i,
+                is_active=True,
             )
 
+    def _replace_products(self, cats):
+        Product.objects.all().delete()
+        now = timezone.now()
         products = [
-            ('Velvet Matte Lipstick Ruby Red', 'cos_lips', 790, 990, 'ZY-COS-LIP-001', 'Zynvo Beauty', 'Makeup', True, True, True, 'Best Seller'),
-            ('Hydra Shine Lip Gloss Crystal', 'cos_lips', 650, 850, 'ZY-COS-LIP-002', 'Zynvo Beauty', 'Makeup', False, True, True, ''),
-            ('Soft Nude Lip Liner Precision', 'cos_lips', 390, 490, 'ZY-COS-LIP-003', 'Zynvo Beauty', 'Makeup', False, False, False, ''),
-            ('Tinted Lip Balm Rose Dew', 'cos_lips', 450, 590, 'ZY-COS-LIP-004', 'Zynvo Beauty', 'Makeup', True, False, True, ''),
-            ('Longwear Liquid Lipstick Mocha', 'cos_lips', 840, 1040, 'ZY-COS-LIP-005', 'Zynvo Beauty', 'Makeup', False, True, False, ''),
-            ('24H Transferproof Lip Tint Berry', 'cos_lips', 720, 920, 'ZY-COS-LIP-006', 'Zynvo Beauty', 'Makeup', True, True, True, ''),
-            ('Silk Finish Foundation Warm Beige', 'cos_face', 1190, 1490, 'ZY-COS-FACE-001', 'Zynvo Beauty', 'Makeup', True, True, True, 'Hot'),
-            ('Air Blur Compact Powder Natural', 'cos_face', 880, 1080, 'ZY-COS-FACE-002', 'Zynvo Beauty', 'Makeup', False, False, True, ''),
-            ('Hydra Grip Face Primer Clear', 'cos_face', 980, 1180, 'ZY-COS-FACE-003', 'Zynvo Beauty', 'Makeup', False, True, False, ''),
-            ('Full Cover Concealer Sand', 'cos_face', 760, 920, 'ZY-COS-FACE-004', 'Zynvo Beauty', 'Makeup', False, True, True, ''),
-            ('Velvet Cream Blush Coral', 'cos_face', 690, 890, 'ZY-COS-FACE-005', 'Zynvo Beauty', 'Makeup', True, False, True, ''),
-            ('Glow Beam Liquid Highlighter Gold', 'cos_face', 820, 990, 'ZY-COS-FACE-006', 'Zynvo Beauty', 'Makeup', False, True, True, ''),
-            ('Ultra Length Mascara Black', 'cos_eyes', 710, 890, 'ZY-COS-EYE-001', 'Zynvo Beauty', 'Makeup', True, True, True, ''),
-            ('Precision Liquid Eyeliner Jet', 'cos_eyes', 620, 790, 'ZY-COS-EYE-002', 'Zynvo Beauty', 'Makeup', False, False, True, ''),
-            ('Brow Definer Pencil Dark Brown', 'cos_eyes', 480, 620, 'ZY-COS-EYE-003', 'Zynvo Beauty', 'Makeup', False, True, False, ''),
-            ('Nude Eye Shadow Palette 12 Color', 'cos_eyes', 1290, 1590, 'ZY-COS-EYE-004', 'Zynvo Beauty', 'Makeup', True, True, True, 'Trending'),
-            ('Volume Lash Mascara Waterproof', 'cos_eyes', 760, 940, 'ZY-COS-EYE-005', 'Zynvo Beauty', 'Makeup', False, False, True, ''),
-            ('Glitter Eye Shadow Quad Rose', 'cos_eyes', 840, 1020, 'ZY-COS-EYE-006', 'Zynvo Beauty', 'Makeup', True, True, False, ''),
-            ('Quick Dry Nail Polish Cherry', 'cos_nails', 330, 450, 'ZY-COS-NAIL-001', 'Zynvo Beauty', 'Makeup', False, True, False, ''),
-            ('Gel Finish Nail Polish Nude', 'cos_nails', 360, 480, 'ZY-COS-NAIL-002', 'Zynvo Beauty', 'Makeup', False, False, True, ''),
-            ('French Manicure Nail Kit', 'cos_nails', 940, 1220, 'ZY-COS-NAIL-003', 'Zynvo Beauty', 'Makeup', True, True, True, ''),
-            ('Nail Strengthener Treatment', 'cos_nails', 420, 560, 'ZY-COS-NAIL-004', 'Zynvo Beauty', 'Makeup', False, False, False, ''),
-            ('Professional Makeup Brush Set 12', 'cos_tools', 1350, 1690, 'ZY-COS-TOOL-001', 'Zynvo Beauty', 'Makeup', True, True, True, ''),
-            ('Beauty Blender Sponge Duo', 'cos_tools', 520, 680, 'ZY-COS-TOOL-002', 'Zynvo Beauty', 'Makeup', False, True, True, ''),
-            ('Precision Concealer Brush Pro', 'cos_tools', 420, 560, 'ZY-COS-TOOL-003', 'Zynvo Beauty', 'Makeup', False, False, False, ''),
-            ('Travel Makeup Brush Pouch', 'cos_tools', 690, 860, 'ZY-COS-TOOL-004', 'Zynvo Beauty', 'Makeup', False, True, False, ''),
-            ('Gentle Foaming Cleanser 150ml', 'skin_cleanser', 780, 980, 'ZY-SKIN-CLN-001', 'Zynvo Derma', 'Skincare', True, True, True, ''),
-            ('Hydrating Gel Cleanser 120ml', 'skin_cleanser', 720, 910, 'ZY-SKIN-CLN-002', 'Zynvo Derma', 'Skincare', False, False, True, ''),
-            ('Vitamin C Brightening Serum', 'skin_serum', 1290, 1590, 'ZY-SKIN-SER-001', 'Zynvo Derma', 'Skincare', True, True, True, 'Top Rated'),
-            ('Niacinamide Repair Serum', 'skin_serum', 1190, 1490, 'ZY-SKIN-SER-002', 'Zynvo Derma', 'Skincare', True, True, True, ''),
-            ('Hyaluronic Acid Serum Booster', 'skin_serum', 1090, 1390, 'ZY-SKIN-SER-003', 'Zynvo Derma', 'Skincare', False, False, True, ''),
-            ('Ceramide Moisturizer Cream', 'skin_moisturizer', 980, 1240, 'ZY-SKIN-MOI-001', 'Zynvo Derma', 'Skincare', False, True, False, ''),
-            ('Oil Free Moisturizer Gel', 'skin_moisturizer', 950, 1190, 'ZY-SKIN-MOI-002', 'Zynvo Derma', 'Skincare', False, False, True, ''),
-            ('SPF50 Sunscreen Aqua Shield', 'skin_suncare', 890, 1090, 'ZY-SKIN-SUN-001', 'Zynvo Derma', 'Skincare', True, True, True, 'Bestseller'),
-            ('Matte Sunscreen SPF50 PA++++', 'skin_suncare', 920, 1150, 'ZY-SKIN-SUN-002', 'Zynvo Derma', 'Skincare', True, False, True, ''),
-            ('Keratin Repair Shampoo', 'hair_wash', 760, 960, 'ZY-HAIR-WSH-001', 'Zynvo Hair', 'Haircare', False, True, True, ''),
-            ('Argan Smooth Conditioner', 'hair_wash', 760, 960, 'ZY-HAIR-WSH-002', 'Zynvo Hair', 'Haircare', False, False, True, ''),
-            ('Deep Restore Hair Mask', 'hair_treatment', 990, 1240, 'ZY-HAIR-TRT-001', 'Zynvo Hair', 'Haircare', True, True, True, ''),
-            ('Anti Frizz Hair Serum', 'hair_treatment', 820, 1020, 'ZY-HAIR-TRT-002', 'Zynvo Hair', 'Haircare', False, True, True, ''),
-            ('Nourishing Hair Oil 100ml', 'hair_treatment', 680, 860, 'ZY-HAIR-TRT-003', 'Zynvo Hair', 'Haircare', False, False, True, ''),
-            ('Flexible Hold Styling Cream', 'hair_style', 620, 790, 'ZY-HAIR-STL-001', 'Zynvo Hair', 'Haircare', False, False, False, ''),
-            ('Heat Protect Hair Spray', 'hair_style', 710, 890, 'ZY-HAIR-STL-002', 'Zynvo Hair', 'Haircare', False, True, True, ''),
-            ('Floral Day Perfume Women', 'frag_women', 1890, 2290, 'ZY-FRG-WMN-001', 'Zynvo Scents', 'Fragrance', True, True, True, ''),
-            ('Vanilla Musk Perfume Women', 'frag_women', 1990, 2390, 'ZY-FRG-WMN-002', 'Zynvo Scents', 'Fragrance', True, False, True, ''),
-            ('Woody Spice Perfume Men', 'frag_men', 1950, 2350, 'ZY-FRG-MEN-001', 'Zynvo Scents', 'Fragrance', False, True, True, ''),
-            ('Aqua Fresh Cologne Men', 'frag_men', 1790, 2190, 'ZY-FRG-MEN-002', 'Zynvo Scents', 'Fragrance', False, False, True, ''),
-            ('Rose Bloom Body Mist', 'frag_mist', 690, 890, 'ZY-FRG-MST-001', 'Zynvo Scents', 'Fragrance', True, True, True, ''),
-            ('Ocean Breeze Body Mist', 'frag_mist', 690, 890, 'ZY-FRG-MST-002', 'Zynvo Scents', 'Fragrance', True, False, True, ''),
-            ('Beard Grooming Kit Pro', 'men_groom', 1450, 1790, 'ZY-MEN-GRM-001', 'Zynvo Men', 'Men Grooming', True, True, True, ''),
-            ('Precision Beard Trimmer', 'men_groom', 1650, 1990, 'ZY-MEN-GRM-002', 'Zynvo Men', 'Men Grooming', True, False, True, ''),
-            ('Shaving Foam Sensitive Skin', 'men_groom', 420, 540, 'ZY-MEN-GRM-003', 'Zynvo Men', 'Men Grooming', False, False, False, ''),
-            ('Pulse Wireless Earbuds', 'elec_audio', 2490, 2990, 'ZY-EL-AUD-001', 'Zynvo Tech', 'Audio', True, True, True, ''),
-            ('Noise Free Headphone Pro', 'elec_audio', 3290, 3890, 'ZY-EL-AUD-002', 'Zynvo Tech', 'Audio', False, True, True, ''),
-            ('Glow Smart Watch Lite', 'elec_wearable', 2190, 2590, 'ZY-EL-WEA-001', 'Zynvo Tech', 'Wearables', True, True, True, ''),
-            ('Urban Flex Backpack', 'women', 1850, 2200, 'ZY-WMN-ACC-001', 'Zynvo Style', 'Bags', False, True, False, ''),
-            ('Core Casual Tee Men', 'men', 850, 990, 'ZY-MEN-FSN-001', 'Zynvo Style', 'Fashion', False, True, False, ''),
-            ('Bright Kids Set', 'kids', 990, 1290, 'ZY-KID-FSN-001', 'Zynvo Style', 'Fashion', False, True, False, ''),
+            product('Fenty Beauty Gloss Bomb Universal Lip Luminizer', 'lip-makeup', 2550, 2990, 'FB-GB-001', 'Fenty Beauty', 'lip_gloss', 'Makeup', is_daily_deal=True, is_trending=True, badge='Cult Pick'),
+            product('Maybelline SuperStay Matte Ink Liquid Lipstick', 'lip-makeup', 1150, 1450, 'MNY-SMI-002', 'Maybelline', 'lipstick', 'Makeup', is_new=True, is_trending=True),
+            product('NYX Professional Makeup Butter Gloss', 'lip-makeup', 890, 1090, 'NYX-BG-003', 'NYX Professional Makeup', 'lip_gloss', 'Makeup', is_daily_deal=True),
+            product('MAC Matte Lipstick Ruby Woo', 'lip-makeup', 2850, 3290, 'MAC-RW-004', 'MAC Cosmetics', 'lipstick', 'Makeup', is_trending=True, badge='Icon'),
+            product('Charlotte Tilbury Matte Revolution Pillow Talk', 'lip-makeup', 3650, 4200, 'CT-PT-005', 'Charlotte Tilbury', 'lipstick', 'Makeup', is_new=True),
+            product('NARS Radiant Creamy Concealer', 'face-makeup', 3450, 3990, 'NARS-RCC-006', 'NARS', 'foundation', 'Makeup', is_trending=True),
+            product('Rare Beauty Soft Pinch Liquid Blush', 'face-makeup', 3150, 3650, 'RB-SPB-007', 'Rare Beauty', 'foundation', 'Makeup', is_daily_deal=True, badge='Trending'),
+            product('Maybelline Fit Me Matte + Poreless Foundation', 'face-makeup', 1350, 1690, 'MNY-FIT-008', 'Maybelline', 'foundation', 'Makeup', is_new=True),
+            product('e.l.f. Power Grip Primer', 'face-makeup', 1290, 1590, 'ELF-PGP-009', 'e.l.f. Cosmetics', 'foundation', 'Makeup', is_trending=True),
+            product('Laura Mercier Translucent Loose Setting Powder', 'face-makeup', 4250, 4890, 'LM-TLP-010', 'Laura Mercier', 'foundation', 'Makeup'),
+            product('Too Faced Better Than Sex Mascara', 'eye-makeup', 3150, 3750, 'TF-BTS-011', 'Too Faced', 'mascara', 'Makeup', is_daily_deal=True),
+            product('Essence Lash Princess False Lash Effect Mascara', 'eye-makeup', 850, 1050, 'ESS-LP-012', 'essence', 'mascara', 'Makeup', is_trending=True),
+            product('Urban Decay Naked3 Eyeshadow Palette', 'eye-makeup', 6250, 6990, 'UD-N3-013', 'Urban Decay', 'palette', 'Makeup', is_new=True),
+            product('Anastasia Beverly Hills Brow Wiz', 'eye-makeup', 2750, 3250, 'ABH-BW-014', 'Anastasia Beverly Hills', 'mascara', 'Makeup'),
+            product('Real Techniques Everyday Essentials Brush Set', 'beauty-tools', 2450, 2890, 'RT-EE-015', 'Real Techniques', 'brush', 'Makeup', is_daily_deal=True),
+            product('Beautyblender Original Makeup Sponge', 'beauty-tools', 2250, 2690, 'BB-ORG-016', 'Beautyblender', 'brush', 'Makeup', is_trending=True),
+            product('The Ordinary Niacinamide 10% + Zinc 1%', 'serum', 1350, 1650, 'TO-NIA-017', 'The Ordinary', 'serum', 'Skincare', is_daily_deal=True, is_trending=True, badge='Bestseller'),
+            product('The Ordinary Hyaluronic Acid 2% + B5', 'serum', 1450, 1750, 'TO-HA-018', 'The Ordinary', 'serum', 'Skincare', is_new=True),
+            product('CeraVe Hydrating Cleanser', 'cleanser', 1850, 2200, 'CRV-HC-019', 'CeraVe', 'skincare', 'Skincare', is_trending=True),
+            product('La Roche-Posay Toleriane Purifying Foaming Cleanser', 'cleanser', 2850, 3350, 'LRP-TPC-020', 'La Roche-Posay', 'skincare', 'Skincare'),
+            product('COSRX Low pH Good Morning Gel Cleanser', 'cleanser', 1450, 1790, 'COSRX-GM-021', 'COSRX', 'skincare', 'Skincare', is_daily_deal=True),
+            product('CeraVe Moisturizing Cream', 'moisturizer', 2350, 2790, 'CRV-MC-022', 'CeraVe', 'skincare', 'Skincare', is_trending=True),
+            product('Clinique Moisture Surge 100H Auto-Replenishing Hydrator', 'moisturizer', 4650, 5200, 'CLQ-MS-023', 'Clinique', 'skincare', 'Skincare', is_new=True),
+            product('Neutrogena Hydro Boost Water Gel', 'moisturizer', 1850, 2250, 'NEU-HB-024', 'Neutrogena', 'skincare', 'Skincare'),
+            product('Supergoop! Unseen Sunscreen SPF 40', 'suncare', 3550, 4100, 'SG-US-025', 'Supergoop!', 'sunscreen', 'Skincare', is_trending=True),
+            product('La Roche-Posay Anthelios Melt-In Milk Sunscreen SPF 60', 'suncare', 3290, 3890, 'LRP-AM-026', 'La Roche-Posay', 'sunscreen', 'Skincare', is_daily_deal=True),
+            product('Beauty of Joseon Relief Sun Rice + Probiotics SPF50+', 'suncare', 1850, 2290, 'BOJ-RS-027', 'Beauty of Joseon', 'sunscreen', 'Skincare', is_new=True),
+            product('Olaplex No.4 Bond Maintenance Shampoo', 'hair-wash', 3250, 3750, 'OLX-N4-028', 'Olaplex', 'haircare', 'Haircare', is_trending=True),
+            product('K18 Leave-In Molecular Repair Hair Mask', 'hair-treatment', 6950, 7590, 'K18-MASK-029', 'K18', 'haircare', 'Haircare', is_daily_deal=True),
+            product('Moroccanoil Treatment Original', 'hair-treatment', 3850, 4450, 'MO-TO-030', 'Moroccanoil', 'haircare', 'Haircare'),
+            product('Dior Sauvage Eau de Parfum', 'men-perfume', 11250, 12490, 'DIOR-SVG-031', 'Dior', 'perfume', 'Fragrance', is_trending=True),
+            product('Yves Saint Laurent Libre Eau de Parfum', 'women-perfume', 10850, 11990, 'YSL-LIB-032', 'Yves Saint Laurent', 'perfume', 'Fragrance', is_new=True),
+            product('Chanel Coco Mademoiselle Eau de Parfum', 'women-perfume', 13250, 14500, 'CH-CM-033', 'CHANEL', 'perfume', 'Fragrance', is_trending=True, badge='Luxury'),
+            product('Versace Dylan Blue Pour Homme', 'men-perfume', 7350, 8290, 'VER-DB-034', 'Versace', 'perfume', 'Fragrance', is_daily_deal=True),
+            product('Gillette Fusion5 Razor', 'men-grooming', 1450, 1750, 'GIL-F5-035', 'Gillette', 'grooming', 'Men Grooming'),
+            product('Philips Norelco OneBlade Trimmer', 'men-grooming', 4650, 5290, 'PHL-OB-036', 'Philips', 'grooming', 'Men Grooming', is_trending=True),
+            product('Sony WF-1000XM5 Wireless Noise Canceling Earbuds', 'audio', 24900, 27900, 'SONY-XM5-037', 'Sony', 'earbuds', 'Audio', is_trending=True),
+            product('Apple AirPods Pro 2nd Generation', 'audio', 28500, 31900, 'APL-APP2-038', 'Apple', 'earbuds', 'Audio', is_new=True),
+            product('JBL Flip 6 Portable Bluetooth Speaker', 'audio', 11200, 12900, 'JBL-F6-039', 'JBL', 'earbuds', 'Audio', is_daily_deal=True),
+            product('Apple Watch SE GPS 40mm', 'wearables', 29900, 33900, 'APL-WSE-040', 'Apple', 'watch', 'Wearables', is_trending=True),
+            product('Samsung Galaxy Watch6', 'wearables', 24500, 27900, 'SAM-GW6-041', 'Samsung', 'watch', 'Wearables'),
+            product('Nike Heritage Backpack', 'fashion', 3150, 3650, 'NIKE-HB-042', 'Nike', 'fashion', 'Fashion', is_new=True),
+            product('Adidas Essentials 3-Stripes Tee', 'fashion', 1850, 2250, 'ADI-TEE-043', 'Adidas', 'fashion', 'Fashion'),
+            product('Carter’s Baby 3-Piece Cotton Set', 'kids', 2450, 2890, 'CAR-KID-044', 'Carter’s', 'kids', 'Fashion'),
         ]
 
-        for idx, (name, category_key, price, compare_at, sku, brand, group, deal, is_new, trending, badge_text) in enumerate(products, start=1):
-            product = Product.objects.filter(sku=sku).first() or Product.objects.filter(name=name).first() or Product(sku=sku)
-            product.name = name
-            product.sku = sku
-            product.category = cats[category_key]
-            product.short_description = 'A curated premium pick from Zynvo.'
-            product.description = f'{name} is selected to deliver reliable performance, finish, and comfort for everyday use.'
-            product.specifications = 'Origin: Bangladesh\nQuality: Premium\nUse: Daily'
-            product.price = price
-            product.compare_at_price = compare_at
-            product.stock = 15 + (idx % 18)
-            product.brand = brand
-            product.badge_text = badge_text
-            product.is_active = True
-            product.is_featured = idx % 3 == 0
-            product.is_new = is_new
-            product.is_daily_deal = deal
-            product.is_trending = trending
-            product.collection_label = 'Cosmetics Edit' if idx <= 24 else ''
-            product.trending_group = group
-            product.deal_ends_at = timezone.now() + timedelta(days=3)
-            product.meta_title = f'{name} | Zynvo'
-            product.meta_description = f'Buy {name} online at Zynvo with fast delivery in Bangladesh.'
-            product.save()
-
-            if idx <= 20:
-                ProductVariant.objects.update_or_create(
-                    product=product,
+        for idx, item in enumerate(products, start=1):
+            product_obj = Product.objects.create(
+                name=item['name'],
+                category=cats[item['category']],
+                short_description=f"Popular {item['brand']} item selected for the Zynvo demo catalog.",
+                description=(
+                    f"{item['name']} is a real-world inspired catalog item. "
+                    "Use this demo data to test product cards, filtering, cart, wishlist, checkout, and homepage sections."
+                ),
+                specifications='Source: public product naming from popular retail/brand catalogs\nDemo image: remote URL\nWarranty: Seller policy applies',
+                price=item['price'],
+                compare_at_price=item['compare'],
+                sku=item['sku'],
+                stock=12 + (idx % 22),
+                brand=item['brand'],
+                badge_text=item.get('badge', ''),
+                external_image_url=item['image'],
+                is_active=True,
+                is_featured=idx % 3 == 0,
+                is_new=item.get('is_new', False),
+                is_daily_deal=item.get('is_daily_deal', False),
+                is_trending=item.get('is_trending', False),
+                collection_label='Signature' if idx % 5 == 0 else '',
+                trending_group=item['group'],
+                deal_ends_at=now + timedelta(days=3 + (idx % 4)),
+                meta_title=f"{item['name']} | Zynvo",
+                meta_description=f"Buy {item['name']} online at Zynvo with fast delivery in Bangladesh.",
+            )
+            if idx <= 18:
+                ProductVariant.objects.create(
+                    product=product_obj,
                     attribute_name='Size',
                     value='Standard',
-                    defaults={
-                        'sku': f'{sku}-STD',
-                        'stock': product.stock,
-                        'is_default': True,
-                    },
+                    sku=f"{item['sku']}-STD",
+                    stock=product_obj.stock,
+                    is_default=True,
                 )
-                ProductVariant.objects.update_or_create(
-                    product=product,
+                ProductVariant.objects.create(
+                    product=product_obj,
                     attribute_name='Size',
-                    value='Mini',
-                    defaults={
-                        'sku': f'{sku}-MINI',
-                        'stock': max(product.stock - 4, 1),
-                        'is_default': False,
-                    },
+                    value='Mini / Travel',
+                    sku=f"{item['sku']}-MINI",
+                    stock=max(product_obj.stock - 5, 1),
+                    is_default=False,
                 )
 
+    def _seed_pages_and_blog(self):
         page_titles = ['about-us', 'contact-us', 'privacy-policy', 'terms-&-conditions', 'return-policy', 'faqs', 'blogs', 'careers']
         for slug in page_titles:
             StaticPage.objects.update_or_create(
@@ -268,29 +306,24 @@ class Command(BaseCommand):
             )
 
         blog_cat, _ = BlogCategory.objects.get_or_create(name='Beauty Guides', slug='beauty-guides')
-        BlogPost.objects.update_or_create(
-            slug='build-a-complete-cosmetics-routine',
-            defaults={
-                'category': blog_cat,
-                'title': 'Build a Complete Cosmetics Routine in 5 Steps',
-                'excerpt': 'Choose base, eyes, lips, and skincare prep with balanced formulas.',
-                'content': 'This guide helps you choose practical products for office, events, and daily wear while staying within budget.',
-                'is_published': True,
-            },
-        )
-        BlogPost.objects.update_or_create(
-            slug='how-to-layer-serum-and-moisturizer',
-            defaults={
-                'category': blog_cat,
-                'title': 'How to Layer Serum and Moisturizer for Better Results',
-                'excerpt': 'A simple AM/PM method for hydration and glow.',
-                'content': 'Use cleanser first, then serum, then moisturizer, and in daytime finish with sunscreen. Keep routines consistent for better outcomes.',
-                'is_published': True,
-            },
-        )
+        posts = [
+            ('best-cult-beauty-products-to-build-a-routine', 'Best Cult Beauty Products to Build a Routine', 'Start with cleanser, serum, SPF, mascara, and a reliable lip product.'),
+            ('how-to-shop-skincare-by-ingredient', 'How to Shop Skincare by Ingredient', 'Niacinamide, hyaluronic acid, ceramides, and SPF solve different daily needs.'),
+            ('fragrance-grooming-and-gadget-gift-guide', 'Fragrance, Grooming, and Gadget Gift Guide', 'Easy gifting picks across perfume, trimmer, earbuds, and watch categories.'),
+        ]
+        for slug, title, excerpt in posts:
+            BlogPost.objects.update_or_create(
+                slug=slug,
+                defaults={
+                    'category': blog_cat,
+                    'title': title,
+                    'excerpt': excerpt,
+                    'content': f'{excerpt}\n\nThis demo article supports the modern ecommerce homepage and blog listing.',
+                    'is_published': True,
+                },
+            )
 
+    def _seed_admin(self):
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser('admin', 'admin@zynvo.com', 'admin12345')
             self.stdout.write(self.style.WARNING('Created admin user: admin / admin12345'))
-
-        self.stdout.write(self.style.SUCCESS('Demo data seeded successfully with expanded cosmetics catalog.'))

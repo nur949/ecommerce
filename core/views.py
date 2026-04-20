@@ -125,6 +125,8 @@ def get_home_sections():
 def get_category_image(category):
     if category.image:
         return category.image.url
+    if getattr(category, 'external_image_url', ''):
+        return category.external_image_url
     category_name = (category.name or '').lower()
     for keywords, image_url in CATEGORY_IMAGE_FALLBACKS:
         if any(keyword in category_name for keyword in keywords):

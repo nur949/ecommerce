@@ -71,7 +71,16 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('avatar', 'phone')
+        fields = ('avatar', 'phone', 'birthday', 'beauty_preferences', 'preferred_brands', 'marketing_opt_in')
+        widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+            'beauty_preferences': forms.Textarea(attrs={'rows': 4}),
+        }
+        labels = {
+            'beauty_preferences': 'Beauty preferences',
+            'preferred_brands': 'Preferred brands',
+            'marketing_opt_in': 'Send me offers and account updates',
+        }
 
     def __init__(self, *args, user=None, **kwargs):
         self.user = user
@@ -79,10 +88,26 @@ class ProfileForm(forms.ModelForm):
         if user:
             initial.update({'name': user.get_full_name() or user.first_name or user.username, 'email': user.email})
         super().__init__(*args, initial=initial, **kwargs)
-        self.fields['avatar'].widget.attrs.update({'class': 'form-control', 'accept': 'image/*'})
-        self.fields['phone'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Phone number'})
-        self.fields['name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Full name'})
-        self.fields['email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Email address'})
+        placeholders = {
+            'name': 'Full name',
+            'email': 'Email address',
+            'phone': 'Phone number',
+            'beauty_preferences': 'Skin type, routines, shades, allergies, or product goals',
+            'preferred_brands': 'Example: The Ordinary, COSRX, Fenty Beauty',
+        }
+        for name, field in self.fields.items():
+            if name == 'marketing_opt_in':
+                field.widget.attrs.update({'class': 'form-check-input'})
+            else:
+                field.widget.attrs.update({'class': 'form-control', 'placeholder': placeholders.get(name, field.label)})
+        self.fields['avatar'].widget.attrs.update({'accept': 'image/*'})
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get('phone') or '').strip()
+        normalized = phone.replace('+', '', 1).replace('-', '').replace(' ', '')
+        if phone and (not normalized.isdigit() or len(normalized) < 8):
+            raise forms.ValidationError('Enter a valid phone number.')
+        return phone
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
@@ -139,3 +164,12 @@ class AddressForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-check-input'})
             else:
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': field.label})
+                if field.required:
+                    field.widget.attrs['required'] = 'required'
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone'].strip()
+        normalized = phone.replace('+', '', 1).replace('-', '').replace(' ', '')
+        if not normalized.isdigit() or len(normalized) < 8:
+            raise forms.ValidationError('Enter a valid phone number.')
+        return phone

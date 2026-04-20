@@ -10,8 +10,8 @@
       <div class="col-md-6 col-lg-4 col-xl-3">
         <a href="{{ banner.url }}" class="premium-grid-card block overflow-hidden text-decoration-none">
           <div class="aspect-[4/4.8] overflow-hidden bg-[#f1f5f3]">
-            {% if banner.image %}
-            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async">
+            {% if banner.primary_image_url %}
+            <img src="{{ banner.primary_image_url }}" alt="{{ banner.title }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async">
             {% else %}
             <img src="{% static 'aura/images/product-item' %}{{ forloop.counter }}.jpg" alt="{{ banner.title }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async">
             {% endif %}

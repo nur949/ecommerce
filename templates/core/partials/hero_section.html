@@ -6,7 +6,7 @@
         {% for slide in hero_slides %}
         <div class="swiper-slide">
           <div class="relative min-h-[430px] overflow-hidden bg-[#0f172a] md:min-h-[500px] lg:min-h-[560px] xl:min-h-[620px]">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% if slide.image %}{{ slide.image.url }}{% elif forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %});"></div>
+            <div class="absolute inset-0 bg-cover bg-center" style="background-image:url({% if slide.primary_image_url %}{{ slide.primary_image_url }}{% elif forloop.counter == 1 %}{% static 'aura/images/banner2.jpg' %}{% elif forloop.counter == 2 %}{% static 'aura/images/banner1.jpg' %}{% else %}{% static 'aura/images/banner3.jpg' %}{% endif %});"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a]/92 via-[#0f172a]/62 to-[#0f172a]/12"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a]/55 via-transparent to-transparent"></div>
             <div class="relative mx-auto flex min-h-[430px] max-w-7xl items-end px-5 pb-12 pt-14 md:min-h-[500px] md:px-8 md:pb-14 lg:min-h-[560px] lg:px-10 lg:pb-16 xl:min-h-[620px]">

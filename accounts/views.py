@@ -65,7 +65,7 @@ def _json_body(request):
 
 
 class UserLoginView(LoginView):
-    template_name = 'accounts/login_register.html'
+    template_name = 'accounts/login.html'
     authentication_form = StyledAuthenticationForm
 
     def get_context_data(self, **kwargs):
@@ -94,7 +94,7 @@ def register_view(request):
             return redirect('accounts:dashboard')
     else:
         form = RegisterForm()
-    return render(request, 'accounts/login_register.html', {
+    return render(request, 'accounts/register.html', {
         'form': StyledAuthenticationForm(),
         'register_form': form,
         'active_tab': 'register',

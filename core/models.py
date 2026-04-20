@@ -94,6 +94,7 @@ class HeroSlide(models.Model):
     cta_url = models.CharField(max_length=255, default='/shop/')
     accent_label = models.CharField(max_length=40, blank=True, help_text='Example: Up to 38% Off')
     image = models.ImageField(upload_to='hero/', blank=True, null=True)
+    external_image_url = models.URLField(blank=True)
     bg_color = models.CharField(max_length=20, default='#eef6ff')
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -104,12 +105,19 @@ class HeroSlide(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def primary_image_url(self):
+        if self.image:
+            return self.image.url
+        return self.external_image_url
+
 
 class PromoBanner(models.Model):
     title = models.CharField(max_length=120)
     subtitle = models.CharField(max_length=120, blank=True)
     url = models.CharField(max_length=255, default='/shop/')
     image = models.ImageField(upload_to='banners/', blank=True, null=True)
+    external_image_url = models.URLField(blank=True)
     color = models.CharField(max_length=20, default='#f0f7ff')
     group = models.CharField(max_length=30, default='hero_right', help_text='hero_right, gadget, unlimited')
     order = models.PositiveIntegerField(default=0)
@@ -120,6 +128,12 @@ class PromoBanner(models.Model):
 
     def __str__(self):
         return f'{self.group}: {self.title}'
+
+    @property
+    def primary_image_url(self):
+        if self.image:
+            return self.image.url
+        return self.external_image_url
 
 
 class StaticPage(models.Model):

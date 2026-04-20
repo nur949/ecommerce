@@ -4,20 +4,25 @@
 {% block content %}
 <section class="px-4 py-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <div class="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+    <div class="grid gap-6 lg:grid-cols-[288px_minmax(0,1fr)]">
       <aside class="h-fit rounded-[8px] border border-black/5 bg-white p-5 shadow-soft lg:sticky lg:top-36">
         <div class="flex items-center gap-4">
           {% if profile.avatar %}
           <img src="{{ profile.avatar.url }}" alt="{{ request.user.get_full_name|default:request.user.email }}" class="h-16 w-16 rounded-[8px] object-cover">
           {% else %}
-          <div class="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#111827] text-xl font-bold text-white">{{ request.user.first_name|default:request.user.email|first|upper }}</div>
+          <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-[8px] bg-[#111827] text-xl font-bold text-white">{{ request.user.first_name|default:request.user.email|first|upper }}</div>
           {% endif %}
           <div class="min-w-0">
-            <h1 class="truncate text-xl font-semibold text-ink">{{ request.user.first_name|default:request.user.email }}</h1>
+            <h1 class="truncate text-xl font-semibold text-ink">{{ request.user.get_full_name|default:request.user.first_name|default:request.user.email }}</h1>
             <p class="truncate text-sm text-stone">{{ request.user.email }}</p>
           </div>
         </div>
-        <nav class="mt-6 grid gap-2 text-sm font-semibold">
+        <div class="mt-5 rounded-[8px] bg-[#f8fafc] p-3">
+          <p class="text-xs font-bold uppercase text-stone">Reward tier</p>
+          <p class="mt-1 text-lg font-semibold text-ink">{{ reward_account.tier }}</p>
+          <p class="text-sm text-stone">{{ reward_account.points_balance }} points available</p>
+        </div>
+        <nav class="mt-6 grid gap-2 text-sm font-semibold" aria-label="Account sections">
           <a href="#profile" class="rounded-[8px] px-3 py-2 text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood">Profile</a>
           <a href="#orders" class="rounded-[8px] px-3 py-2 text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood">Orders</a>
           <a href="#wishlist" class="rounded-[8px] px-3 py-2 text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood">Wishlist</a>
@@ -27,78 +32,106 @@
       </aside>
 
       <div class="space-y-6">
-        <div class="grid gap-4 md:grid-cols-4">
-          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-[0.18em] text-stone">Orders</p><p class="mt-2 text-3xl font-semibold text-ink">{{ orders|length }}</p></div>
-          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-[0.18em] text-stone">Wishlist</p><p class="mt-2 text-3xl font-semibold text-ink">{{ wishlist_count }}</p></div>
-          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-[0.18em] text-stone">Addresses</p><p class="mt-2 text-3xl font-semibold text-ink">{{ addresses|length }}</p></div>
-          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-[0.18em] text-stone">Cart</p><p class="mt-2 text-3xl font-semibold text-ink">{{ cart_count }}</p></div>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase text-stone">Orders</p><p class="mt-2 text-3xl font-semibold text-ink">{{ orders|length }}</p></div>
+          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase text-stone">Wishlist</p><p class="mt-2 text-3xl font-semibold text-ink">{{ wishlist_count }}</p></div>
+          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase text-stone">Addresses</p><p class="mt-2 text-3xl font-semibold text-ink">{{ addresses|length }}</p></div>
+          <div class="rounded-[8px] border border-black/5 bg-white p-5 shadow-soft"><p class="text-xs font-bold uppercase text-stone">Cart</p><p class="mt-2 text-3xl font-semibold text-ink">{{ cart_count }}</p></div>
         </div>
 
-        <section id="profile" class="rounded-[8px] border border-black/5 bg-white p-6 shadow-soft">
-          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <section id="profile" class="scroll-mt-36 rounded-[8px] border border-black/5 bg-white p-5 shadow-soft md:p-6">
+          <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-rosewood">Basic Profile</p>
+              <p class="text-xs font-bold uppercase text-rosewood">Basic profile</p>
               <h2 class="mt-1 text-2xl font-semibold text-ink">Personal information</h2>
+              <p class="mt-2 max-w-2xl text-sm leading-6 text-stone">Keep your contact details and product preferences current for faster checkout and better recommendations.</p>
             </div>
-            <span class="rounded-[8px] bg-[#ecfdf5] px-3 py-1 text-xs font-bold text-[#047857]">Session auth</span>
+            <span class="rounded-[8px] bg-[#ecfdf5] px-3 py-1 text-xs font-bold text-[#047857]">Signed in</span>
           </div>
-          <form method="post" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2">
+          <form method="post" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2" novalidate>
             {% csrf_token %}
             <input type="hidden" name="action" value="profile">
+            {% if profile_form.non_field_errors %}<div class="rounded-[8px] border border-red-200 bg-red-50 p-3 text-sm text-red-700 md:col-span-2">{{ profile_form.non_field_errors|join:', ' }}</div>{% endif %}
             <div>
-              <label class="mb-1 block text-sm font-semibold text-ink">Name</label>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.name.id_for_label }}">Name</label>
               {{ profile_form.name }}
               {% if profile_form.name.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.name.errors|join:', ' }}</p>{% endif %}
             </div>
             <div>
-              <label class="mb-1 block text-sm font-semibold text-ink">Email</label>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.email.id_for_label }}">Email</label>
               {{ profile_form.email }}
               {% if profile_form.email.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.email.errors|join:', ' }}</p>{% endif %}
             </div>
             <div>
-              <label class="mb-1 block text-sm font-semibold text-ink">Phone</label>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.phone.id_for_label }}">Phone</label>
               {{ profile_form.phone }}
               {% if profile_form.phone.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.phone.errors|join:', ' }}</p>{% endif %}
             </div>
             <div>
-              <label class="mb-1 block text-sm font-semibold text-ink">Profile image</label>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.birthday.id_for_label }}">Birthday</label>
+              {{ profile_form.birthday }}
+              {% if profile_form.birthday.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.birthday.errors|join:', ' }}</p>{% endif %}
+            </div>
+            <div>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.avatar.id_for_label }}">Profile image</label>
               {{ profile_form.avatar }}
               {% if profile_form.avatar.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.avatar.errors|join:', ' }}</p>{% endif %}
             </div>
+            <div>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.preferred_brands.id_for_label }}">Preferred brands</label>
+              {{ profile_form.preferred_brands }}
+              {% if profile_form.preferred_brands.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.preferred_brands.errors|join:', ' }}</p>{% endif %}
+            </div>
             <div class="md:col-span-2">
-              <button class="btn btn-primary">Update Profile</button>
+              <label class="mb-1 block text-sm font-semibold text-ink" for="{{ profile_form.beauty_preferences.id_for_label }}">Beauty preferences</label>
+              {{ profile_form.beauty_preferences }}
+              {% if profile_form.beauty_preferences.errors %}<p class="mt-1 text-sm text-red-700">{{ profile_form.beauty_preferences.errors|join:', ' }}</p>{% endif %}
+            </div>
+            <label class="flex items-start gap-2 text-sm font-semibold text-ink md:col-span-2" for="{{ profile_form.marketing_opt_in.id_for_label }}">
+              {{ profile_form.marketing_opt_in }}
+              <span>{{ profile_form.marketing_opt_in.label }}</span>
+            </label>
+            {% if profile_form.marketing_opt_in.errors %}<p class="text-sm text-red-700 md:col-span-2">{{ profile_form.marketing_opt_in.errors|join:', ' }}</p>{% endif %}
+            <div class="md:col-span-2">
+              <button class="btn btn-primary">Update profile</button>
             </div>
           </form>
         </section>
 
-        <section id="orders" class="rounded-[8px] border border-black/5 bg-white p-6 shadow-soft">
-          <div class="mb-5 flex items-center justify-between gap-3">
+        <section id="orders" class="scroll-mt-36 rounded-[8px] border border-black/5 bg-white p-5 shadow-soft md:p-6">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-rosewood">Order System</p>
+              <p class="text-xs font-bold uppercase text-rosewood">Order system</p>
               <h2 class="mt-1 text-2xl font-semibold text-ink">Recent orders</h2>
             </div>
-            <a href="{% url 'orders:tracking' %}" class="text-sm font-bold text-rosewood">Track order</a>
+            <a href="{% url 'orders:tracking' %}" class="rounded-[8px] border border-black/10 px-3 py-2 text-sm font-bold text-ink hover:border-rosewood hover:text-rosewood">Track order</a>
           </div>
           <div class="grid gap-3">
             {% for order in orders %}
             <a href="{{ order.get_absolute_url }}" class="dashboard-order-link">
-              <span class="font-semibold">{{ order.order_number }}</span>
-              <span class="text-sm text-stone">{{ order.get_status_display }}</span>
+              <span class="min-w-0">
+                <span class="block truncate font-semibold">{{ order.order_number }}</span>
+                <span class="block text-xs text-stone">{{ order.created_at|date:"M j, Y" }}</span>
+              </span>
+              <span class="rounded-[8px] bg-[#f8fafc] px-3 py-1 text-sm font-semibold text-stone">{{ order.get_status_display }}</span>
               <strong>&#2547;{{ order.total }}</strong>
             </a>
             {% empty %}
-            <p class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone">No orders yet.</p>
+            <div class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone">
+              <p class="font-semibold text-ink">No orders yet.</p>
+              <a href="{% url 'catalog:shop' %}" class="mt-2 inline-flex font-bold text-rosewood">Start shopping</a>
+            </div>
             {% endfor %}
           </div>
         </section>
 
-        <section id="wishlist" class="rounded-[8px] border border-black/5 bg-white p-6 shadow-soft">
-          <div class="mb-5 flex items-center justify-between gap-3">
+        <section id="wishlist" class="scroll-mt-36 rounded-[8px] border border-black/5 bg-white p-5 shadow-soft md:p-6">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-rosewood">Wishlist</p>
+              <p class="text-xs font-bold uppercase text-rosewood">Wishlist</p>
               <h2 class="mt-1 text-2xl font-semibold text-ink">Saved products</h2>
             </div>
-            <a href="{% url 'accounts:wishlist' %}" class="text-sm font-bold text-rosewood">Open wishlist</a>
+            <a href="{% url 'accounts:wishlist' %}" class="rounded-[8px] border border-black/10 px-3 py-2 text-sm font-bold text-ink hover:border-rosewood hover:text-rosewood">Open wishlist</a>
           </div>
           <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {% for item in wishlist_items %}
@@ -108,99 +141,154 @@
               <p class="mt-1 text-sm font-bold text-rosewood">&#2547;{{ item.product.price }}</p>
               <form method="post" action="{% url 'accounts:move_wishlist_to_cart' item.product.slug %}" class="mt-3">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'accounts:dashboard' %}#wishlist">
                 <button class="w-full rounded-[8px] bg-[#111827] px-3 py-2 text-sm font-bold text-white">Move to cart</button>
               </form>
             </article>
             {% empty %}
-            <p class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone sm:col-span-2 xl:col-span-4">No saved products.</p>
+            <div class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone sm:col-span-2 xl:col-span-4">
+              <p class="font-semibold text-ink">No saved products.</p>
+              <a href="{% url 'catalog:shop' %}" class="mt-2 inline-flex font-bold text-rosewood">Browse products</a>
+            </div>
             {% endfor %}
           </div>
         </section>
 
-        <section id="addresses" class="rounded-[8px] border border-black/5 bg-white p-6 shadow-soft">
+        <section id="addresses" class="scroll-mt-36 rounded-[8px] border border-black/5 bg-white p-5 shadow-soft md:p-6">
           <div class="mb-5">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-rosewood">Address System</p>
+            <p class="text-xs font-bold uppercase text-rosewood">Address system</p>
             <h2 class="mt-1 text-2xl font-semibold text-ink">Delivery addresses</h2>
           </div>
-          <div class="grid gap-4 lg:grid-cols-2">
-            <form method="post" action="{% url 'accounts:address_create' %}" class="grid gap-3 rounded-[8px] bg-[#f8fafc] p-4">
+          <div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <form method="post" action="{% url 'accounts:address_create' %}" class="grid gap-3 rounded-[8px] bg-[#f8fafc] p-4" novalidate>
               {% csrf_token %}
               <h3 class="text-lg font-semibold text-ink">Add address</h3>
-              {{ address_form.full_name }}
-              {{ address_form.phone }}
-              <div class="grid gap-3 sm:grid-cols-2">
-                {{ address_form.city }}
-                {{ address_form.area }}
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.full_name.id_for_label }}">Recipient name</label>
+                {{ address_form.full_name }}
               </div>
-              {{ address_form.address_line }}
-              {{ address_form.postcode }}
-              {{ address_form.delivery_type }}
-              <label class="flex items-center gap-2 text-sm font-semibold text-ink">{{ address_form.is_default }} Default address</label>
-              <button class="btn btn-primary">Save Address</button>
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.phone.id_for_label }}">Phone</label>
+                {{ address_form.phone }}
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.city.id_for_label }}">City</label>
+                  {{ address_form.city }}
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.area.id_for_label }}">Area</label>
+                  {{ address_form.area }}
+                </div>
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.address_line.id_for_label }}">Street address</label>
+                {{ address_form.address_line }}
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.postcode.id_for_label }}">Postal code</label>
+                  {{ address_form.postcode }}
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-semibold text-ink" for="{{ address_form.delivery_type.id_for_label }}">Address type</label>
+                  {{ address_form.delivery_type }}
+                </div>
+              </div>
+              <label class="flex items-center gap-2 text-sm font-semibold text-ink" for="{{ address_form.is_default.id_for_label }}">{{ address_form.is_default }} Default address</label>
+              <button class="btn btn-primary">Save address</button>
             </form>
             <div class="grid gap-3">
               {% for address in addresses %}
               <article class="rounded-[8px] border border-black/5 p-4">
                 <div class="flex items-start justify-between gap-3">
-                  <div>
+                  <div class="min-w-0">
                     <p class="font-semibold text-ink">{{ address.full_name }}</p>
-                    <p class="mt-1 text-sm text-stone">{{ address.address_line }}, {{ address.area }}, {{ address.city }} {{ address.postcode }}</p>
-                    <p class="mt-1 text-sm text-stone">{{ address.phone }}</p>
+                    <p class="mt-1 text-sm leading-6 text-stone">{{ address.address_line }}, {{ address.area }}, {{ address.city }}{% if address.postcode %} {{ address.postcode }}{% endif %}</p>
+                    <p class="mt-1 text-sm text-stone">{{ address.phone }} · {{ address.get_delivery_type_display }}</p>
                   </div>
-                  {% if address.is_default %}<span class="rounded-[8px] bg-[#ecfdf5] px-2 py-1 text-xs font-bold text-[#047857]">Default</span>{% endif %}
+                  {% if address.is_default %}<span class="shrink-0 rounded-[8px] bg-[#ecfdf5] px-2 py-1 text-xs font-bold text-[#047857]">Default</span>{% endif %}
                 </div>
                 <details class="mt-3">
-                  <summary class="cursor-pointer text-sm font-bold text-rosewood">Edit</summary>
+                  <summary class="cursor-pointer text-sm font-bold text-rosewood">Edit address</summary>
                   <form method="post" action="{% url 'accounts:address_update' address.id %}" class="mt-3 grid gap-3">
                     {% csrf_token %}
-                    <input class="form-control" name="full_name" value="{{ address.full_name }}" placeholder="Recipient name">
-                    <input class="form-control" name="phone" value="{{ address.phone }}" placeholder="Phone">
+                    <label class="sr-only" for="address-{{ address.id }}-name">Recipient name</label>
+                    <input id="address-{{ address.id }}-name" class="form-control" name="full_name" value="{{ address.full_name }}" placeholder="Recipient name" required>
+                    <label class="sr-only" for="address-{{ address.id }}-phone">Phone</label>
+                    <input id="address-{{ address.id }}-phone" class="form-control" name="phone" value="{{ address.phone }}" placeholder="Phone" required>
                     <div class="grid gap-3 sm:grid-cols-2">
-                      <input class="form-control" name="city" value="{{ address.city }}" placeholder="City">
-                      <input class="form-control" name="area" value="{{ address.area }}" placeholder="Area">
+                      <label class="sr-only" for="address-{{ address.id }}-city">City</label>
+                      <input id="address-{{ address.id }}-city" class="form-control" name="city" value="{{ address.city }}" placeholder="City" required>
+                      <label class="sr-only" for="address-{{ address.id }}-area">Area</label>
+                      <input id="address-{{ address.id }}-area" class="form-control" name="area" value="{{ address.area }}" placeholder="Area" required>
                     </div>
-                    <textarea class="form-control" name="address_line" rows="3" placeholder="Street address">{{ address.address_line }}</textarea>
-                    <input class="form-control" name="postcode" value="{{ address.postcode }}" placeholder="Postal code">
-                    <input type="hidden" name="delivery_type" value="{{ address.delivery_type }}">
+                    <label class="sr-only" for="address-{{ address.id }}-line">Street address</label>
+                    <textarea id="address-{{ address.id }}-line" class="form-control" name="address_line" rows="3" placeholder="Street address" required>{{ address.address_line }}</textarea>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <label class="sr-only" for="address-{{ address.id }}-postcode">Postal code</label>
+                      <input id="address-{{ address.id }}-postcode" class="form-control" name="postcode" value="{{ address.postcode }}" placeholder="Postal code">
+                      <label class="sr-only" for="address-{{ address.id }}-type">Address type</label>
+                      <select id="address-{{ address.id }}-type" class="form-control" name="delivery_type">
+                        <option value="home" {% if address.delivery_type == 'home' %}selected{% endif %}>Home</option>
+                        <option value="office" {% if address.delivery_type == 'office' %}selected{% endif %}>Office</option>
+                      </select>
+                    </div>
                     <label class="flex items-center gap-2 text-sm font-semibold text-ink"><input type="checkbox" name="is_default" class="form-check-input" {% if address.is_default %}checked{% endif %}> Default address</label>
-                    <button class="btn btn-outline-primary">Update Address</button>
+                    <button class="btn btn-outline-primary">Update address</button>
                   </form>
                 </details>
                 <div class="mt-3 flex flex-wrap gap-2">
                   {% if not address.is_default %}
-                  <form method="post" action="{% url 'accounts:address_set_default' address.id %}">{% csrf_token %}<button class="rounded-[8px] border border-black/10 px-3 py-2 text-sm font-bold text-ink">Set default</button></form>
+                  <form method="post" action="{% url 'accounts:address_set_default' address.id %}">{% csrf_token %}<button class="rounded-[8px] border border-black/10 px-3 py-2 text-sm font-bold text-ink hover:border-rosewood hover:text-rosewood">Set default</button></form>
                   {% endif %}
-                  <form method="post" action="{% url 'accounts:address_delete' address.id %}">{% csrf_token %}<button class="rounded-[8px] border border-red-200 px-3 py-2 text-sm font-bold text-red-700">Delete</button></form>
+                  <form method="post" action="{% url 'accounts:address_delete' address.id %}">{% csrf_token %}<button class="rounded-[8px] border border-red-200 px-3 py-2 text-sm font-bold text-red-700" onclick="return confirm('Delete this address?')">Delete</button></form>
                 </div>
               </article>
               {% empty %}
-              <p class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone">No addresses saved.</p>
+              <div class="rounded-[8px] bg-[#f8fafc] p-4 text-sm text-stone">
+                <p class="font-semibold text-ink">No addresses saved.</p>
+                <p class="mt-1">Add one now to speed up checkout.</p>
+              </div>
               {% endfor %}
             </div>
           </div>
         </section>
 
-        <section id="settings" class="rounded-[8px] border border-black/5 bg-white p-6 shadow-soft">
+        <section id="settings" class="scroll-mt-36 rounded-[8px] border border-black/5 bg-white p-5 shadow-soft md:p-6">
           <div class="mb-5">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-rosewood">Account Settings</p>
+            <p class="text-xs font-bold uppercase text-rosewood">Account settings</p>
             <h2 class="mt-1 text-2xl font-semibold text-ink">Security</h2>
           </div>
           <div class="grid gap-6 lg:grid-cols-2">
-            <form method="post" class="grid gap-3 rounded-[8px] bg-[#f8fafc] p-4">
+            <form method="post" class="grid gap-3 rounded-[8px] bg-[#f8fafc] p-4" novalidate>
               {% csrf_token %}
               <input type="hidden" name="action" value="password">
               <h3 class="text-lg font-semibold text-ink">Change password</h3>
-              {{ password_form.old_password }}
-              {{ password_form.new_password1 }}
-              {{ password_form.new_password2 }}
-              <button class="btn btn-primary">Update Password</button>
+              {% if password_form.non_field_errors %}<div class="rounded-[8px] border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ password_form.non_field_errors|join:', ' }}</div>{% endif %}
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ password_form.old_password.id_for_label }}">Current password</label>
+                {{ password_form.old_password }}
+                {% if password_form.old_password.errors %}<p class="mt-1 text-sm text-red-700">{{ password_form.old_password.errors|join:', ' }}</p>{% endif %}
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ password_form.new_password1.id_for_label }}">New password</label>
+                {{ password_form.new_password1 }}
+                {% if password_form.new_password1.errors %}<p class="mt-1 text-sm text-red-700">{{ password_form.new_password1.errors|join:', ' }}</p>{% endif %}
+              </div>
+              <div>
+                <label class="mb-1 block text-sm font-semibold text-ink" for="{{ password_form.new_password2.id_for_label }}">Confirm new password</label>
+                {{ password_form.new_password2 }}
+                {% if password_form.new_password2.errors %}<p class="mt-1 text-sm text-red-700">{{ password_form.new_password2.errors|join:', ' }}</p>{% endif %}
+              </div>
+              <button class="btn btn-primary">Update password</button>
             </form>
             <form method="post" class="rounded-[8px] border border-red-200 bg-red-50 p-4">
               {% csrf_token %}
               <input type="hidden" name="action" value="delete_account">
               <h3 class="text-lg font-semibold text-red-800">Delete account</h3>
               <p class="mt-2 text-sm leading-6 text-red-700">This permanently removes your login, profile, addresses, wishlist, and cart data.</p>
-              <button class="mt-4 rounded-[8px] bg-red-700 px-4 py-3 text-sm font-bold text-white" onclick="return confirm('Delete your account permanently?')">Delete Account</button>
+              <button class="mt-4 rounded-[8px] bg-red-700 px-4 py-3 text-sm font-bold text-white" onclick="return confirm('Delete your account permanently?')">Delete account</button>
             </form>
           </div>
         </section>
