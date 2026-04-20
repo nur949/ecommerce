@@ -1,15 +1,22 @@
 import json
+from datetime import timedelta
 from types import SimpleNamespace
 
 from django.contrib import messages
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Q
-from django.http import Http404, HttpResponse
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.db.models import Count, Q, Sum
+from django.db.models.functions import TruncDate
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import NoReverseMatch
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 
 from catalog.models import Category, Product
 from orders.models import Order
@@ -85,6 +92,8 @@ DEMO_BLOG_POSTS = [
         'primary_image_url': 'https://images.pexels.com/photos/6169034/pexels-photo-6169034.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop',
     },
 ]
+
+User = get_user_model()
 
 
 def _demo_posts_as_objects():
@@ -346,3 +355,128 @@ def newsletter_subscribe(request):
         subscriber.save(update_fields=['is_active'])
     messages.success(request, 'Thanks for subscribing to beauty updates.')
     return redirect(request.META.get('HTTP_REFERER', reverse('core:home')))
+
+
+def _admin_stats_rate_limited(request):
+    limit = getattr(settings, 'DASHBOARD_STATS_RATE_LIMIT', 60)
+    if limit <= 0:
+        return False
+    window = 60
+    cache_key = f"admin-dashboard-rate:{request.user.pk}:{request.META.get('REMOTE_ADDR', '')}"
+    count = cache.get(cache_key, 0)
+    if count >= limit:
+        return True
+    cache.set(cache_key, count + 1, window)
+    return False
+
+
+def _daily_map(queryset, value_key='value'):
+    return {
+        item['day'].isoformat(): float(item[value_key] or 0)
+        for item in queryset
+        if item['day']
+    }
+
+
+@staff_member_required
+@require_GET
+def dashboard_stats_api(request):
+    if _admin_stats_rate_limited(request):
+        return JsonResponse({'ok': False, 'error': 'Rate limit exceeded.'}, status=429)
+
+    cache_key = 'admin-dashboard-stats:v2'
+    cached = cache.get(cache_key)
+    if cached:
+        return JsonResponse(cached)
+
+    now = timezone.now()
+    today = timezone.localdate()
+    start_day = today - timedelta(days=29)
+    current_start = now - timedelta(days=30)
+    previous_start = now - timedelta(days=60)
+
+    orders_base = Order.objects.select_related('user', 'address')
+    users_total = User.objects.count()
+    orders_total = orders_base.count()
+    revenue_total = orders_base.aggregate(total=Sum('total'))['total'] or 0
+    current_revenue = orders_base.filter(created_at__gte=current_start).aggregate(total=Sum('total'))['total'] or 0
+    previous_revenue = orders_base.filter(created_at__gte=previous_start, created_at__lt=current_start).aggregate(total=Sum('total'))['total'] or 0
+    growth = 100.0 if previous_revenue == 0 and current_revenue else 0.0
+    if previous_revenue:
+        growth = ((float(current_revenue) - float(previous_revenue)) / float(previous_revenue)) * 100
+
+    revenue_by_day = _daily_map(
+        orders_base.filter(created_at__date__gte=start_day)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(value=Sum('total'))
+        .order_by('day')
+    )
+    orders_by_day = _daily_map(
+        orders_base.filter(created_at__date__gte=start_day)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(value=Count('id'))
+        .order_by('day')
+    )
+    users_by_day = _daily_map(
+        User.objects.filter(date_joined__date__gte=start_day)
+        .annotate(day=TruncDate('date_joined'))
+        .values('day')
+        .annotate(value=Count('id'))
+        .order_by('day')
+    )
+
+    labels = [(start_day + timedelta(days=offset)).isoformat() for offset in range(30)]
+    latest_orders = [
+        {
+            'id': order.id,
+            'order_number': order.order_number,
+            'customer': order.user.get_full_name() or order.user.email if order.user else (order.address.full_name if order.address else 'Guest'),
+            'status': order.status,
+            'total': float(order.total or 0),
+            'created_at': order.created_at.isoformat(),
+        }
+        for order in orders_base.order_by('-created_at')[:8]
+    ]
+    latest_users = [
+        {
+            'id': user.id,
+            'name': user.get_full_name() or user.email or user.username,
+            'email': user.email,
+            'created_at': user.date_joined.isoformat(),
+        }
+        for user in User.objects.order_by('-date_joined')[:8]
+    ]
+    logs = [
+        {
+            'id': entry.id,
+            'user': entry.user.get_full_name() or entry.user.email or entry.user.username if entry.user_id else 'System',
+            'action': entry.get_action_flag_display(),
+            'object': entry.object_repr,
+            'created_at': entry.action_time.isoformat(),
+        }
+        for entry in LogEntry.objects.select_related('user', 'content_type').order_by('-action_time')[:10]
+    ]
+
+    payload = {
+        'ok': True,
+        'users': users_total,
+        'orders': orders_total,
+        'revenue': float(revenue_total),
+        'growth': round(growth, 1),
+        'chart_data': {
+            'labels': labels,
+            'revenue': [revenue_by_day.get(label, 0) for label in labels],
+            'orders': [orders_by_day.get(label, 0) for label in labels],
+            'users': [users_by_day.get(label, 0) for label in labels],
+        },
+        'activity': {
+            'recent_orders': latest_orders,
+            'latest_users': latest_users,
+            'logs': logs,
+        },
+        'generated_at': now.isoformat(),
+    }
+    cache.set(cache_key, payload, getattr(settings, 'DASHBOARD_STATS_CACHE_SECONDS', 60))
+    return JsonResponse(payload)

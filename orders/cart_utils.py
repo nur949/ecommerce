@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.utils import timezone
 
-from .models import Coupon
+from .models import Cart, CartItem, Coupon
 
 FREE_DELIVERY_THRESHOLD = Decimal('3000.00')
 
@@ -16,11 +16,39 @@ def _cart(request, create=False):
     return cart
 
 
+def _user_cart(request):
+    if not getattr(request, 'user', None) or not request.user.is_authenticated:
+        return None
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    session_cart = request.session.get('cart') or {}
+    if session_cart:
+        from catalog.models import Product, ProductVariant
+
+        product_ids = [entry.get('product_id') for entry in session_cart.values() if entry.get('product_id')]
+        variant_ids = [entry.get('variant_id') for entry in session_cart.values() if entry.get('variant_id')]
+        products = Product.objects.filter(id__in=product_ids, is_active=True).in_bulk()
+        variants = ProductVariant.objects.filter(id__in=variant_ids).in_bulk()
+        for entry in session_cart.values():
+            product = products.get(entry.get('product_id'))
+            if not product:
+                continue
+            variant = variants.get(entry.get('variant_id')) if entry.get('variant_id') else None
+            quantity = max(int(entry.get('quantity') or 1), 1)
+            item, created = CartItem.objects.get_or_create(cart=cart, product=product, variant=variant, defaults={'quantity': quantity})
+            if not created:
+                item.quantity = max(item.quantity, quantity)
+                item.save(update_fields=['quantity', 'updated_at'])
+        request.session['cart'] = {}
+        request.session.modified = True
+    return cart
+
+
 def make_item_key(product_id, variant_id=None):
     return f'{product_id}:{variant_id or 0}'
 
 
 def add_to_cart(request, product, quantity=1, variant=None):
+    user_cart = _user_cart(request)
     cart = _cart(request, create=True)
     key = make_item_key(product.id, variant.id if variant else None)
     requested_quantity = max(int(quantity or 1), 1)
@@ -28,6 +56,13 @@ def add_to_cart(request, product, quantity=1, variant=None):
     available_stock = max(int(available_stock or 0), 0)
     if available_stock <= 0:
         return 0
+    if user_cart:
+        item, _ = CartItem.objects.get_or_create(cart=user_cart, product=product, variant=variant, defaults={'quantity': 0})
+        current_quantity = int(item.quantity or 0)
+        next_quantity = min(current_quantity + requested_quantity, available_stock)
+        item.quantity = next_quantity
+        item.save(update_fields=['quantity', 'updated_at'])
+        return next_quantity - current_quantity
     current_quantity = int(cart.get(key, {}).get('quantity', 0))
     next_quantity = current_quantity + requested_quantity
     if available_stock:
@@ -44,6 +79,25 @@ def add_to_cart(request, product, quantity=1, variant=None):
 
 
 def update_cart_quantity(request, item_key, quantity):
+    user_cart = _user_cart(request)
+    if user_cart:
+        try:
+            product_id, variant_id = item_key.split(':', 1)
+            variant_id = None if variant_id == '0' else int(variant_id)
+            item = CartItem.objects.select_related('product', 'variant').get(cart=user_cart, product_id=int(product_id), variant_id=variant_id)
+        except (ValueError, CartItem.DoesNotExist):
+            return
+        if quantity <= 0:
+            item.delete()
+            return
+        available_stock = item.variant.stock if item.variant else item.product.stock
+        available_stock = max(int(available_stock or 0), 0)
+        if available_stock <= 0:
+            item.delete()
+            return
+        item.quantity = min(max(int(quantity or 1), 1), available_stock)
+        item.save(update_fields=['quantity', 'updated_at'])
+        return
     cart = _cart(request, create=True)
     if item_key in cart:
         if quantity <= 0:
@@ -70,12 +124,24 @@ def update_cart_quantity(request, item_key, quantity):
 
 
 def remove_from_cart(request, item_key):
+    user_cart = _user_cart(request)
+    if user_cart:
+        try:
+            product_id, variant_id = item_key.split(':', 1)
+            variant_id = None if variant_id == '0' else int(variant_id)
+        except ValueError:
+            return
+        CartItem.objects.filter(cart=user_cart, product_id=product_id, variant_id=variant_id).delete()
+        return
     cart = _cart(request, create=True)
     cart.pop(item_key, None)
     request.session.modified = True
 
 
 def clear_cart(request):
+    user_cart = _user_cart(request)
+    if user_cart:
+        user_cart.items.all().delete()
     request.session['cart'] = {}
     request.session.pop('cart_coupon_code', None)
     request.session.pop('cart_reward_points', None)
@@ -84,6 +150,43 @@ def clear_cart(request):
 
 def get_cart_items(request):
     from catalog.models import Product, ProductVariant
+
+    user_cart = _user_cart(request)
+    if user_cart:
+        items = []
+        subtotal = Decimal('0.00')
+        stale_ids = []
+        cart_items = user_cart.items.select_related('product', 'variant', 'product__category')
+        for cart_item in cart_items:
+            product = cart_item.product
+            if not product.is_active:
+                stale_ids.append(cart_item.id)
+                continue
+            variant = cart_item.variant
+            unit_price = variant.price_override if variant and variant.price_override else product.price
+            quantity = max(int(cart_item.quantity or 1), 1)
+            available_stock = variant.stock if variant else product.stock
+            available_stock = max(int(available_stock or 0), 0)
+            if available_stock <= 0:
+                stale_ids.append(cart_item.id)
+                continue
+            if quantity > available_stock:
+                quantity = available_stock
+                cart_item.quantity = quantity
+                cart_item.save(update_fields=['quantity', 'updated_at'])
+            total = unit_price * quantity
+            subtotal += total
+            items.append({
+                'key': cart_item.key,
+                'product': product,
+                'variant': variant,
+                'quantity': quantity,
+                'unit_price': unit_price,
+                'total': total,
+            })
+        if stale_ids:
+            CartItem.objects.filter(id__in=stale_ids).delete()
+        return items, subtotal
 
     cart = _cart(request)
     items = []

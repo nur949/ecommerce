@@ -19,6 +19,7 @@ class WishlistItem(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='profiles/', blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
     birthday = models.DateField(null=True, blank=True)
     beauty_preferences = models.TextField(blank=True)

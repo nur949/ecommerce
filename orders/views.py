@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from accounts.services import add_reward_points, get_or_create_reward_account, redeem_reward_points
@@ -292,7 +291,6 @@ def order_tracking(request):
     return render(request, 'orders/order_tracking.html', {'order': order})
 
 
-@csrf_exempt
 @require_POST
 def api_coupon_validate(request):
     payload = _json_body(request)

@@ -20,10 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
           el: slider.querySelector('.swiper-pagination'),
           clickable: true,
         },
-        navigation: {
-          prevEl: slider.querySelector('.hero-slider-prev'),
-          nextEl: slider.querySelector('.hero-slider-next'),
-        },
       });
     });
   }
@@ -31,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const miniCartPanel = document.getElementById('miniCartPanel');
   const miniCartBackdrop = document.getElementById('miniCartBackdrop');
   const miniCartToggles = () => document.querySelectorAll('.js-mini-cart-toggle');
+  const accountMenuWrap = document.getElementById('accountMenuWrap');
+  const accountMenuToggle = document.getElementById('accountMenuToggle');
+  const accountMenuPanel = document.getElementById('accountMenuPanel');
 
   const openMiniCart = () => {
     if (!miniCartPanel) return;
@@ -50,6 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
       miniCartBackdrop?.classList.add('d-none');
     }, 220);
   };
+  const setAccountMenuOpen = (open) => {
+    if (!accountMenuToggle || !accountMenuPanel) return;
+    accountMenuPanel.classList.toggle('pointer-events-none', !open);
+    accountMenuPanel.classList.toggle('pointer-events-auto', open);
+    accountMenuPanel.classList.toggle('opacity-0', !open);
+    accountMenuPanel.classList.toggle('opacity-100', open);
+    accountMenuPanel.classList.toggle('translate-y-2', !open);
+    accountMenuPanel.classList.toggle('translate-y-0', open);
+    accountMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  const closeAccountMenu = () => setAccountMenuOpen(false);
 
   const replaceMiniCart = (html) => {
     if (!html || !miniCartPanel) return;
@@ -107,7 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
       closeSearchOverlay();
       closeMobileNav();
       setMegaMenuOpen(false);
+      closeAccountMenu();
     }
+  });
+
+  accountMenuToggle?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const open = accountMenuToggle.getAttribute('aria-expanded') !== 'true';
+    setAccountMenuOpen(open);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!accountMenuWrap?.contains(e.target)) closeAccountMenu();
   });
 
   const notify = (message) => {
@@ -256,6 +278,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(new FormData(shopForm));
     params.set('page', String(page));
     status && (status.textContent = 'Loading products...');
+    if (!append) {
+      shopGrid.classList.add('is-loading');
+      shopGrid.setAttribute('aria-busy', 'true');
+    }
     const res = await fetch(`${shopForm.action}?${params.toString()}`, {
       headers: {'X-Requested-With': 'XMLHttpRequest'},
       credentials: 'same-origin',
@@ -280,6 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
     shopCount && (shopCount.textContent = `${data.count} products`);
     nextPage = data.next_page;
     status && (status.textContent = '');
+    shopGrid.classList.remove('is-loading');
+    shopGrid.setAttribute('aria-busy', 'false');
     refreshIcons();
   };
 
@@ -315,12 +343,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mobileToggle = document.getElementById('mobileNavToggle');
   const mobilePanel = document.getElementById('mobileNavPanel');
+  const mobileAccountToggle = document.getElementById('mobileAccountToggle');
+  const mobileAccountPanel = document.getElementById('mobileAccountPanel');
   const closeMobileNav = () => {
     mobilePanel?.classList.add('hidden');
     mobilePanel?.classList.remove('is-open');
     mobileToggle?.setAttribute('aria-expanded', 'false');
     mobileCategoriesPanel?.classList.add('hidden');
     mobileCategoriesToggle?.setAttribute('aria-expanded', 'false');
+    mobileAccountPanel?.classList.add('hidden');
+    mobileAccountToggle?.setAttribute('aria-expanded', 'false');
   };
   mobileToggle?.addEventListener('click', () => {
     const open = mobilePanel?.classList.contains('hidden');
@@ -435,6 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (open) loadCategories();
   });
 
+  mobileAccountToggle?.addEventListener('click', () => {
+    const open = mobileAccountPanel?.classList.contains('hidden');
+    mobileAccountPanel?.classList.toggle('hidden', !open);
+    mobileAccountToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
   const searchOverlay = document.getElementById('searchOverlay');
   const searchToggle = document.getElementById('searchOverlayToggle');
   const mobileSearchToggle = document.getElementById('mobileSearchToggle');
@@ -499,7 +537,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const link = document.createElement('a');
         link.href = item.url;
         link.className = 'block rounded-[12px] border border-black/10 px-3 py-2 hover:bg-[#f8fafc]';
-        link.innerHTML = `<div class="text-sm font-semibold text-ink">${item.label}</div><div class="text-xs text-stone">${item.subtext || ''}</div>`;
+        const label = document.createElement('div');
+        label.className = 'text-sm font-semibold text-ink';
+        label.textContent = item.label || '';
+        const subtext = document.createElement('div');
+        subtext.className = 'text-xs text-stone';
+        subtext.textContent = item.subtext || '';
+        link.append(label, subtext);
         link.addEventListener('click', () => {
           const recent = [q, ...getRecent().filter((v) => v !== q)];
           setRecent(recent);
@@ -534,7 +578,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!detailPrice || !detailTotalPrice || !qtyInput) return;
     const unitPrice = Number(detailPrice.dataset.currentPrice || detailPrice.dataset.basePrice || 0);
     const quantity = Math.max(Number(qtyInput.value || 1), 1);
-    detailTotalPrice.textContent = money((unitPrice * quantity).toFixed(2));
+    const total = money((unitPrice * quantity).toFixed(2));
+    detailTotalPrice.textContent = total;
+    const mobileTotal = document.getElementById('mobileDetailTotalPrice');
+    if (mobileTotal) mobileTotal.textContent = total;
   };
   document.querySelectorAll('.js-qty-button').forEach((btn) => {
     btn.addEventListener('click', () => {

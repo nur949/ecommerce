@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Address, Coupon, Order, OrderItem, PaymentTransaction
+from .models import Address, Cart, CartItem, Coupon, Order, OrderItem, PaymentTransaction
 
 
 class OrderItemInline(admin.TabularInline):
@@ -15,6 +15,12 @@ class PaymentInline(admin.TabularInline):
     extra = 0
     readonly_fields = ('provider', 'reference', 'amount', 'status', 'created_at', 'payload')
     can_delete = False
+
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    readonly_fields = ('product', 'variant', 'quantity', 'updated_at')
 
 
 @admin.register(Order)
@@ -51,9 +57,18 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'phone', 'city', 'delivery_type', 'created_at')
-    list_filter = ('delivery_type', 'city')
+    list_display = ('full_name', 'user', 'phone', 'city', 'delivery_type', 'is_default', 'created_at')
+    list_filter = ('delivery_type', 'city', 'is_default')
     search_fields = ('full_name', 'phone', 'city', 'area')
+    list_select_related = ('user',)
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'updated_at', 'created_at')
+    search_fields = ('user__username', 'user__email')
+    list_select_related = ('user',)
+    inlines = [CartItemInline]
 
 
 @admin.register(PaymentTransaction)

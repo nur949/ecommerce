@@ -1,13 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Blog | Zynvo{% endblock %}
 {% block content %}
-<section class="px-4 py-6 lg:px-8">
-  <div class="mx-auto max-w-7xl rounded-[36px] bg-[#1b141a] px-6 py-14 text-white shadow-panel md:px-10">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-white/55">Editorial</p>
-    <h1 class="mt-4 font-brand text-5xl font-semibold uppercase tracking-[0.12em] md:text-7xl">Beauty Journal</h1>
-  </div>
-</section>
-<section class="px-4 pb-16 pt-8 lg:px-8">
+<section class="px-4 pb-16 pt-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
     <div class="row g-4">
       {% for post in posts %}

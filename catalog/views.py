@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from orders.cart_utils import (
@@ -453,7 +452,6 @@ def notify_stock(request, slug):
     return redirect(product.get_absolute_url())
 
 
-@csrf_exempt
 @require_POST
 def api_submit_review(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)

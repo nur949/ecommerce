@@ -3,16 +3,18 @@
 {% block meta_description %}{{ product.meta_description|default:product.short_description }}{% endblock %}
 {% block og_type %}product{% endblock %}
 {% block content %}
-<section class="px-4 py-6 lg:px-8">
+<section class="commerce-shell px-4 py-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
     <nav class="mb-6 flex items-center gap-2 text-sm text-stone">
       <a href="{% url 'core:home' %}" class="hover:text-rosewood">Home</a><span>/</span>
       <a href="{% url 'catalog:shop' %}" class="hover:text-rosewood">Shop</a><span>/</span>
       <span class="text-ink">{{ product.name }}</span>
     </nav>
-    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.9fr)]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.9fr)]">
       <div>
-        <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-main-image mb-3 w-full">
+        <div class="commerce-panel overflow-hidden p-2">
+          <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-main-image mb-0 w-full">
+        </div>
         <div class="flex flex-wrap gap-2">
           <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="detail-thumb active-thumb">
           {% for image in product.gallery.all %}
@@ -20,9 +22,9 @@
           {% endfor %}
         </div>
       </div>
-      <div>
+      <div class="commerce-panel h-fit p-5 md:p-6 lg:sticky lg:top-36">
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">{{ product.category.name }}</p>
-        <h1 class="mt-3 font-brand text-5xl font-semibold uppercase tracking-[0.08em] text-ink md:text-6xl">{{ product.name }}</h1>
+        <h1 class="commerce-title mt-3 text-4xl md:text-5xl">{{ product.name }}</h1>
         <div class="mt-4 flex items-center gap-2 text-sm text-amber-500">
           {% for _ in "12345" %}
             {% if forloop.counter <= average_rating|floatformat:0|add:0 %}<i data-lucide="star" class="h-4 w-4 fill-current"></i>{% else %}<i data-lucide="star" class="h-4 w-4"></i>{% endif %}
@@ -30,6 +32,11 @@
           <span class="ml-1 text-stone">{{ average_rating }} ({{ review_count }} reviews)</span>
         </div>
         <p class="mt-4 text-sm leading-7 text-stone">{{ product.short_description|default:product.description|truncatechars:220 }}</p>
+        <div class="mt-5 grid gap-2 sm:grid-cols-3">
+          <div class="rounded-[8px] bg-[#ecfdf5] p-3 text-xs font-bold text-[#047857]"><i data-lucide="shield-check" class="mb-2 h-4 w-4"></i>Authentic</div>
+          <div class="rounded-[8px] bg-[#eff6ff] p-3 text-xs font-bold text-[#1d4ed8]"><i data-lucide="truck" class="mb-2 h-4 w-4"></i>Fast ship</div>
+          <div class="rounded-[8px] bg-[#fffbeb] p-3 text-xs font-bold text-[#b45309]"><i data-lucide="rotate-ccw" class="mb-2 h-4 w-4"></i>Easy return</div>
+        </div>
         <div class="mt-6 flex items-center gap-3">
           <strong id="detailPrice" data-base-price="{{ selected_variant.price_override|default:product.price }}" class="text-3xl text-ink">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
           {% if product.compare_at_price %}<span class="text-lg text-stone line-through">&#2547;{{ product.compare_at_price }}</span>{% endif %}
@@ -51,7 +58,7 @@
             </div>
           </div>
           {% endif %}
-          <div class="mb-5 rounded-[20px] border border-black/5 bg-[#f8fafc] p-4">
+          <div class="mb-5 rounded-[8px] border border-black/5 bg-[#f8fafc] p-4">
             <div class="product-qty-controls" data-max-stock="{% if selected_variant %}{{ selected_variant.stock }}{% else %}{{ product.stock }}{% endif %}">
               <button type="button" class="btn btn-outline-primary btn-sm js-qty-button" data-step="-1">-</button>
               <input id="quantity" type="number" name="quantity" value="1" min="1" max="{% if selected_variant %}{{ selected_variant.stock }}{% else %}{{ product.stock }}{% endif %}" class="form-control text-center js-detail-quantity">
@@ -72,23 +79,32 @@
               <strong id="detailTotalPrice">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
             </div>
           </div>
-          <button id="addToCartButton" {% if selected_variant %}{% if selected_variant.stock <= 0 %}disabled{% endif %}{% elif not product.is_orderable %}disabled{% endif %} class="btn btn-primary w-full">
+          <button id="addToCartButton" {% if selected_variant %}{% if selected_variant.stock <= 0 %}disabled{% endif %}{% elif not product.is_orderable %}disabled{% endif %} class="commerce-btn-primary w-full">
             {% if selected_variant %}
               {% if selected_variant.stock > 0 %}Add to Cart{% else %}Out of Stock{% endif %}
             {% else %}
               {% if product.is_orderable %}Add to Cart{% else %}Out of Stock{% endif %}
             {% endif %}
           </button>
+          <div class="sticky-buy-bar mt-4 lg:hidden">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-[0.14em] text-stone">Total</p>
+                <strong id="mobileDetailTotalPrice" class="text-lg text-ink">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
+              </div>
+              <button type="submit" class="commerce-btn-primary px-5 text-sm" {% if selected_variant %}{% if selected_variant.stock <= 0 %}disabled{% endif %}{% elif not product.is_orderable %}disabled{% endif %}>Add to Cart</button>
+            </div>
+          </div>
         </form>
         <div class="mt-3">
           {% if request.user.is_authenticated %}
           <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax" data-product-id="{{ product.id }}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button class="js-wishlist-button btn btn-outline-primary w-full {% if product.id in wishlist_product_ids %}is-active{% endif %}" data-add-label="Save to Wishlist" data-remove-label="Remove from Wishlist">{% if product.id in wishlist_product_ids %}Remove from Wishlist{% else %}Save to Wishlist{% endif %}</button>
+            <button class="js-wishlist-button commerce-btn-secondary w-full {% if product.id in wishlist_product_ids %}is-active{% endif %}" data-add-label="Save to Wishlist" data-remove-label="Remove from Wishlist">{% if product.id in wishlist_product_ids %}Remove from Wishlist{% else %}Save to Wishlist{% endif %}</button>
           </form>
           {% else %}
-          <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-full">Login to save</a>
+          <a href="{% url 'accounts:login' %}" class="commerce-btn-secondary w-full">Login to save</a>
           {% endif %}
         </div>
         {% if not product.is_orderable %}
@@ -104,11 +120,11 @@
       </div>
     </div>
     <div class="mt-12 grid gap-8 lg:grid-cols-2">
-      <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+      <article class="commerce-panel p-6">
         <h2 class="text-2xl font-semibold text-ink">Description</h2>
         <div class="mt-4 text-sm leading-7 text-stone">{{ product.description|linebreaks }}</div>
       </article>
-      <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+      <article class="commerce-panel p-6">
         <h2 class="text-2xl font-semibold text-ink">FAQ</h2>
         <div class="mt-4 space-y-3">
           {% for faq in product.faqs.all %}
@@ -122,7 +138,7 @@
         </div>
       </article>
     </div>
-    <div class="mt-12 rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
+    <div class="commerce-panel mt-12 p-6">
       <div class="mb-6 flex items-center justify-between">
         <h2 class="text-2xl font-semibold text-ink">Ratings & Reviews</h2>
         <span class="text-sm text-stone">{{ average_rating }} / 5 ({{ review_count }})</span>

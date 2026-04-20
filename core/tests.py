@@ -21,7 +21,7 @@ class HomeSectionTests(TestCase):
         self.assertContains(response, 'home-hero-slider')
         self.assertContains(response, 'data-hero-slider')
         self.assertContains(response, 'Large Hero Slide')
-        self.assertContains(response, 'hero-slider-next')
+        self.assertNotContains(response, 'hero-slider-next')
         self.assertNotContains(response, 'lg:grid-cols-[1.9fr_1fr]')
 
     def test_popular_categories_render_count_and_empty_state_hooks(self):

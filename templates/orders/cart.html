@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Cart | {{ site_settings.site_name }}{% endblock %}
 {% block content %}
-<section class="px-4 py-6 lg:px-8">
-  <div class="mx-auto max-w-7xl rounded-[28px] bg-[#111827] px-6 py-10 text-white shadow-panel md:px-10">
-    <p class="text-xs font-semibold uppercase tracking-[0.26em] text-white/55">Cart Drawer + Summary</p>
-    <h1 class="mt-3 font-brand text-5xl font-semibold uppercase tracking-[0.1em] md:text-6xl">Shopping Bag</h1>
-    <p class="mt-3 text-sm text-white/75">Track savings, delivery threshold, and reward redemption before checkout.</p>
+<section class="commerce-shell px-4 py-6 lg:px-8">
+  <div class="commerce-hero mx-auto max-w-7xl px-6 py-10 text-white md:px-10">
+    <p class="commerce-kicker">Secure cart</p>
+    <h1 class="mt-3 text-4xl font-black tracking-[-0.03em] md:text-6xl">Review your bag.</h1>
+    <p class="mt-3 max-w-2xl text-sm leading-7 text-white/75">Clear totals, instant updates, and a fast checkout path with no distractions.</p>
   </div>
 </section>
-<section class="px-4 pb-16 pt-8 lg:px-8">
+<section class="commerce-shell px-4 pb-16 pt-8 lg:px-8">
   <div class="mx-auto max-w-7xl">
     {% if items %}
     <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div class="space-y-4">
         {% for item in items %}
-        <div class="cart-line grid gap-4 rounded-[20px] border border-black/5 bg-white p-5 shadow-soft md:grid-cols-[110px_minmax(0,1fr)_90px_auto_auto]" data-item-key="{{ item.key }}">
-          <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[120px] w-[96px] rounded-[16px] object-cover">
+        <div class="commerce-card cart-line grid gap-4 p-4 md:grid-cols-[110px_minmax(0,1fr)_90px_auto_auto]" data-item-key="{{ item.key }}">
+          <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="cart-image h-[120px] w-[96px] rounded-[8px] object-cover">
           <div>
             <h3 class="text-lg font-semibold text-ink">{{ item.product.name }}</h3>
             <p class="mt-1 text-xs uppercase tracking-[0.16em] text-stone">{{ item.variant.value|default:"Default" }} | SKU {{ item.variant.sku|default:item.product.sku }}</p>
@@ -28,13 +28,13 @@
           <div class="self-center text-base font-semibold text-ink cart-line-total">&#2547;{{ item.total }}</div>
           <form action="{% url 'catalog:remove_cart_item' item.key %}" method="post" class="js-cart-remove-form self-center">
             {% csrf_token %}
-            <button type="submit" class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink" data-item-key="{{ item.key }}">Remove</button>
+            <button type="submit" class="commerce-btn-secondary px-4 py-2 text-sm" data-item-key="{{ item.key }}">Remove</button>
           </form>
         </div>
         {% endfor %}
       </div>
       <aside>
-        <div class="sticky top-32 rounded-[24px] border border-black/5 bg-white p-6 shadow-panel">
+        <div class="commerce-panel sticky top-32 p-6">
           <h2 class="text-2xl font-semibold text-ink">Order Summary</h2>
           <div class="mt-4 rounded-[16px] bg-[#f8fafc] p-3 text-sm text-stone">
             {% if totals.free_delivery_remaining > 0 %}
@@ -48,7 +48,7 @@
             <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Coupon code</label>
             <div class="flex gap-2">
               <input type="text" name="coupon_code" value="{{ coupon.code|default:'' }}" class="form-control" placeholder="BEAUTY10">
-              <button class="btn btn-outline-primary" type="submit">Apply</button>
+              <button class="commerce-btn-secondary px-4" type="submit">Apply</button>
             </div>
             {% if coupon %}
             <button type="submit" name="remove_coupon" value="1" class="text-xs font-semibold text-rosewood">Remove {{ coupon.code }}</button>
@@ -65,15 +65,19 @@
             <div class="flex justify-between"><span>Reward discount</span><strong class="cart-reward-discount-value text-ink">-&#2547;{{ totals.reward_discount }}</strong></div>
             <div class="flex justify-between border-t border-black/10 pt-3"><span>Total</span><strong class="cart-total-value text-xl text-ink">&#2547;{{ totals.total }}</strong></div>
           </div>
-          <a href="{% url 'orders:checkout' %}" class="btn btn-primary mt-6 w-full">Proceed to Checkout</a>
+          <div class="mt-5 grid gap-2 rounded-[8px] bg-[#f8fafc] p-3 text-xs font-semibold text-stone">
+            <span class="flex items-center gap-2"><i data-lucide="lock" class="h-4 w-4 text-rosewood"></i> Secure checkout</span>
+            <span class="flex items-center gap-2"><i data-lucide="truck" class="h-4 w-4 text-rosewood"></i> Fast delivery after confirmation</span>
+          </div>
+          <a href="{% url 'orders:checkout' %}" class="commerce-btn-primary mt-6 w-full">Proceed to Checkout</a>
         </div>
       </aside>
     </div>
     {% else %}
-    <div class="rounded-[24px] border border-black/5 bg-white px-6 py-20 text-center shadow-soft">
+    <div class="commerce-panel px-6 py-20 text-center">
       <h2 class="text-3xl font-semibold text-ink">Your cart is empty</h2>
       <p class="mt-3 text-sm text-stone">Start adding products from the beauty catalog.</p>
-      <a href="{% url 'catalog:shop' %}" class="btn btn-primary mt-7">Go to Shop</a>
+      <a href="{% url 'catalog:shop' %}" class="commerce-btn-primary mt-7 px-6">Go to Shop</a>
     </div>
     {% endif %}
   </div>
