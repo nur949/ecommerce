@@ -1,12 +1,16 @@
-<article class="group relative flex h-full flex-col overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-soft" data-product-id="{{ product.id }}">
-  <a href="{{ product.get_absolute_url }}" class="relative block aspect-square overflow-hidden bg-[#f8fafc]">
+<article class="commerce-card product-card-premium group relative flex h-full flex-col" data-product-id="{{ product.id }}">
+  <a href="{{ product.get_absolute_url }}" class="product-media relative block">
     {% if product.discount_percentage %}
-    <span class="absolute left-3 top-3 z-10 rounded-full bg-[#ef4444] px-2 py-1 text-[10px] font-bold uppercase text-white">-{{ product.discount_percentage }}%</span>
+    <span class="absolute left-3 top-3 z-10 rounded-[8px] bg-[#dc2626] px-2 py-1 text-[10px] font-bold uppercase text-white">-{{ product.discount_percentage }}%</span>
+    {% endif %}
+    {% if product.stock and product.stock <= 5 %}
+    <span class="absolute right-3 top-3 z-10 rounded-[8px] bg-[#f59e0b] px-2 py-1 text-[10px] font-bold uppercase text-white">Only {{ product.stock }} left</span>
     {% endif %}
     <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
   </a>
-  <div class="flex flex-1 flex-col p-3">
-    <a href="{{ product.get_absolute_url }}" class="product-card-title text-sm font-semibold leading-5 text-ink transition hover:text-rosewood">{{ product.name }}</a>
+  <div class="flex flex-1 flex-col p-4">
+    <p class="mb-1 truncate text-[11px] font-bold uppercase tracking-[0.12em] text-stone">{{ product.brand }}</p>
+    <a href="{{ product.get_absolute_url }}" class="product-card-title text-sm font-bold leading-5 text-ink transition hover:text-rosewood">{{ product.name }}</a>
     <div class="mt-2 flex items-center gap-1 text-[11px] text-amber-500">
       {% with rating=product.average_rating|default:0 %}
       {% for _ in "12345" %}
@@ -19,20 +23,20 @@
       {% endwith %}
       <span class="ml-1 text-stone">({{ product.reviews.count }})</span>
     </div>
-    <div class="mt-2 flex items-baseline gap-2">
+    <div class="mt-auto flex items-baseline gap-2 pt-3">
       <strong class="text-lg text-ink">&#2547;{{ product.price }}</strong>
       {% if product.compare_at_price %}<span class="text-xs text-stone line-through">&#2547;{{ product.compare_at_price }}</span>{% endif %}
     </div>
-    <div class="mt-3 grid grid-cols-[1fr_36px_36px] gap-2">
+    <div class="product-card-action-row mt-3">
       {% if product.variants.exists %}
-      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded bg-ink px-2 text-xs font-bold text-white">Choose Options</a>
+      <a href="{{ product.get_absolute_url }}" class="commerce-btn-primary px-2 text-xs">Choose Options</a>
       {% else %}
       <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
         {% csrf_token %}
         <input type="hidden" name="quantity" value="1">
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="inline-flex min-h-9 w-full items-center justify-center rounded bg-ink px-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-stone/40" {% if not product.is_orderable %}disabled{% endif %}>
-          {% if product.is_orderable %}Add{% else %}Sold{% endif %}
+        <button type="submit" class="commerce-btn-primary w-full px-2 text-xs disabled:cursor-not-allowed disabled:border-stone/40 disabled:bg-stone/40" {% if not product.is_orderable %}disabled{% endif %}>
+          {% if product.is_orderable %}Add to Cart{% else %}Sold Out{% endif %}
         </button>
       </form>
       {% endif %}
@@ -40,18 +44,15 @@
       <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax" data-product-id="{{ product.id }}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="js-wishlist-button inline-flex min-h-9 w-full items-center justify-center rounded border border-black/10 bg-white text-ink {% if product.id in wishlist_product_ids %}is-active text-rosewood{% endif %}" data-add-label="Save" data-remove-label="Saved">
+        <button type="submit" class="js-wishlist-button commerce-btn-secondary w-full {% if product.id in wishlist_product_ids %}is-active text-rosewood{% endif %}" data-add-label="Save" data-remove-label="Saved" aria-label="Save {{ product.name }}">
           <i data-lucide="heart" class="h-4 w-4"></i>
         </button>
       </form>
       {% else %}
-      <a href="{% url 'accounts:login' %}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink">
+      <a href="{% url 'accounts:login' %}" class="commerce-btn-secondary" aria-label="Login to save {{ product.name }}">
         <i data-lucide="heart" class="h-4 w-4"></i>
       </a>
       {% endif %}
-      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink" aria-label="Quick bag access">
-        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
-      </a>
     </div>
   </div>
 </article>

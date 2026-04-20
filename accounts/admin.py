@@ -12,7 +12,7 @@ class WishlistItemAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone', 'birthday', 'marketing_opt_in')
+    list_display = ('user', 'phone', 'avatar', 'birthday', 'marketing_opt_in')
     list_filter = ('marketing_opt_in',)
     search_fields = ('user__username', 'user__email', 'phone')
 

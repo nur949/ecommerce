@@ -110,7 +110,7 @@ class AccountApiTests(TestCase):
     def test_profile_api_rejects_invalid_birthday(self):
         login_response = self.client.post(
             reverse('accounts:api_login'),
-            data='{"username": "apiuser", "password": "StrongPass123"}',
+            data='{"email": "api@example.com", "password": "StrongPass123"}',
             content_type='application/json',
             HTTP_HOST='testserver',
         )

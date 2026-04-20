@@ -38,13 +38,6 @@ This project provides a complete **ecommerce system** with product listings, sho
 
 ---
 
-## Demo Admin Credentials
-
-- **Username:** `admin`
-- **Password:** `admin12345`
-
----
-
 ## Installation Guide (Run Django Ecommerce Locally)
 
 Follow the steps below to run this **Django ecommerce project locally**.

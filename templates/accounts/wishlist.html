@@ -14,7 +14,13 @@
     {% if wishlist_items %}
     <div class="row g-4" id="wishlistGrid">
       {% for item in wishlist_items %}
-      <div class="col-6 col-sm-4 col-lg-3 col-xxl-2" data-wishlist-card="{{ item.product.id }}">{% include 'catalog/partials/product_card.html' with product=item.product %}</div>
+      <div class="col-6 col-sm-4 col-lg-3 col-xxl-2" data-wishlist-card="{{ item.product.id }}">
+        {% include 'catalog/partials/product_card.html' with product=item.product %}
+        <form method="post" action="{% url 'accounts:move_wishlist_to_cart' item.product.slug %}" class="mt-2">
+          {% csrf_token %}
+          <button class="w-full rounded-[8px] bg-[#111827] px-3 py-2 text-sm font-bold text-white">Move to cart</button>
+        </form>
+      </div>
       {% endfor %}
     </div>
     {% else %}

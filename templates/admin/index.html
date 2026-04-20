@@ -1,0 +1,446 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  :root {
+    --dash-bg: #080b12;
+    --dash-panel: #0f1420;
+    --dash-panel-2: #121826;
+    --dash-border: rgba(148, 163, 184, .14);
+    --dash-text: #f8fafc;
+    --dash-muted: #94a3b8;
+    --dash-accent: #22c55e;
+    --dash-blue: #60a5fa;
+    --dash-violet: #a78bfa;
+    --dash-warning: #f59e0b;
+  }
+
+  body,
+  .content-wrapper {
+    background: radial-gradient(circle at 20% -10%, rgba(34, 197, 94, .12), transparent 28rem), var(--dash-bg) !important;
+  }
+
+  .content-header,
+  .breadcrumb,
+  .card,
+  .module {
+    background: transparent !important;
+  }
+
+  .pro-dashboard {
+    color: var(--dash-text);
+    padding: .25rem 0 2rem;
+  }
+
+  .pro-dashboard-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .pro-kicker {
+    color: var(--dash-accent);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+    margin: 0 0 .45rem;
+    text-transform: uppercase;
+  }
+
+  .pro-title {
+    color: var(--dash-text);
+    font-size: clamp(1.75rem, 2vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .pro-subtitle {
+    color: var(--dash-muted);
+    margin: .7rem 0 0;
+  }
+
+  .pro-live-pill {
+    align-items: center;
+    background: rgba(34, 197, 94, .1);
+    border: 1px solid rgba(34, 197, 94, .24);
+    border-radius: 8px;
+    color: #bbf7d0;
+    display: inline-flex;
+    font-size: .78rem;
+    font-weight: 800;
+    gap: .5rem;
+    padding: .65rem .85rem;
+  }
+
+  .pro-live-dot {
+    animation: pulse-dot 1.4s infinite;
+    background: var(--dash-accent);
+    border-radius: 999px;
+    height: .5rem;
+    width: .5rem;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: .45; transform: scale(.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .pro-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pro-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .pro-card {
+    background: linear-gradient(180deg, rgba(15, 20, 32, .98), rgba(12, 17, 27, .98));
+    border: 1px solid var(--dash-border);
+    border-radius: 8px;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, .26);
+    min-width: 0;
+  }
+
+  .pro-kpi {
+    min-height: 140px;
+    overflow: hidden;
+    padding: 1.1rem;
+    position: relative;
+  }
+
+  .pro-kpi::after {
+    background: radial-gradient(circle, rgba(34, 197, 94, .2), transparent 58%);
+    content: "";
+    height: 9rem;
+    position: absolute;
+    right: -4rem;
+    top: -4.5rem;
+    width: 9rem;
+  }
+
+  .pro-kpi-top {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+  }
+
+  .pro-kpi-label {
+    color: var(--dash-muted);
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .pro-icon {
+    align-items: center;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 8px;
+    color: var(--dash-text);
+    display: inline-flex;
+    height: 2.35rem;
+    justify-content: center;
+    width: 2.35rem;
+  }
+
+  .pro-kpi-value {
+    color: var(--dash-text);
+    font-size: clamp(1.7rem, 3vw, 2.65rem);
+    font-weight: 850;
+    letter-spacing: -.04em;
+    line-height: 1;
+    margin: 1.15rem 0 .55rem;
+  }
+
+  .pro-kpi-note {
+    color: var(--dash-muted);
+    font-size: .85rem;
+    margin: 0;
+  }
+
+  .pro-section-grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(340px, .7fr);
+    margin-top: 1rem;
+  }
+
+  .pro-chart-card,
+  .pro-activity-card {
+    padding: 1.1rem;
+  }
+
+  .pro-card-title {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .pro-card-title h2 {
+    color: var(--dash-text);
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pro-card-title span {
+    color: var(--dash-muted);
+    font-size: .78rem;
+  }
+
+  .pro-chart-wrap {
+    height: 320px;
+    position: relative;
+  }
+
+  .pro-mini-charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 1rem;
+  }
+
+  .pro-mini-charts .pro-chart-wrap {
+    height: 250px;
+  }
+
+  .pro-tabs {
+    display: grid;
+    gap: .75rem;
+  }
+
+  .pro-list {
+    display: grid;
+    gap: .65rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pro-list-item {
+    align-items: center;
+    background: rgba(255, 255, 255, .035);
+    border: 1px solid rgba(148, 163, 184, .1);
+    border-radius: 8px;
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: .75rem;
+  }
+
+  .pro-list-item strong {
+    color: var(--dash-text);
+    display: block;
+    font-size: .9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pro-list-item span,
+  .pro-list-item small {
+    color: var(--dash-muted);
+    display: block;
+    font-size: .78rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pro-status {
+    border-radius: 8px;
+    font-size: .7rem;
+    font-weight: 800;
+    padding: .35rem .55rem;
+    text-transform: uppercase;
+  }
+
+  .pro-status.pending,
+  .pro-status.awaiting_payment {
+    background: rgba(245, 158, 11, .14);
+    color: #fbbf24;
+  }
+
+  .pro-status.shipped,
+  .pro-status.processing,
+  .pro-status.confirmed {
+    background: rgba(96, 165, 250, .14);
+    color: #93c5fd;
+  }
+
+  .pro-status.delivered {
+    background: rgba(34, 197, 94, .14);
+    color: #86efac;
+  }
+
+  .pro-status.cancelled {
+    background: rgba(248, 113, 113, .14);
+    color: #fca5a5;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .13), rgba(255, 255, 255, .05));
+    background-size: 220% 100%;
+    border-radius: 8px;
+    min-height: 1rem;
+    animation: skeleton-shimmer 1.2s infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    to { background-position-x: -220%; }
+  }
+
+  .pro-error {
+    background: rgba(248, 113, 113, .12);
+    border: 1px solid rgba(248, 113, 113, .26);
+    border-radius: 8px;
+    color: #fecaca;
+    display: none;
+    margin-bottom: 1rem;
+    padding: .85rem 1rem;
+  }
+
+  @media (max-width: 1199px) {
+    .pro-kpis,
+    .pro-section-grid,
+    .pro-mini-charts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pro-dashboard-header,
+    .pro-card-title {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .pro-kpis,
+    .pro-section-grid,
+    .pro-mini-charts {
+      grid-template-columns: 1fr;
+    }
+
+    .pro-chart-wrap {
+      height: 270px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pro-dashboard" data-dashboard-endpoint="{% url 'core:dashboard_stats_api' %}">
+  <div class="pro-dashboard-header">
+    <div>
+      <p class="pro-kicker">Live commerce intelligence</p>
+      <h1 class="pro-title">Executive dashboard</h1>
+      <p class="pro-subtitle">Revenue, orders, user growth, and operational activity in one fast admin view.</p>
+    </div>
+    <div class="pro-live-pill"><span class="pro-live-dot"></span><span id="dashboardUpdatedAt">Syncing...</span></div>
+  </div>
+
+  <div id="dashboardError" class="pro-error"></div>
+
+  <section class="pro-grid pro-kpis" aria-label="KPI analytics">
+    <article class="pro-card pro-kpi">
+      <div class="pro-kpi-top"><p class="pro-kpi-label">Total Users</p><span class="pro-icon"><i class="fas fa-users"></i></span></div>
+      <div class="pro-kpi-value" data-kpi="users"><div class="skeleton" style="height: 2.4rem;"></div></div>
+      <p class="pro-kpi-note">Registered customer accounts</p>
+    </article>
+    <article class="pro-card pro-kpi">
+      <div class="pro-kpi-top"><p class="pro-kpi-label">Total Orders</p><span class="pro-icon"><i class="fas fa-box"></i></span></div>
+      <div class="pro-kpi-value" data-kpi="orders"><div class="skeleton" style="height: 2.4rem;"></div></div>
+      <p class="pro-kpi-note">All order lifecycle states</p>
+    </article>
+    <article class="pro-card pro-kpi">
+      <div class="pro-kpi-top"><p class="pro-kpi-label">Revenue</p><span class="pro-icon"><i class="fas fa-dollar-sign"></i></span></div>
+      <div class="pro-kpi-value" data-kpi="revenue"><div class="skeleton" style="height: 2.4rem;"></div></div>
+      <p class="pro-kpi-note">Gross order revenue</p>
+    </article>
+    <article class="pro-card pro-kpi">
+      <div class="pro-kpi-top"><p class="pro-kpi-label">Growth</p><span class="pro-icon"><i class="fas fa-chart-line"></i></span></div>
+      <div class="pro-kpi-value" data-kpi="growth"><div class="skeleton" style="height: 2.4rem;"></div></div>
+      <p class="pro-kpi-note">Last 30 days vs previous 30</p>
+    </article>
+  </section>
+
+  <section class="pro-grid pro-section-grid">
+    <div>
+      <article class="pro-card pro-chart-card">
+        <div class="pro-card-title">
+          <h2>Revenue over time</h2>
+          <span>30 day trend</span>
+        </div>
+        <div class="pro-chart-wrap" data-chart-lazy>
+          <canvas id="revenueChart" aria-label="Revenue over time chart"></canvas>
+        </div>
+      </article>
+
+      <div class="pro-grid pro-mini-charts">
+        <article class="pro-card pro-chart-card">
+          <div class="pro-card-title">
+            <h2>Orders distribution</h2>
+            <span>Daily volume</span>
+          </div>
+          <div class="pro-chart-wrap" data-chart-lazy>
+            <canvas id="ordersChart" aria-label="Orders distribution chart"></canvas>
+          </div>
+        </article>
+        <article class="pro-card pro-chart-card">
+          <div class="pro-card-title">
+            <h2>User growth</h2>
+            <span>New accounts</span>
+          </div>
+          <div class="pro-chart-wrap" data-chart-lazy>
+            <canvas id="usersChart" aria-label="User growth chart"></canvas>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <aside class="pro-card pro-activity-card">
+      <div class="pro-card-title">
+        <h2>Activity</h2>
+        <span>Recent signals</span>
+      </div>
+      <div class="pro-tabs">
+        <section>
+          <p class="pro-kpi-label">Recent Orders</p>
+          <div class="pro-list" id="recentOrdersList">
+            <div class="skeleton" style="height: 3.3rem;"></div>
+            <div class="skeleton" style="height: 3.3rem;"></div>
+            <div class="skeleton" style="height: 3.3rem;"></div>
+          </div>
+        </section>
+        <section>
+          <p class="pro-kpi-label">Latest Users</p>
+          <div class="pro-list" id="latestUsersList">
+            <div class="skeleton" style="height: 3.3rem;"></div>
+            <div class="skeleton" style="height: 3.3rem;"></div>
+          </div>
+        </section>
+        <section>
+          <p class="pro-kpi-label">Logs</p>
+          <div class="pro-list" id="adminLogsList">
+            <div class="skeleton" style="height: 3.3rem;"></div>
+            <div class="skeleton" style="height: 3.3rem;"></div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </section>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="{% static 'js/admin_dashboard.js' %}" defer></script>
+{% endblock %}

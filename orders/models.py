@@ -17,10 +17,56 @@ class Address(models.Model):
     postcode = models.CharField(max_length=20, blank=True)
     address_line = models.TextField()
     delivery_type = models.CharField(max_length=10, choices=DELIVERY_CHOICES, default='home')
+    is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_default', '-created_at']
 
     def __str__(self):
         return f'{self.full_name} - {self.city}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.user_id and self.is_default:
+            Address.objects.filter(user_id=self.user_id, is_default=True).exclude(pk=self.pk).update(is_default=False)
+
+    @property
+    def postal_code(self):
+        return self.postcode
+
+    @property
+    def street(self):
+        return self.address_line
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Cart: {self.user}'
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+        unique_together = ('cart', 'product', 'variant')
+
+    def __str__(self):
+        return f'{self.product} x {self.quantity}'
+
+    @property
+    def key(self):
+        return f'{self.product_id}:{self.variant_id or 0}'
 
 
 class Order(models.Model):
