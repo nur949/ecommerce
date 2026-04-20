@@ -130,7 +130,10 @@ def checkout_view(request):
 
 
 def payment_view(request, order_number):
-    order = _get_accessible_order(request, order_number)
+    order = _get_accessible_order(request, order_number, include_payments=True)
+    if request.method == 'POST' and order.payments.exists():
+        messages.info(request, f'Payment has already been recorded for order {order.order_number}.')
+        return redirect('orders:payment_complete', order_number=order.order_number)
     if request.method == 'POST':
         form = PaymentSelectionForm(request.POST)
         if form.is_valid():

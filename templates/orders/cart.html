@@ -23,10 +23,14 @@
           <form action="{% url 'catalog:update_cart' %}" method="post" class="js-cart-update-form">
             {% csrf_token %}
             <input type="hidden" name="item_key" value="{{ item.key }}">
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control cart-qty-input h-12 rounded-full border border-black/10 bg-[#fbf8f5] px-4 text-center text-sm text-ink">
+            <label class="sr-only" for="cart-quantity-{{ forloop.counter }}">Quantity for {{ item.product.name }}</label>
+            <input id="cart-quantity-{{ forloop.counter }}" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}" class="form-control cart-qty-input h-12 rounded-full border border-black/10 bg-[#fbf8f5] px-4 text-center text-sm text-ink">
           </form>
           <div class="self-center text-base font-semibold text-ink cart-line-total">&#2547;{{ item.total }}</div>
-          <a href="{% url 'catalog:remove_cart_item' item.key %}" class="js-cart-remove-link self-center rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink transition hover:border-rosewood hover:text-rosewood" data-item-key="{{ item.key }}">Remove</a>
+          <form action="{% url 'catalog:remove_cart_item' item.key %}" method="post" class="js-cart-remove-form self-center">
+            {% csrf_token %}
+            <button type="submit" class="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink transition hover:border-rosewood hover:text-rosewood" data-item-key="{{ item.key }}">Remove</button>
+          </form>
         </div>
         {% endfor %}
       </div>

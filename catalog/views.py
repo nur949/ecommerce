@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from .models import Category, Product, ProductVariant
 from orders.cart_utils import add_to_cart, get_cart_items, update_cart_quantity, remove_from_cart
@@ -155,6 +156,7 @@ def update_cart(request):
     return redirect('orders:cart')
 
 
+@require_POST
 def remove_cart_item(request, item_key):
     remove_from_cart(request, item_key)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

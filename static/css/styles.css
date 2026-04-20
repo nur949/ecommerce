@@ -1338,10 +1338,14 @@ main .page-hero:first-child {
     grid-template-columns: 84px minmax(0, 1fr) !important;
   }
 
-  .cart-line form,
+  .cart-line .js-cart-update-form,
   .cart-line .cart-line-total,
-  .cart-line .js-cart-remove-link {
+  .cart-line .js-cart-remove-form {
     grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .cart-line .js-cart-remove-form button {
     width: 100%;
   }
 

@@ -137,6 +137,17 @@ class Product(models.Model):
         return self.stock > 0
 
     @property
+    def has_available_variants(self):
+        variants = getattr(self, '_prefetched_objects_cache', {}).get('variants')
+        if variants is not None:
+            return any(variant.stock > 0 for variant in variants)
+        return self.variants.filter(stock__gt=0).exists()
+
+    @property
+    def is_orderable(self):
+        return self.in_stock or self.has_available_variants
+
+    @property
     def is_deal_active(self):
         return self.is_daily_deal and (self.deal_ends_at is None or self.deal_ends_at > timezone.now())
 

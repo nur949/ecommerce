@@ -23,6 +23,20 @@ class PasswordResetTests(TestCase):
         self.assertRedirects(response, reverse('accounts:password_reset_done'), fetch_redirect_response=False)
 
 
+class LoginTests(TestCase):
+    def setUp(self):
+        User.objects.create_user(username='nur', email='nur@example.com', password='StrongPass123')
+
+    def test_user_can_login_with_email_address(self):
+        response = self.client.post(
+            reverse('accounts:login'),
+            {'username': 'nur@example.com', 'password': 'StrongPass123'},
+            HTTP_HOST='testserver',
+        )
+
+        self.assertRedirects(response, reverse('accounts:dashboard'), fetch_redirect_response=False)
+
+
 class WishlistTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='nur', email='nur@example.com', password='StrongPass123')

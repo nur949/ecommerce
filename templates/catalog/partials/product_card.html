@@ -2,7 +2,7 @@
   <div class="relative overflow-hidden bg-[#f5efe8]">
     {% if product.compare_at_price %}
     <div class="absolute left-4 top-4 z-10 rounded-full bg-rosewood px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">Sale</div>
-    {% elif not product.in_stock %}
+    {% elif not product.is_orderable %}
     <div class="absolute left-4 top-4 z-10 rounded-full bg-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">Sold out</div>
     {% endif %}
     <a href="{{ product.get_absolute_url }}" class="block aspect-[4/4.8] overflow-hidden">
@@ -10,14 +10,20 @@
     </a>
     <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 translate-y-full p-4 opacity-0 transition duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
       <div class="flex items-center gap-2 rounded-[24px] border border-white/80 bg-white/95 p-2 shadow-soft backdrop-blur">
+        {% if product.variants.exists %}
+        <a href="{{ product.get_absolute_url }}" class="inline-flex flex-1 items-center justify-center rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-rosewood">
+          Choose Options
+        </a>
+        {% else %}
         <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax flex-1">
           {% csrf_token %}
           <input type="hidden" name="quantity" value="1">
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-rosewood" {% if not product.in_stock %}disabled{% endif %}>
-            {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+          <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-rosewood" {% if not product.is_orderable %}disabled{% endif %}>
+            {% if product.is_orderable %}Add to Cart{% else %}Out of Stock{% endif %}
           </button>
         </form>
+        {% endif %}
         {% if request.user.is_authenticated %}
         <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}">
           {% csrf_token %}

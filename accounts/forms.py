@@ -11,6 +11,14 @@ class StyledAuthenticationForm(AuthenticationForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control', 'placeholder': field.label})
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username', '').strip()
+        if '@' in username:
+            user = User.objects.filter(email__iexact=username).only('username').first()
+            if user:
+                return user.username
+        return username
+
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)

@@ -25,16 +25,22 @@
       <form method="post" action="{% url 'accounts:register' %}" class="grid gap-4">
         {% csrf_token %}
         {% if register_form.non_field_errors %}<div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ register_form.non_field_errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
         {{ register_form.first_name }}
         {% if register_form.first_name.errors %}<div class="text-sm text-rosewood">{{ register_form.first_name.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.email.id_for_label }}">{{ register_form.email.label }}</label>
         {{ register_form.email }}
         {% if register_form.email.errors %}<div class="text-sm text-rosewood">{{ register_form.email.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.username.id_for_label }}">{{ register_form.username.label }}</label>
         {{ register_form.username }}
         {% if register_form.username.errors %}<div class="text-sm text-rosewood">{{ register_form.username.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.phone.id_for_label }}">{{ register_form.phone.label }}</label>
         {{ register_form.phone }}
         {% if register_form.phone.errors %}<div class="text-sm text-rosewood">{{ register_form.phone.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.password1.id_for_label }}">{{ register_form.password1.label }}</label>
         {{ register_form.password1 }}
         {% if register_form.password1.errors %}<div class="text-sm text-rosewood">{{ register_form.password1.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ register_form.password2.id_for_label }}">{{ register_form.password2.label }}</label>
         {{ register_form.password2 }}
         {% if register_form.password2.errors %}<div class="text-sm text-rosewood">{{ register_form.password2.errors|join:', ' }}</div>{% endif %}
         <button class="btn btn-primary w-full">Create Account</button>
@@ -43,14 +49,16 @@
       <form method="post" action="{% url 'accounts:login' %}" class="grid gap-4">
         {% csrf_token %}
         {% if form.non_field_errors %}<div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
         {{ form.username }}
         {% if form.username.errors %}<div class="text-sm text-rosewood">{{ form.username.errors|join:', ' }}</div>{% endif %}
+        <label class="sr-only" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
         {{ form.password }}
         {% if form.password.errors %}<div class="text-sm text-rosewood">{{ form.password.errors|join:', ' }}</div>{% endif %}
         <button class="btn btn-primary w-full">Login</button>
       </form>
       <div class="mt-4 text-right">
-        <a href="/account/password-reset/" class="text-sm font-semibold text-rosewood">Forgot password?</a>
+        <a href="{% url 'accounts:password_reset' %}" class="text-sm font-semibold text-rosewood">Forgot password?</a>
       </div>
       {% endif %}
       <p class="mt-6 text-center text-sm text-stone">CSRF protection, Django validation, and existing auth redirects are preserved.</p>

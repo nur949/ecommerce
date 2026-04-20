@@ -30,6 +30,20 @@ class CatalogCartTests(TestCase):
             self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['cart_count'], 2)
 
+    def test_cart_remove_requires_post_and_csrf_protected_form(self):
+        self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 1})
+        item_key = f'{self.product.id}:0'
+
+        get_response = self.client.get(reverse('catalog:remove_cart_item', args=[item_key]), HTTP_HOST='testserver')
+        self.assertEqual(get_response.status_code, 405)
+
+        cart_response = self.client.get(reverse('orders:cart'), HTTP_HOST='testserver')
+        self.assertContains(cart_response, 'js-cart-remove-form')
+
+        post_response = self.client.post(reverse('catalog:remove_cart_item', args=[item_key]), HTTP_HOST='testserver')
+        self.assertRedirects(post_response, reverse('orders:cart'), fetch_redirect_response=False)
+        self.assertEqual(self.client.session.get('cart'), {})
+
     def test_cart_items_clamp_stale_session_quantity_to_current_stock(self):
         self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 2})
         self.product.stock = 1
@@ -110,3 +124,19 @@ class CatalogCartTests(TestCase):
 
         self.assertContains(response, 'id="addToCartButton" disabled')
         self.assertContains(response, 'Out of Stock')
+
+    def test_product_card_sends_variant_products_to_detail_page(self):
+        ProductVariant.objects.create(
+            product=self.product,
+            attribute_name='Size',
+            value='Mini',
+            sku='WM-001-MINI',
+            price_override='900.00',
+            stock=2,
+            is_default=True,
+        )
+
+        response = self.client.get(reverse('catalog:shop'), HTTP_HOST='testserver')
+
+        self.assertContains(response, 'Choose Options')
+        self.assertNotContains(response, f'action="{reverse("catalog:add_to_cart", args=[self.product.slug])}"')

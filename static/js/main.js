@@ -422,19 +422,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  document.querySelectorAll('.js-cart-remove-link').forEach((removeLink) => {
-    removeLink.addEventListener('click', async (event) => {
+  document.querySelectorAll('.js-cart-remove-form').forEach((removeForm) => {
+    removeForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const itemKey = removeLink.dataset.itemKey;
+      const submitButton = removeForm.querySelector("button[type='submit']");
+      const itemKey = submitButton ? submitButton.dataset.itemKey : '';
       if (!itemKey) return;
+      const formData = new FormData(removeForm);
 
       try {
-        const response = await fetch(removeLink.href, {
-          method: 'GET',
+        const response = await fetch(removeForm.action, {
+          method: 'POST',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',
           },
           credentials: 'same-origin',
+          body: formData,
         });
         if (!response.ok) throw new Error('Remove failed');
         const data = await response.json();
@@ -454,7 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
           window.location.reload();
         }
       } catch (error) {
-        window.location.href = removeLink.href;
+        removeForm.submit();
       }
     });
   });

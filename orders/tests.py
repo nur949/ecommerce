@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from catalog.models import Category, Product
-from .models import Order
+from .models import Order, PaymentTransaction
 
 
 class CheckoutFlowTests(TestCase):
@@ -63,3 +63,27 @@ class CheckoutFlowTests(TestCase):
 
         self.assertEqual(checkout_response.status_code, 302)
         self.assertEqual(detail_response.status_code, 200)
+
+    def test_payment_post_is_idempotent_after_first_submission(self):
+        self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 1}, HTTP_HOST='testserver')
+        self.client.post(reverse('orders:checkout'), {
+            'full_name': 'Test Customer',
+            'phone': '+880 1700 000000',
+            'country': 'Bangladesh',
+            'city': 'Dhaka',
+            'area': 'Dhanmondi',
+            'postcode': '1209',
+            'address_line': 'House 1, Road 2, Dhanmondi',
+            'delivery_type': 'home',
+        }, HTTP_HOST='testserver')
+        order = Order.objects.get()
+        payment_url = reverse('orders:payment', args=[order.order_number])
+
+        first_response = self.client.post(payment_url, {'payment_method': 'cod'}, HTTP_HOST='testserver')
+        second_response = self.client.post(payment_url, {'payment_method': 'card', 'cardholder_name': 'Test Customer'}, HTTP_HOST='testserver')
+
+        self.assertRedirects(first_response, reverse('orders:payment_complete', args=[order.order_number]), fetch_redirect_response=False)
+        self.assertRedirects(second_response, reverse('orders:payment_complete', args=[order.order_number]), fetch_redirect_response=False)
+        self.assertEqual(PaymentTransaction.objects.filter(order=order).count(), 1)
+        order.refresh_from_db()
+        self.assertEqual(order.payment_method, 'cod')
