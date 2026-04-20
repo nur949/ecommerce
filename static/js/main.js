@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   miniCartToggles().forEach((btn) => btn.addEventListener('click', (e) => {
+    if (!miniCartPanel) return;
     e.preventDefault();
     if (miniCartPanel?.classList.contains('is-open')) closeMiniCart();
     else openMiniCart();
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeMiniCart();
       closeSearchOverlay();
       closeMobileNav();
+      setMegaMenuOpen(false);
     }
   });
 
@@ -293,6 +295,8 @@ document.addEventListener('DOMContentLoaded', () => {
     mobilePanel?.classList.add('hidden');
     mobilePanel?.classList.remove('is-open');
     mobileToggle?.setAttribute('aria-expanded', 'false');
+    mobileCategoriesPanel?.classList.add('hidden');
+    mobileCategoriesToggle?.setAttribute('aria-expanded', 'false');
   };
   mobileToggle?.addEventListener('click', () => {
     const open = mobilePanel?.classList.contains('hidden');
@@ -302,45 +306,110 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const megaMenuWrap = document.getElementById('megaMenuWrap');
+  const megaMenuToggle = document.getElementById('megaMenuToggle');
+  const megaMenuPanel = document.getElementById('megaMenuPanel');
   const megaCategoriesList = document.getElementById('megaCategoriesList');
-  let megaMenuLoaded = false;
-  let megaMenuLoading = false;
-  const loadMegaCategories = async () => {
-    if (!megaCategoriesList || megaMenuLoaded || megaMenuLoading) return;
-    const apiUrl = megaCategoriesList.dataset.url;
+  const mobileCategoriesToggle = document.getElementById('mobileCategoriesToggle');
+  const mobileCategoriesPanel = document.getElementById('mobileCategoriesPanel');
+  const mobileCategoriesList = document.getElementById('mobileCategoriesList');
+  let categoriesLoaded = false;
+  let categoriesLoading = false;
+
+  const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+
+  const renderDesktopCategories = (items) => {
+    if (!megaCategoriesList) return;
+    megaCategoriesList.innerHTML = items.map((category) => {
+      const children = (category.children || []).map((child) => (
+        `<a href="/category/${encodeURIComponent(child.slug)}/" class="text-sm text-stone transition hover:text-rosewood">${escapeHtml(child.name)}</a>`
+      )).join('');
+      return `
+        <div>
+          <a href="/category/${encodeURIComponent(category.slug)}/" class="text-sm font-bold uppercase tracking-[0.16em] text-ink">${escapeHtml(category.name)}</a>
+          <div class="mt-3 grid gap-2">
+            ${children || '<span class="text-sm text-stone">No sub-categories</span>'}
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const renderMobileCategories = (items) => {
+    if (!mobileCategoriesList) return;
+    mobileCategoriesList.innerHTML = items.map((category) => {
+      const children = (category.children || []).map((child) => (
+        `<a href="/category/${encodeURIComponent(child.slug)}/" class="ml-3 rounded-xl px-3 py-2 text-sm text-stone transition hover:bg-white hover:text-rosewood">${escapeHtml(child.name)}</a>`
+      )).join('');
+      return `
+        <div class="grid gap-1">
+          <a href="/category/${encodeURIComponent(category.slug)}/" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">${escapeHtml(category.name)}</a>
+          ${children}
+        </div>
+      `;
+    }).join('');
+  };
+
+  const loadCategories = async () => {
+    if (categoriesLoaded || categoriesLoading) return;
+    const apiUrl = megaCategoriesList?.dataset.url || mobileCategoriesList?.dataset.url;
     if (!apiUrl) return;
-    megaMenuLoading = true;
+    categoriesLoading = true;
     try {
       const res = await fetch(apiUrl, {credentials: 'same-origin'});
       const data = await res.json();
       if (!data.ok) throw new Error('Category load failed');
       const items = data.results || [];
       if (!items.length) {
-        megaCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
-        megaMenuLoaded = true;
+        if (megaCategoriesList) megaCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
+        if (mobileCategoriesList) mobileCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
+        categoriesLoaded = true;
         return;
       }
-      megaCategoriesList.innerHTML = items.map((category) => {
-        const children = (category.children || []).map((child) => (
-          `<a href="/category/${child.slug}/" class="text-sm text-stone transition hover:text-rosewood">${child.name}</a>`
-        )).join('');
-        return `
-          <div>
-            <a href="/category/${category.slug}/" class="text-sm font-bold uppercase tracking-[0.16em] text-ink">${category.name}</a>
-            <div class="mt-3 grid gap-2">
-              ${children || '<span class="text-sm text-stone">No sub-categories</span>'}
-            </div>
-          </div>
-        `;
-      }).join('');
-      megaMenuLoaded = true;
+      renderDesktopCategories(items);
+      renderMobileCategories(items);
+      categoriesLoaded = true;
+      refreshIcons();
     } catch (_) {
-      megaCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
+      if (megaCategoriesList) megaCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
+      if (mobileCategoriesList) mobileCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
     } finally {
-      megaMenuLoading = false;
+      categoriesLoading = false;
     }
   };
-  megaMenuWrap?.addEventListener('mouseenter', loadMegaCategories);
+
+  const setMegaMenuOpen = (open) => {
+    if (!megaMenuPanel || !megaMenuToggle) return;
+    megaMenuPanel.classList.toggle('pointer-events-none', !open);
+    megaMenuPanel.classList.toggle('pointer-events-auto', open);
+    megaMenuPanel.classList.toggle('opacity-0', !open);
+    megaMenuPanel.classList.toggle('opacity-100', open);
+    megaMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) loadCategories();
+  };
+
+  megaMenuWrap?.addEventListener('mouseenter', () => loadCategories());
+  megaMenuToggle?.addEventListener('focus', () => loadCategories());
+  megaMenuToggle?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = megaMenuToggle.getAttribute('aria-expanded') === 'true';
+    setMegaMenuOpen(!isOpen);
+  });
+  document.addEventListener('click', (e) => {
+    if (!megaMenuWrap?.contains(e.target)) setMegaMenuOpen(false);
+  });
+
+  mobileCategoriesToggle?.addEventListener('click', () => {
+    const open = mobileCategoriesPanel?.classList.contains('hidden');
+    mobileCategoriesPanel?.classList.toggle('hidden', !open);
+    mobileCategoriesToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) loadCategories();
+  });
 
   const searchOverlay = document.getElementById('searchOverlay');
   const searchToggle = document.getElementById('searchOverlayToggle');

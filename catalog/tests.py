@@ -130,6 +130,35 @@ class CatalogCartTests(TestCase):
         self.assertIn('col-xl-3', data['html'])
         self.assertNotIn('col-xxl-2', data['html'])
 
+    def test_navbar_categories_render_ajax_hooks(self):
+        response = self.client.get(reverse('core:home'), HTTP_HOST='testserver')
+
+        self.assertContains(response, 'id="megaMenuToggle"')
+        self.assertContains(response, 'id="megaMenuPanel"')
+        self.assertContains(response, 'id="megaCategoriesList"')
+        self.assertContains(response, 'id="mobileCategoriesToggle"')
+        self.assertContains(response, 'id="mobileCategoriesList"')
+        self.assertContains(response, reverse('catalog:api_categories'))
+
+    def test_base_renders_mini_cart_for_navbar_cart_button(self):
+        response = self.client.get(reverse('core:home'), HTTP_HOST='testserver')
+
+        self.assertContains(response, 'id="miniCartToggle"')
+        self.assertContains(response, 'id="miniCartPanel"')
+        self.assertContains(response, 'id="miniCartBackdrop"')
+
+    def test_categories_api_returns_children_for_ajax_navbar(self):
+        parent = Category.objects.create(name='Beauty', slug='beauty-nav')
+        child = Category.objects.create(name='Serums', slug='serums-nav', parent=parent)
+
+        response = self.client.get(reverse('catalog:api_categories'), HTTP_HOST='testserver')
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        nav_category = next(item for item in data['results'] if item['slug'] == parent.slug)
+        self.assertEqual(nav_category['children'][0]['slug'], child.slug)
+
     def test_parent_category_pages_include_child_products(self):
         parent = Category.objects.create(name='Beauty', slug='beauty')
         child = Category.objects.create(name='Serums', slug='serums', parent=parent)
