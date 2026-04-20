@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -32,21 +31,44 @@ def _ajax_cart_payload(request):
     return cart_items, cart_subtotal, cart_count, mini_cart_html
 
 
+def _shop_product_groups(products, categories):
+    product_list = list(products)
+    grouped_ids = set()
+    groups = []
+    for category in categories:
+        category_ids = set(_category_tree_ids(category))
+        category_products = [product for product in product_list if product.category_id in category_ids]
+        if category_products:
+            grouped_ids.update(product.id for product in category_products)
+            groups.append({
+                'category': category,
+                'products': category_products,
+                'count': len(category_products),
+            })
+    uncategorized_products = [product for product in product_list if product.id not in grouped_ids]
+    if uncategorized_products:
+        groups.append({
+            'category': None,
+            'products': uncategorized_products,
+            'count': len(uncategorized_products),
+        })
+    return groups, len(product_list)
+
+
 def shop(request):
+    if 'sale' in request.GET:
+        params = request.GET.copy()
+        params.pop('sale', None)
+        query_string = params.urlencode()
+        next_url = reverse('catalog:shop')
+        if query_string:
+            next_url = f'{next_url}?{query_string}'
+        return redirect(next_url)
+
     products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('variants')
     q = (request.GET.get('q') or '').strip()
     if q:
         products = products.filter(name__icontains=q)
-    category_slug = request.GET.get('category')
-    if category_slug:
-        active_category = Category.objects.filter(slug=category_slug).prefetch_related('children').first()
-        if active_category:
-            products = products.filter(category_id__in=_category_tree_ids(active_category))
-        else:
-            products = products.none()
-    sale = request.GET.get('sale') in {'1', 'true', 'yes'}
-    if sale:
-        products = products.filter(compare_at_price__gt=F('price'))
     sort = request.GET.get('sort') or 'latest'
     sort_map = {
         'latest': '-created_at',
@@ -55,20 +77,23 @@ def shop(request):
         'name': 'name',
     }
     products = products.order_by(sort_map.get(sort, '-created_at'))
+    categories = list(Category.objects.filter(parent__isnull=True).prefetch_related('children'))
+    product_groups, product_count = _shop_product_groups(products, categories)
     context = {
         'products': products,
-        'categories': Category.objects.filter(parent__isnull=True).prefetch_related('children'),
+        'product_groups': product_groups,
+        'categories': categories,
+        'product_count': product_count,
         'query': q,
-        'active_category': category_slug or '',
         'active_sort': sort,
-        'sale': sale,
     }
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse(
             {
                 'ok': True,
                 'html': render_to_string('catalog/partials/product_grid.html', context, request=request),
-                'count': products.count(),
+                'nav_html': render_to_string('catalog/partials/category_nav.html', context, request=request),
+                'count': product_count,
             }
         )
     return render(request, 'catalog/shop.html', {

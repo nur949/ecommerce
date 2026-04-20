@@ -1399,6 +1399,44 @@ main .page-hero:first-child {
   color: var(--accent-color);
 }
 
+.shop-category-nav a {
+  align-items: center;
+  border-radius: var(--radius);
+  gap: .75rem;
+  padding: .75rem .85rem;
+}
+
+.shop-category-nav a span {
+  display: inline-flex;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.shop-category-nav a.active {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.shop-category-nav a.active span {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.shop-category-section {
+  scroll-margin-top: 9.5rem;
+}
+
+.shop-category-section + .shop-category-section {
+  margin-top: 3rem;
+}
+
 .cart-line,
 .dashboard-order-link,
 .builder-item,

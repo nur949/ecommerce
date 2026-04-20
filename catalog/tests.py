@@ -71,6 +71,35 @@ class CatalogCartTests(TestCase):
         products = list(response.context['products'])
         self.assertEqual(products[0].name, 'Budget Keyboard')
 
+    def test_sale_query_redirects_to_normal_shop(self):
+        response = self.client.get(reverse('catalog:shop'), {'sale': '1'}, HTTP_HOST='testserver')
+
+        self.assertRedirects(response, reverse('catalog:shop'), fetch_redirect_response=False)
+
+    def test_sale_query_redirect_preserves_other_filters(self):
+        response = self.client.get(
+            reverse('catalog:shop'),
+            {'sale': '1', 'q': 'mouse', 'sort': 'name'},
+            HTTP_HOST='testserver',
+        )
+
+        self.assertRedirects(response, f'{reverse("catalog:shop")}?q=mouse&sort=name', fetch_redirect_response=False)
+
+    def test_shop_ajax_returns_grouped_sections_and_category_nav(self):
+        response = self.client.get(
+            reverse('catalog:shop'),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_HOST='testserver',
+        )
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        self.assertIn('shop-category-section', data['html'])
+        self.assertIn('data-category="gadgets"', data['nav_html'])
+        self.assertIn('col-xl-3', data['html'])
+        self.assertNotIn('col-xxl-2', data['html'])
+
     def test_parent_category_pages_include_child_products(self):
         parent = Category.objects.create(name='Beauty', slug='beauty')
         child = Category.objects.create(name='Serums', slug='serums', parent=parent)

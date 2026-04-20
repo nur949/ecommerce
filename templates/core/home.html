@@ -4,7 +4,6 @@
 {% for section in home_sections %}
   {% if section.is_active %}
     {% if section.key == 'hero' %}{% include 'core/partials/hero_section.html' %}{% endif %}
-    {% if section.key == 'hero_showcase' %}{% include 'core/partials/hero_showcase.html' %}{% endif %}
     {% if section.key == 'popular_categories' %}{% include 'core/partials/popular_categories.html' %}{% endif %}
     {% if section.key == 'daily_deals' %}{% include 'core/partials/daily_deals.html' %}{% endif %}
     {% if section.key == 'new_collection' %}{% include 'core/partials/new_collection.html' %}{% endif %}

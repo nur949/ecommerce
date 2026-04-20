@@ -1,0 +1,7 @@
+<a href="#shopProductGrid" data-category="all" class="active">All Products <span>{{ product_count }}</span></a>
+{% for group in product_groups %}
+  <a href="#shop-category-{% if group.category %}{{ group.category.slug }}{% else %}uncategorized{% endif %}" data-category="{% if group.category %}{{ group.category.slug }}{% else %}uncategorized{% endif %}">
+    {% if group.category %}{{ group.category.name }}{% else %}More Products{% endif %}
+    <span>{{ group.count }}</span>
+  </a>
+{% endfor %}

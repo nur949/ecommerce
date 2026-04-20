@@ -301,12 +301,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const shopStatus = document.getElementById('shopResultsStatus');
   const shopSearch = document.getElementById('shopSearch');
   const shopSort = document.getElementById('shopSort');
+  const shopCategoryNav = document.getElementById('shopCategoryNav');
 
   if (shopForm && shopGrid) {
-    const categoryInput = shopForm.querySelector("input[name='category']");
-    const saleInput = shopForm.querySelector("input[name='sale']");
     let shopTimer = null;
     let activeController = null;
+    let categoryObserver = null;
 
     const setShopLoading = (isLoading) => {
       shopGrid.classList.toggle('is-loading', isLoading);
@@ -325,6 +325,52 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
       return `${shopForm.action}?${params.toString()}`;
+    };
+
+    const setActiveShopCategory = (category) => {
+      if (!shopCategoryNav) return;
+      shopCategoryNav.querySelectorAll('a[data-category]').forEach((link) => {
+        link.classList.toggle('active', link.dataset.category === category);
+      });
+    };
+
+    const initShopCategoryNav = () => {
+      if (!shopCategoryNav) return;
+      shopCategoryNav.querySelectorAll('a[data-category]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const targetSelector = link.getAttribute('href');
+          if (!targetSelector || !targetSelector.startsWith('#')) return;
+          const target = document.querySelector(targetSelector);
+          if (!target) return;
+          event.preventDefault();
+          setActiveShopCategory(link.dataset.category || 'all');
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.history.replaceState({}, '', targetSelector === '#shopProductGrid' ? window.location.pathname + window.location.search : targetSelector);
+        });
+      });
+    };
+
+    const initShopScrollSpy = () => {
+      if (categoryObserver) {
+        categoryObserver.disconnect();
+      }
+      const sections = shopGrid.querySelectorAll('.shop-category-section[data-shop-category]');
+      if (!sections.length || !shopCategoryNav || !('IntersectionObserver' in window)) {
+        setActiveShopCategory('all');
+        return;
+      }
+      categoryObserver = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) {
+          setActiveShopCategory(visible.target.dataset.shopCategory || 'all');
+        }
+      }, {
+        rootMargin: '-35% 0px -50% 0px',
+        threshold: [0.15, 0.3, 0.6],
+      });
+      sections.forEach((section) => categoryObserver.observe(section));
     };
 
     const loadShopProducts = async (pushState = true) => {
@@ -347,7 +393,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = await response.json();
         if (!data.ok) throw new Error('Invalid shop payload');
         shopGrid.innerHTML = data.html;
+        if (shopCategoryNav && data.nav_html) {
+          shopCategoryNav.innerHTML = data.nav_html;
+        }
         refreshLucideIcons();
+        initShopCategoryNav();
+        initShopScrollSpy();
         if (shopCount) {
           shopCount.textContent = `${Number(data.count || 0)} products`;
         }
@@ -379,20 +430,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    document.querySelectorAll('.filter-list a[data-category]').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        event.preventDefault();
-        if (categoryInput) {
-          categoryInput.value = link.dataset.category || '';
-        }
-        if (saleInput && link.href.includes('sale=1')) {
-          saleInput.value = '1';
-        }
-        document.querySelectorAll('.filter-list a[data-category]').forEach((item) => item.classList.remove('active'));
-        link.classList.add('active');
-        loadShopProducts();
-      });
-    });
+    initShopCategoryNav();
+    initShopScrollSpy();
 
     window.addEventListener('popstate', () => {
       window.location.reload();

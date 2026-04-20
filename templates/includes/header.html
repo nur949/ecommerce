@@ -15,7 +15,6 @@
     <nav class="hidden items-center gap-6 text-sm font-medium text-white/80 lg:flex">
       <a href="{% url 'core:home' %}" class="transition hover:text-white">Home</a>
       <a href="{% url 'catalog:shop' %}" class="transition hover:text-white">Shop</a>
-      <a href="{% url 'catalog:shop' %}?sale=1" class="transition hover:text-white">Sale</a>
       <a href="{% url 'core:corporate' %}" class="transition hover:text-white">Corporate</a>
       <a href="{% url 'core:outlets' %}" class="transition hover:text-white">Outlets</a>
       {% if request.user.is_authenticated and request.user.is_staff %}
@@ -48,7 +47,6 @@
     <div class="grid gap-2 text-sm font-medium text-white/80">
       <a href="{% url 'core:home' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Home</a>
       <a href="{% url 'catalog:shop' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Shop</a>
-      <a href="{% url 'catalog:shop' %}?sale=1" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Sale</a>
       <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Wishlist</a>
       <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Account</a>
       <a href="{% url 'orders:tracking' %}" class="rounded-2xl px-4 py-3 transition hover:bg-white/5 hover:text-white">Track Order</a>
