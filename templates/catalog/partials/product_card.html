@@ -1,4 +1,4 @@
-<article class="product-card-daraz group relative flex h-full flex-col overflow-hidden bg-white transition duration-200 hover:shadow-panel" data-aos="fade-up">
+<article class="product-card-daraz group relative flex h-full flex-col overflow-hidden bg-white transition duration-200 hover:shadow-panel" data-product-id="{{ product.id }}" data-aos="fade-up">
   <div class="relative overflow-hidden bg-[#f1f5f3]">
     {% if product.compare_at_price %}
     <div class="absolute left-2 top-2 z-10 rounded bg-[#f85606] px-2 py-0.5 text-[10px] font-bold uppercase text-white">Sale</div>
@@ -9,10 +9,10 @@
       <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
     </a>
     {% if request.user.is_authenticated %}
-    <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="absolute right-2 top-2 z-10">
+    <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax absolute right-2 top-2 z-10" data-product-id="{{ product.id }}">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606] {% if product.id in wishlist_product_ids %}text-[#f85606]{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}">
+      <button type="submit" class="js-wishlist-button inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606] {% if product.id in wishlist_product_ids %}is-active text-[#f85606]{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}" data-add-label="Add {{ product.name }} to wishlist" data-remove-label="Remove {{ product.name }} from wishlist">
         <i data-lucide="heart" class="h-4 w-4"></i>
       </button>
     </form>

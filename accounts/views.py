@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from .forms import RegisterForm, StyledAuthenticationForm
 from .models import WishlistItem
@@ -59,9 +61,21 @@ def wishlist_view(request):
 
 
 @login_required
+@require_POST
 def add_to_wishlist(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     _, created = WishlistItem.objects.get_or_create(user=request.user, product=product)
+    wishlist_count = WishlistItem.objects.filter(user=request.user).count()
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'ok': True,
+            'product_id': product.id,
+            'is_wishlisted': True,
+            'wishlist_count': wishlist_count,
+            'add_url': reverse('accounts:add_to_wishlist', args=[product.slug]),
+            'remove_url': reverse('accounts:remove_from_wishlist', args=[product.slug]),
+            'message': f'{product.name} added to your wishlist.' if created else f'{product.name} is already in your wishlist.',
+        })
     if created:
         messages.success(request, f'{product.name} added to your wishlist.')
     else:
@@ -70,9 +84,21 @@ def add_to_wishlist(request, slug):
 
 
 @login_required
+@require_POST
 def remove_from_wishlist(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     deleted, _ = WishlistItem.objects.filter(user=request.user, product=product).delete()
+    wishlist_count = WishlistItem.objects.filter(user=request.user).count()
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'ok': True,
+            'product_id': product.id,
+            'is_wishlisted': False,
+            'wishlist_count': wishlist_count,
+            'add_url': reverse('accounts:add_to_wishlist', args=[product.slug]),
+            'remove_url': reverse('accounts:remove_from_wishlist', args=[product.slug]),
+            'message': f'{product.name} removed from your wishlist.' if deleted else f'{product.name} was not in your wishlist.',
+        })
     if deleted:
         messages.info(request, f'{product.name} removed from your wishlist.')
     return redirect(request.POST.get('next') or request.META.get('HTTP_REFERER') or reverse('accounts:wishlist'))

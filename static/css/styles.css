@@ -1295,6 +1295,11 @@ main .page-hero:first-child {
   transform: translateY(-2px);
 }
 
+.js-wishlist-button.is-active {
+  border-color: #f85606 !important;
+  color: #f85606 !important;
+}
+
 .product-card-title {
   display: -webkit-box;
   min-height: 2.5rem;

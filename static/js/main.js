@@ -82,6 +82,63 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   };
 
+  const updateWishlistBadge = (count) => {
+    document.querySelectorAll('.js-wishlist-link').forEach((link) => {
+      let badge = link.querySelector('.js-wishlist-badge');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'js-wishlist-badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-ink';
+          link.appendChild(badge);
+        }
+        badge.textContent = String(count);
+      } else if (badge) {
+        badge.remove();
+      }
+    });
+  };
+
+  const updateWishlistForms = (data) => {
+    const isWishlisted = Boolean(data.is_wishlisted);
+    document.querySelectorAll(`form.js-wishlist-ajax[data-product-id="${data.product_id}"]`).forEach((form) => {
+      form.action = isWishlisted ? data.remove_url : data.add_url;
+      const button = form.querySelector('.js-wishlist-button');
+      if (!button) return;
+      button.classList.toggle('is-active', isWishlisted);
+      button.classList.toggle('text-[#f85606]', isWishlisted);
+      const nextLabel = isWishlisted ? button.dataset.removeLabel : button.dataset.addLabel;
+      if (nextLabel) {
+        button.setAttribute('aria-label', nextLabel);
+        if (button.textContent.trim()) {
+          button.textContent = nextLabel;
+        }
+      }
+    });
+    refreshLucideIcons();
+  };
+
+  const updateWishlistPageAfterRemoval = (data) => {
+    if (data.is_wishlisted) return;
+    const card = document.querySelector(`[data-wishlist-card="${data.product_id}"]`);
+    if (card) {
+      card.remove();
+    }
+    const grid = document.getElementById('wishlistGrid');
+    if (grid && !grid.querySelector('[data-wishlist-card]')) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'col-12';
+      emptyState.innerHTML = `
+        <div class="rounded-[32px] border border-black/5 bg-white px-6 py-20 text-center shadow-soft">
+          <div class="mini-empty-icon mx-auto">Love</div>
+          <h2 class="mt-6 text-3xl font-semibold text-ink">Your wishlist is empty</h2>
+          <p class="mt-3 text-sm text-stone">Save products while browsing so you can compare and buy later.</p>
+          <a href="/shop/" class="btn btn-primary mt-8">Browse Shop</a>
+        </div>
+      `;
+      grid.appendChild(emptyState);
+    }
+  };
+
   const replaceMiniCartPanelFromHtml = (html) => {
     const { panel } = getMiniCartElements();
     if (!panel || !html) return;
@@ -460,6 +517,42 @@ document.addEventListener('DOMContentLoaded', function () {
         removeForm.submit();
       }
     });
+  });
+
+  document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form.js-wishlist-ajax');
+    if (!form) return;
+    event.preventDefault();
+    const button = form.querySelector("button[type='submit']");
+    const formData = new FormData(form);
+    if (button) {
+      button.disabled = true;
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'same-origin',
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Wishlist request failed');
+      const data = await response.json();
+      if (!data.ok) throw new Error('Invalid wishlist payload');
+
+      updateWishlistBadge(Number(data.wishlist_count || 0));
+      updateWishlistForms(data);
+      updateWishlistPageAfterRemoval(data);
+      showCartNotice(data.message || 'Wishlist updated.');
+    } catch (error) {
+      form.submit();
+    } finally {
+      if (button) {
+        button.disabled = false;
+      }
+    }
   });
 
   document.querySelectorAll('form.js-no-empty-submit').forEach((form) => {

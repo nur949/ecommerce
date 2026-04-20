@@ -58,11 +58,44 @@ class WishlistTests(TestCase):
         self.assertRedirects(response, reverse('catalog:shop'), fetch_redirect_response=False)
         self.assertTrue(WishlistItem.objects.filter(user=self.user, product=self.product).exists())
 
+    def test_ajax_wishlist_add_returns_updated_state(self):
+        self.client.login(username='nur', password='StrongPass123')
+        response = self.client.post(
+            reverse('accounts:add_to_wishlist', args=[self.product.slug]),
+            {'next': reverse('catalog:shop')},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_HOST='testserver',
+        )
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        self.assertTrue(data['is_wishlisted'])
+        self.assertEqual(data['wishlist_count'], 1)
+        self.assertEqual(data['product_id'], self.product.id)
+
     def test_authenticated_user_can_remove_product_from_wishlist(self):
         WishlistItem.objects.create(user=self.user, product=self.product)
         self.client.login(username='nur', password='StrongPass123')
         response = self.client.post(reverse('accounts:remove_from_wishlist', args=[self.product.slug]), {'next': reverse('accounts:wishlist')}, HTTP_HOST='testserver')
         self.assertRedirects(response, reverse('accounts:wishlist'), fetch_redirect_response=False)
+        self.assertFalse(WishlistItem.objects.filter(user=self.user, product=self.product).exists())
+
+    def test_ajax_wishlist_remove_returns_updated_state(self):
+        WishlistItem.objects.create(user=self.user, product=self.product)
+        self.client.login(username='nur', password='StrongPass123')
+        response = self.client.post(
+            reverse('accounts:remove_from_wishlist', args=[self.product.slug]),
+            {'next': reverse('accounts:wishlist')},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_HOST='testserver',
+        )
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        self.assertFalse(data['is_wishlisted'])
+        self.assertEqual(data['wishlist_count'], 0)
         self.assertFalse(WishlistItem.objects.filter(user=self.user, product=self.product).exists())
 
     def test_wishlist_page_requires_login(self):

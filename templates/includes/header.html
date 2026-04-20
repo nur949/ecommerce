@@ -27,9 +27,9 @@
       <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex" aria-label="Account">
         <i data-lucide="user" class="h-4 w-4"></i>
       </a>
-      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="relative hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex" aria-label="Wishlist">
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="js-wishlist-link relative hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex" aria-label="Wishlist">
         <i data-lucide="heart" class="h-4 w-4"></i>
-        {% if wishlist_count %}<span class="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-ink">{{ wishlist_count }}</span>{% endif %}
+        {% if wishlist_count %}<span class="js-wishlist-badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-ink">{{ wishlist_count }}</span>{% endif %}
       </a>
       <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch" aria-controls="offcanvasSearch" class="hidden rounded-full border border-white/15 bg-white/5 p-2.5 text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white md:inline-flex">
         <i data-lucide="search" class="h-4 w-4"></i>

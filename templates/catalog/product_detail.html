@@ -92,10 +92,10 @@
         </form>
         <div class="mt-3">
           {% if request.user.is_authenticated %}
-          <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}">
+          <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="js-wishlist-ajax" data-product-id="{{ product.id }}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button class="btn btn-outline-primary w-full">{% if product.id in wishlist_product_ids %}Remove from Wishlist{% else %}Save to Wishlist{% endif %}</button>
+            <button class="js-wishlist-button btn btn-outline-primary w-full {% if product.id in wishlist_product_ids %}is-active{% endif %}" data-add-label="Save to Wishlist" data-remove-label="Remove from Wishlist">{% if product.id in wishlist_product_ids %}Remove from Wishlist{% else %}Save to Wishlist{% endif %}</button>
           </form>
           {% else %}
           <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-full">Login to Save</a>
