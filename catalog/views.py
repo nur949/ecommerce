@@ -11,7 +11,15 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
-from orders.cart_utils import add_to_cart, get_cart_items, update_cart_quantity, remove_from_cart
+from orders.cart_utils import (
+    add_to_cart,
+    build_cart_totals,
+    get_cart_coupon,
+    get_cart_items,
+    get_cart_reward_points,
+    remove_from_cart,
+    update_cart_quantity,
+)
 
 from .models import Category, Product, ProductReview, ProductVariant, StockAlert
 
@@ -128,16 +136,22 @@ def _sort_shop_products(products, sort):
 def _ajax_cart_payload(request):
     cart_items, cart_subtotal = get_cart_items(request)
     cart_count = sum(item['quantity'] for item in cart_items)
+    cart_totals = build_cart_totals(
+        cart_subtotal,
+        coupon=get_cart_coupon(request),
+        reward_points=get_cart_reward_points(request),
+    )
     mini_cart_html = render_to_string(
         'includes/minicart.html',
         {
             'cart_count': cart_count,
             'cart_items': cart_items,
             'cart_subtotal': cart_subtotal,
+            'cart_totals': cart_totals,
         },
         request=request,
     )
-    return cart_items, cart_subtotal, cart_count, mini_cart_html
+    return cart_items, cart_subtotal, cart_count, cart_totals, mini_cart_html
 
 
 def shop(request):
@@ -236,12 +250,13 @@ def add_product_to_cart(request, slug):
     added_quantity = add_to_cart(request, product, quantity=quantity, variant=variant)
 
     if is_ajax:
-        _, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+        _, cart_subtotal, cart_count, cart_totals, mini_cart_html = _ajax_cart_payload(request)
         return JsonResponse(
             {
                 'ok': True,
                 'cart_count': cart_count,
                 'cart_subtotal': str(cart_subtotal),
+                'cart_totals': {key: str(value) for key, value in cart_totals.items()},
                 'mini_cart_html': mini_cart_html,
                 'message': f'{product.name} added to cart.' if added_quantity else f'{product.name} is already at the available stock limit.',
             }
@@ -265,7 +280,7 @@ def update_cart(request):
             quantity = 1
         update_cart_quantity(request, item_key, quantity)
         if is_ajax:
-            cart_items, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+            cart_items, cart_subtotal, cart_count, cart_totals, mini_cart_html = _ajax_cart_payload(request)
             updated_item = next((item for item in cart_items if item['key'] == item_key), None)
             return JsonResponse(
                 {
@@ -274,6 +289,7 @@ def update_cart(request):
                     'item_total': str(updated_item['total']) if updated_item else '0.00',
                     'item_quantity': updated_item['quantity'] if updated_item else 0,
                     'cart_subtotal': str(cart_subtotal),
+                    'cart_totals': {key: str(value) for key, value in cart_totals.items()},
                     'cart_count': cart_count,
                     'mini_cart_html': mini_cart_html,
                 }
@@ -286,12 +302,13 @@ def update_cart(request):
 def remove_cart_item(request, item_key):
     remove_from_cart(request, item_key)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        _, cart_subtotal, cart_count, mini_cart_html = _ajax_cart_payload(request)
+        _, cart_subtotal, cart_count, cart_totals, mini_cart_html = _ajax_cart_payload(request)
         return JsonResponse(
             {
                 'ok': True,
                 'item_key': item_key,
                 'cart_subtotal': str(cart_subtotal),
+                'cart_totals': {key: str(value) for key, value in cart_totals.items()},
                 'cart_count': cart_count,
                 'mini_cart_html': mini_cart_html,
             }

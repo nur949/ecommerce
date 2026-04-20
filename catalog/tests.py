@@ -29,6 +29,36 @@ class CatalogCartTests(TestCase):
             )
             self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['cart_count'], 2)
+        self.assertIn('cart_totals', response.json())
+
+    def test_ajax_cart_update_returns_summary_totals(self):
+        self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 1})
+        response = self.client.post(
+            reverse('catalog:update_cart'),
+            {'item_key': f'{self.product.id}:0', 'quantity': 2},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_HOST='testserver',
+        )
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        self.assertEqual(data['item_quantity'], 2)
+        self.assertEqual(data['cart_totals']['subtotal'], '2400.00')
+
+    def test_ajax_cart_remove_returns_summary_totals(self):
+        self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 1})
+        response = self.client.post(
+            reverse('catalog:remove_cart_item', args=[f'{self.product.id}:0']),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_HOST='testserver',
+        )
+
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['ok'])
+        self.assertEqual(data['cart_count'], 0)
+        self.assertEqual(data['cart_totals']['total'], '0.00')
 
     def test_cart_remove_requires_post_and_csrf_protected_form(self):
         self.client.post(reverse('catalog:add_to_cart', args=[self.product.slug]), {'quantity': 1})
@@ -135,6 +165,7 @@ class CatalogCartTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'detailTotalPrice')
+        self.assertContains(response, 'detailSku')
         self.assertContains(response, 'product-qty-controls')
         self.assertContains(response, variant.sku)
 

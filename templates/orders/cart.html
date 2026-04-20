@@ -38,9 +38,9 @@
           <h2 class="text-2xl font-semibold text-ink">Order Summary</h2>
           <div class="mt-4 rounded-[16px] bg-[#f8fafc] p-3 text-sm text-stone">
             {% if totals.free_delivery_remaining > 0 %}
-            Add <strong>&#2547;{{ totals.free_delivery_remaining }}</strong> more for free delivery.
+            Add <strong class="cart-free-delivery-remaining">&#2547;{{ totals.free_delivery_remaining }}</strong> more for free delivery.
             {% else %}
-            You unlocked free delivery.
+            <span class="cart-free-delivery-unlocked">You unlocked free delivery.</span>
             {% endif %}
           </div>
           <form method="post" class="mt-4 space-y-3">
@@ -61,9 +61,9 @@
           </form>
           <div class="mt-5 space-y-3 text-sm text-stone">
             <div class="flex justify-between"><span>Subtotal</span><strong class="cart-subtotal-value text-ink">&#2547;{{ totals.subtotal }}</strong></div>
-            <div class="flex justify-between"><span>Coupon discount</span><strong class="text-ink">-&#2547;{{ totals.coupon_discount }}</strong></div>
-            <div class="flex justify-between"><span>Reward discount</span><strong class="text-ink">-&#2547;{{ totals.reward_discount }}</strong></div>
-            <div class="flex justify-between border-t border-black/10 pt-3"><span>Total</span><strong class="text-xl text-ink">&#2547;{{ totals.total }}</strong></div>
+            <div class="flex justify-between"><span>Coupon discount</span><strong class="cart-coupon-discount-value text-ink">-&#2547;{{ totals.coupon_discount }}</strong></div>
+            <div class="flex justify-between"><span>Reward discount</span><strong class="cart-reward-discount-value text-ink">-&#2547;{{ totals.reward_discount }}</strong></div>
+            <div class="flex justify-between border-t border-black/10 pt-3"><span>Total</span><strong class="cart-total-value text-xl text-ink">&#2547;{{ totals.total }}</strong></div>
           </div>
           <a href="{% url 'orders:checkout' %}" class="btn btn-primary mt-6 w-full">Proceed to Checkout</a>
         </div>

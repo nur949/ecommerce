@@ -34,7 +34,7 @@
           <strong id="detailPrice" data-base-price="{{ selected_variant.price_override|default:product.price }}" class="text-3xl text-ink">&#2547;{{ selected_variant.price_override|default:product.price }}</strong>
           {% if product.compare_at_price %}<span class="text-lg text-stone line-through">&#2547;{{ product.compare_at_price }}</span>{% endif %}
         </div>
-        <p class="mt-2 text-xs uppercase tracking-[0.16em] text-stone">SKU: {{ selected_variant.sku|default:product.sku }}</p>
+        <p class="mt-2 text-xs uppercase tracking-[0.16em] text-stone">SKU: <span id="detailSku">{{ selected_variant.sku|default:product.sku }}</span></p>
         <form action="{% url 'catalog:add_to_cart' product.slug %}" method="post" class="js-add-to-cart-ajax mt-6">
           {% csrf_token %}
           {% if selected_variant %}<input type="hidden" name="variant_id" id="variantIdInput" value="{{ selected_variant.id }}">{% endif %}

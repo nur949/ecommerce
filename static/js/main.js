@@ -52,6 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const money = (value) => `\u09F3${value || '0.00'}`;
+
+  const updateCartSummary = (data) => {
+    const totals = data?.cart_totals || {};
+    const setText = (selector, value) => {
+      const node = document.querySelector(selector);
+      if (node) node.textContent = value;
+    };
+    setText('.cart-subtotal-value', money(totals.subtotal || data?.cart_subtotal));
+    setText('.cart-coupon-discount-value', `-${money(totals.coupon_discount)}`);
+    setText('.cart-reward-discount-value', `-${money(totals.reward_discount)}`);
+    setText('.cart-total-value', money(totals.total));
+    setText('.cart-free-delivery-remaining', money(totals.free_delivery_remaining));
+  };
+
   miniCartToggles().forEach((btn) => btn.addEventListener('click', (e) => {
     e.preventDefault();
     if (miniCartPanel?.classList.contains('is-open')) closeMiniCart();
@@ -108,6 +123,60 @@ document.addEventListener('DOMContentLoaded', () => {
       form.submit();
     } finally {
       if (button) button.disabled = false;
+    }
+  });
+
+  document.addEventListener('change', async (e) => {
+    const input = e.target.closest('.cart-qty-input');
+    if (!input) return;
+    const form = input.closest('form.js-cart-update-form');
+    if (!form) return;
+    const line = form.closest('.cart-line');
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin',
+        body: new FormData(form),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error();
+      if (Number(data.item_quantity || 0) <= 0) {
+        line?.remove();
+      } else {
+        input.value = String(data.item_quantity);
+        line?.querySelector('.cart-line-total') && (line.querySelector('.cart-line-total').textContent = money(data.item_total));
+      }
+      replaceMiniCart(data.mini_cart_html);
+      updateMiniCartBadge(Number(data.cart_count || 0));
+      updateCartSummary(data);
+    } catch (_) {
+      form.submit();
+    }
+  });
+
+  document.addEventListener('submit', async (e) => {
+    const form = e.target.closest('form.js-cart-remove-form');
+    if (!form) return;
+    e.preventDefault();
+    const line = form.closest('.cart-line');
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        credentials: 'same-origin',
+        body: new FormData(form),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error();
+      line?.remove();
+      replaceMiniCart(data.mini_cart_html);
+      updateMiniCartBadge(Number(data.cart_count || 0));
+      updateCartSummary(data);
+      notify('Item removed from cart.');
+      if (Number(data.cart_count || 0) <= 0) window.location.reload();
+    } catch (_) {
+      form.submit();
     }
   });
 
@@ -364,6 +433,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const qtyInput = document.querySelector('.js-detail-quantity');
+  const detailPrice = document.getElementById('detailPrice');
+  const detailTotalPrice = document.getElementById('detailTotalPrice');
+  const detailSku = document.getElementById('detailSku');
+  const variantInput = document.getElementById('variantIdInput');
+  const updateDetailTotal = () => {
+    if (!detailPrice || !detailTotalPrice || !qtyInput) return;
+    const unitPrice = Number(detailPrice.dataset.currentPrice || detailPrice.dataset.basePrice || 0);
+    const quantity = Math.max(Number(qtyInput.value || 1), 1);
+    detailTotalPrice.textContent = money((unitPrice * quantity).toFixed(2));
+  };
   document.querySelectorAll('.js-qty-button').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (!qtyInput) return;
@@ -371,13 +450,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const max = Number(qtyInput.max || 999);
       const next = Math.min(Math.max(Number(qtyInput.value || 1) + step, 1), max);
       qtyInput.value = String(next);
+      updateDetailTotal();
     });
+  });
+  qtyInput?.addEventListener('input', () => {
+    const max = Number(qtyInput.max || 999);
+    const value = Math.min(Math.max(Number(qtyInput.value || 1), 1), max);
+    qtyInput.value = String(value);
+    updateDetailTotal();
   });
   document.querySelectorAll('.js-variant-option').forEach((option) => {
     option.addEventListener('click', () => {
       document.querySelectorAll('.js-variant-option').forEach((node) => node.classList.remove('active'));
       option.classList.add('active');
-      const variantInput = document.getElementById('variantIdInput');
       if (variantInput) variantInput.value = option.dataset.variantId || '';
       const stockLabel = document.getElementById('variantStockLabel');
       const stock = Number(option.dataset.stock || 0);
@@ -387,12 +472,26 @@ document.addEventListener('DOMContentLoaded', () => {
         stockLabel.classList.toggle('text-success', stock > 0);
       }
       const addButton = document.getElementById('addToCartButton');
-      if (addButton) addButton.disabled = stock <= 0;
-      if (qtyInput) qtyInput.max = String(Math.max(stock, 1));
-      const price = document.getElementById('detailPrice');
-      if (price && option.dataset.price) price.textContent = `৳${option.dataset.price}`;
+      if (addButton) {
+        addButton.disabled = stock <= 0;
+        addButton.textContent = stock > 0 ? 'Add to Cart' : 'Out of Stock';
+      }
+      if (qtyInput) {
+        qtyInput.max = String(Math.max(stock, 1));
+        qtyInput.value = String(Math.min(Math.max(Number(qtyInput.value || 1), 1), Math.max(stock, 1)));
+      }
+      if (detailSku) detailSku.textContent = option.dataset.sku || detailSku.textContent;
+      if (detailPrice && option.dataset.price) {
+        detailPrice.dataset.currentPrice = option.dataset.price;
+        detailPrice.textContent = money(option.dataset.price);
+      }
+      updateDetailTotal();
     });
   });
+  if (detailPrice && !detailPrice.dataset.currentPrice) {
+    detailPrice.dataset.currentPrice = detailPrice.dataset.basePrice || '0.00';
+  }
+  updateDetailTotal();
 
   const productSlug = window.location.pathname.split('/').filter(Boolean).slice(-1)[0];
   if (window.location.pathname.includes('/product/') && productSlug) {
