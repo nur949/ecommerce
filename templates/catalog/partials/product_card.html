@@ -1,56 +1,59 @@
-<article class="group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-panel" data-aos="fade-up">
-  <div class="relative overflow-hidden bg-[#f5efe8]">
+<article class="product-card-daraz group relative flex h-full flex-col overflow-hidden bg-white transition duration-200 hover:shadow-panel" data-aos="fade-up">
+  <div class="relative overflow-hidden bg-[#f1f5f3]">
     {% if product.compare_at_price %}
-    <div class="absolute left-4 top-4 z-10 rounded-full bg-rosewood px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">Sale</div>
+    <div class="absolute left-2 top-2 z-10 rounded bg-[#f85606] px-2 py-0.5 text-[10px] font-bold uppercase text-white">Sale</div>
     {% elif not product.is_orderable %}
-    <div class="absolute left-4 top-4 z-10 rounded-full bg-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">Sold out</div>
+    <div class="absolute left-2 top-2 z-10 rounded bg-ink px-2 py-0.5 text-[10px] font-bold uppercase text-white">Sold out</div>
     {% endif %}
-    <a href="{{ product.get_absolute_url }}" class="block aspect-[4/4.8] overflow-hidden">
-      <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" decoding="async">
+    <a href="{{ product.get_absolute_url }}" class="block aspect-square overflow-hidden" aria-label="View {{ product.name }}">
+      <img src="{{ product.primary_image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async">
     </a>
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 translate-y-full p-4 opacity-0 transition duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
-      <div class="flex items-center gap-2 rounded-[24px] border border-white/80 bg-white/95 p-2 shadow-soft backdrop-blur">
-        {% if product.variants.exists %}
-        <a href="{{ product.get_absolute_url }}" class="inline-flex flex-1 items-center justify-center rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-rosewood">
-          Choose Options
-        </a>
-        {% else %}
-        <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax flex-1">
-          {% csrf_token %}
-          <input type="hidden" name="quantity" value="1">
-          <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-rosewood" {% if not product.is_orderable %}disabled{% endif %}>
-            {% if product.is_orderable %}Add to Cart{% else %}Out of Stock{% endif %}
-          </button>
-        </form>
-        {% endif %}
-        {% if request.user.is_authenticated %}
-        <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}">
-          {% csrf_token %}
-          <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button type="submit" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-ink transition hover:border-rosewood hover:text-rosewood {% if product.id in wishlist_product_ids %}text-rosewood{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}">
-            <i data-lucide="heart" class="h-4 w-4"></i>
-          </button>
-        </form>
-        {% else %}
-        <a href="{% url 'accounts:login' %}" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-ink transition hover:border-rosewood hover:text-rosewood" aria-label="Login to save {{ product.name }}">
-          <i data-lucide="heart" class="h-4 w-4"></i>
-        </a>
-        {% endif %}
-      </div>
-    </div>
+    {% if request.user.is_authenticated %}
+    <form method="post" action="{% if product.id in wishlist_product_ids %}{% url 'accounts:remove_from_wishlist' product.slug %}{% else %}{% url 'accounts:add_to_wishlist' product.slug %}{% endif %}" class="absolute right-2 top-2 z-10">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606] {% if product.id in wishlist_product_ids %}text-[#f85606]{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Remove {{ product.name }} from wishlist{% else %}Add {{ product.name }} to wishlist{% endif %}">
+        <i data-lucide="heart" class="h-4 w-4"></i>
+      </button>
+    </form>
+    {% else %}
+    <a href="{% url 'accounts:login' %}" class="absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-ink shadow-soft transition hover:text-[#f85606]" aria-label="Login to save {{ product.name }}">
+      <i data-lucide="heart" class="h-4 w-4"></i>
+    </a>
+    {% endif %}
   </div>
-  <div class="flex flex-1 flex-col p-5">
-    <div class="mb-3 flex items-start justify-between gap-3">
-      <div>
-        <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone">{{ product.category.name|default:"Collection" }}</p>
-        <a href="{{ product.get_absolute_url }}" class="mt-2 block text-lg font-semibold leading-6 text-ink transition group-hover:text-rosewood">{{ product.name }}</a>
-      </div>
-      <div class="text-right">
-        <p class="text-lg font-semibold text-ink">&#2547;{{ product.price }}</p>
-        {% if product.compare_at_price %}<small class="text-sm text-stone line-through">&#2547;{{ product.compare_at_price }}</small>{% endif %}
-      </div>
+  <div class="flex flex-1 flex-col p-3">
+    <a href="{{ product.get_absolute_url }}" class="product-card-title block text-sm font-medium leading-5 text-ink transition hover:text-[#f85606]">{{ product.name }}</a>
+    <div class="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+      <p class="text-lg font-bold leading-none text-[#f85606]">&#2547;{{ product.price }}</p>
+      {% if product.compare_at_price %}
+      <small class="text-xs text-stone line-through">&#2547;{{ product.compare_at_price }}</small>
+      {% endif %}
     </div>
-    <p class="mt-auto text-sm text-stone">{{ product.short_description|default:"Curated premium essentials with reliable delivery."|truncatechars:72 }}</p>
+    <div class="mt-2 flex items-center justify-between gap-2 text-xs text-stone">
+      <span class="product-card-meta">{{ product.category.name|default:"Collection" }}</span>
+      {% if product.discount_percentage %}
+      <span class="font-semibold text-[#f85606]">-{{ product.discount_percentage }}%</span>
+      {% endif %}
+    </div>
+    <div class="mt-3 grid grid-cols-[minmax(0,1fr)_36px] gap-2">
+      {% if product.variants.exists %}
+      <a href="{{ product.get_absolute_url }}" class="product-card-action inline-flex min-h-9 items-center justify-center rounded bg-[#f85606] px-2 text-xs font-bold text-white transition hover:bg-[#df4d05]">
+        Choose Options
+      </a>
+      {% else %}
+      <form method="post" action="{% url 'catalog:add_to_cart' product.slug %}" class="js-add-to-cart-ajax">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="product-card-action inline-flex min-h-9 w-full items-center justify-center rounded bg-[#f85606] px-2 text-xs font-bold text-white transition hover:bg-[#df4d05] disabled:cursor-not-allowed disabled:bg-stone/40" {% if not product.is_orderable %}disabled{% endif %}>
+          {% if product.is_orderable %}Add Cart{% else %}Sold Out{% endif %}
+        </button>
+      </form>
+      {% endif %}
+      <a href="{{ product.get_absolute_url }}" class="inline-flex min-h-9 items-center justify-center rounded border border-black/10 bg-white text-ink transition hover:border-[#f85606] hover:text-[#f85606]" aria-label="View details for {{ product.name }}">
+        <i data-lucide="eye" class="h-4 w-4"></i>
+      </a>
+    </div>
   </div>
 </article>

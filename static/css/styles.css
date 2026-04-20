@@ -1284,6 +1284,39 @@ main .page-hero:first-child {
   opacity: 1;
 }
 
+.product-card-daraz {
+  border: 1px solid rgba(25, 20, 23, .08);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(25, 20, 23, .05);
+}
+
+.product-card-daraz:hover {
+  border-color: rgba(248, 86, 6, .35);
+  transform: translateY(-2px);
+}
+
+.product-card-title {
+  display: -webkit-box;
+  min-height: 2.5rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.product-card-meta,
+.product-card-action {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 575px) {
+  .product-card-daraz .product-card-action {
+    min-height: 2rem;
+    font-size: .68rem;
+  }
+}
+
 .form-check-input:checked {
   background-color: var(--trust-color);
   border-color: var(--trust-color);
