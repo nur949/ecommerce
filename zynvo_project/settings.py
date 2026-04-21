@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'core',
     'catalog',
     'accounts',
@@ -211,6 +212,16 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
 PAYMENT_SANDBOX_MODE = os.getenv('PAYMENT_SANDBOX_MODE', 'True').lower() in {'1', 'true', 'yes', 'on'}
 DASHBOARD_STATS_CACHE_SECONDS = int(os.getenv('DASHBOARD_STATS_CACHE_SECONDS', '60'))
 DASHBOARD_STATS_RATE_LIMIT = int(os.getenv('DASHBOARD_STATS_RATE_LIMIT', '60'))
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
 
 LOGGING = {
     'version': 1,

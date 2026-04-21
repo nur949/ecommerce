@@ -95,6 +95,25 @@ DEMO_BLOG_POSTS = [
 
 User = get_user_model()
 
+CATEGORY_ICON_MAP = {
+    'laptop': 'laptop',
+    'notebook': 'laptop',
+    'desktop': 'monitor',
+    'pc': 'monitor',
+    'phone': 'smartphone',
+    'mobile': 'smartphone',
+    'tablet': 'tablet',
+    'monitor': 'monitor',
+    'camera': 'camera',
+    'gaming': 'gamepad-2',
+    'accessories': 'headphones',
+    'router': 'router',
+    'network': 'router',
+    'printer': 'printer',
+    'tv': 'tv',
+    'appliance': 'microwave',
+}
+
 
 def _demo_posts_as_objects():
     posts = []
@@ -134,6 +153,14 @@ def get_category_image(category):
     return DEFAULT_CATEGORY_IMAGE
 
 
+def get_category_icon(category):
+    category_name = (category.name or '').lower()
+    for keyword, icon in CATEGORY_ICON_MAP.items():
+        if keyword in category_name:
+            return icon
+    return 'layout-grid'
+
+
 def home(request):
     sections = get_home_sections()
     popular_categories = list(
@@ -148,12 +175,17 @@ def home(request):
         {
             'category': category,
             'image_url': get_category_image(category),
+            'icon': get_category_icon(category),
             'product_count': category.active_product_count,
             'child_count': category.child_count,
-            'subtitle': category.description[:90] if category.description else 'Curated essentials for daily shopping.',
+            'subtitle': category.description[:90] if category.description else 'Curated tech essentials for daily shopping.',
         }
         for category in popular_categories
     ]
+    featured_products = Product.objects.filter(is_active=True, is_featured=True).select_related('category').order_by('-created_at')[:8]
+    flash_sale_products = Product.objects.filter(is_active=True, is_daily_deal=True).select_related('category').order_by('deal_ends_at', '-created_at')[:6]
+    trending_products = Product.objects.filter(is_active=True, is_trending=True).select_related('category')[:8] or Product.objects.filter(is_active=True).select_related('category')[:8]
+    brands = [value for value in Product.objects.filter(is_active=True).values_list('brand', flat=True).distinct() if value][:10]
     context = {
         'search_form': SearchForm(request.GET or None),
         'home_sections': sections,
@@ -161,15 +193,18 @@ def home(request):
         'hero_right_banners': PromoBanner.objects.filter(group='hero_right', is_active=True)[:3],
         'popular_categories': popular_categories,
         'popular_categories_data': popular_categories_data,
-        'daily_deals': Product.objects.filter(is_active=True, is_daily_deal=True).select_related('category').order_by('-created_at')[:8],
+        'daily_deals': flash_sale_products,
+        'featured_products': featured_products,
+        'flash_sale_products': flash_sale_products,
         'new_collection': Product.objects.filter(is_active=True, is_new=True).select_related('category').order_by('-created_at')[:8],
         'collection_showcase': Product.objects.filter(is_active=True, collection_label__iexact='Signature').select_related('category').order_by('-created_at')[:8] or Product.objects.filter(is_active=True, is_featured=True).select_related('category')[:8],
         'gadget_banners': PromoBanner.objects.filter(group='gadget', is_active=True)[:6],
         'unlimited_banners': PromoBanner.objects.filter(group='unlimited', is_active=True)[:4],
         'blog_posts': BlogPost.objects.filter(is_published=True)[:3],
         'deal_now': timezone.now(),
+        'brand_showcase': brands,
     }
-    context['trending_products'] = Product.objects.filter(is_active=True, is_trending=True).select_related('category')[:4] or Product.objects.filter(is_active=True).select_related('category')[:4]
+    context['trending_products'] = trending_products
     return render(request, 'core/home.html', context)
 
 
@@ -355,7 +390,7 @@ def newsletter_subscribe(request):
     if not created and not subscriber.is_active:
         subscriber.is_active = True
         subscriber.save(update_fields=['is_active'])
-    messages.success(request, 'Thanks for subscribing to beauty updates.')
+    messages.success(request, 'Thanks for subscribing to the latest product drops.')
     return redirect(request.META.get('HTTP_REFERER', reverse('core:home')))
 
 

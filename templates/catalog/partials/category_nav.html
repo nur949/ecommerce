@@ -1,6 +1,4 @@
-<a href="{% url 'catalog:shop' %}" data-category="all" class="block rounded-full px-4 py-2 text-sm {% if not selected_category %}bg-[#e2e8f0] text-ink{% else %}text-stone{% endif %}">All Products</a>
+<a href="{% url 'catalog:shop' %}" data-category="all" class="rounded-full px-4 py-2 text-sm font-bold transition duration-300 {% if not selected_category %}bg-primary text-white{% else %}bg-white text-muted hover:border-primary hover:text-primary{% endif %}">All</a>
 {% for category in categories %}
-<a href="{% url 'catalog:shop' %}?category={{ category.slug }}" data-category="{{ category.slug }}" class="block rounded-full px-4 py-2 text-sm {% if selected_category and selected_category.id == category.id %}bg-[#e2e8f0] text-ink{% else %}text-stone{% endif %}">
-  {{ category.name }}
-</a>
+  <a href="{% url 'catalog:shop' %}?category={{ category.slug }}" data-category="{{ category.slug }}" class="rounded-full border border-line px-4 py-2 text-sm font-bold transition duration-300 {% if selected_category and selected_category.id == category.id %}border-primary bg-primary text-white{% else %}bg-white text-muted hover:border-primary hover:text-primary{% endif %}">{{ category.name }}</a>
 {% endfor %}

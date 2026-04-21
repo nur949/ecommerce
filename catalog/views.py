@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.core.paginator import EmptyPage, Paginator
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count, Max, Min, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -24,6 +24,27 @@ from orders.cart_utils import (
 from .models import Category, Product, ProductReview, ProductVariant, StockAlert
 
 PAGE_SIZE = 16
+
+
+def _parse_specifications(value):
+    rows = []
+    for line in (value or '').splitlines():
+        if ':' not in line:
+            continue
+        label, spec_value = line.split(':', 1)
+        label = label.strip()
+        spec_value = spec_value.strip()
+        if label and spec_value:
+            rows.append({'label': label, 'value': spec_value})
+    return rows
+
+
+def _group_variants(product):
+    grouped = {}
+    for variant in product.variants.all():
+        key = variant.attribute_name or 'Option'
+        grouped.setdefault(key, []).append(variant)
+    return [{'name': name, 'items': items} for name, items in grouped.items()]
 
 
 def _json_body(request):
@@ -176,6 +197,7 @@ def shop(request):
         page_obj = paginator.page(paginator.num_pages)
     categories = Category.objects.filter(parent__isnull=True).prefetch_related('children')
     brands = sorted(value for value in Product.objects.filter(is_active=True).values_list('brand', flat=True).distinct() if value)
+    price_bounds = Product.objects.filter(is_active=True).aggregate(min_price=Min('price'), max_price=Max('price'))
     context = {
         'products': page_obj.object_list,
         'page_obj': page_obj,
@@ -190,6 +212,8 @@ def shop(request):
         'max_price': (request.GET.get('max_price') or '').strip(),
         'active_sort': sort,
         'product_count': paginator.count,
+        'price_min_bound': price_bounds['min_price'] or 0,
+        'price_max_bound': price_bounds['max_price'] or 0,
     }
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse(
@@ -222,6 +246,7 @@ def product_detail(request, slug):
     reviews = product.reviews.filter(is_approved=True).select_related('user')[:10]
     average_rating = product.reviews.filter(is_approved=True).aggregate(value=Avg('rating'))['value'] or 0
     review_count = product.reviews.filter(is_approved=True).count()
+    urgency_stock = selected_variant.stock if selected_variant else product.stock
     return render(
         request,
         'catalog/product_detail.html',
@@ -232,6 +257,9 @@ def product_detail(request, slug):
             'reviews': reviews,
             'average_rating': round(average_rating, 1),
             'review_count': review_count,
+            'specification_rows': _parse_specifications(product.specifications),
+            'variant_groups': _group_variants(product),
+            'urgency_stock': urgency_stock,
         },
     )
 

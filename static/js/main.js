@@ -1,82 +1,161 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
-  const refreshIcons = () => {
-    if (window.lucide) window.lucide.createIcons();
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+
+  const refreshIcons = () => window.lucide && window.lucide.createIcons();
+
+  const toastRegion = (() => {
+    let region = document.querySelector('.ajax-toast-region');
+    if (!region) {
+      region = document.createElement('div');
+      region.className = 'ajax-toast-region';
+      document.body.appendChild(region);
+    }
+    return region;
+  })();
+
+  const notify = (message, isError = false) => {
+    if (!message) return;
+    const toast = document.createElement('div');
+    toast.className = `ajax-toast${isError ? ' bg-red-600' : ''}`;
+    toast.textContent = message;
+    toastRegion.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('is-visible'));
+    setTimeout(() => {
+      toast.classList.remove('is-visible');
+      setTimeout(() => toast.remove(), 300);
+    }, 2200);
   };
 
   if (window.Swiper) {
     document.querySelectorAll('[data-hero-slider]').forEach((slider) => {
       if (slider.swiper) return;
-      new window.Swiper(slider, {
+      const thumbButtons = slider.parentElement?.querySelectorAll('[data-hero-thumb]') || [];
+      const progressBar = slider.querySelector('.hero-progress-bar');
+      const swiper = new window.Swiper(slider, {
         loop: slider.querySelectorAll('.swiper-slide').length > 1,
-        speed: 850,
-        effect: 'fade',
-        fadeEffect: {crossFade: true},
-        autoplay: {
-          delay: 5200,
-          disableOnInteraction: false,
-        },
-        pagination: {
-          el: slider.querySelector('.swiper-pagination'),
-          clickable: true,
+        speed: 700,
+        autoplay: { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true },
+        pagination: { el: slider.querySelector('.swiper-pagination'), clickable: true },
+        navigation: {
+          nextEl: slider.querySelector('.hero-slider-next'),
+          prevEl: slider.querySelector('.hero-slider-prev'),
         },
       });
+      const updateHeroUi = () => {
+        const total = Math.max(thumbButtons.length || swiper.slides.length - swiper.loopedSlides * 2, 1);
+        const current = ((swiper.realIndex || 0) % total + total) % total;
+        thumbButtons.forEach((button, index) => {
+          button.classList.toggle('is-active', index === current);
+        });
+        if (progressBar) {
+          progressBar.style.width = `${((current + 1) / total) * 100}%`;
+        }
+      };
+      thumbButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          swiper.slideToLoop(Number(button.dataset.heroThumb || 0));
+        });
+      });
+      swiper.on('slideChange', updateHeroUi);
+      updateHeroUi();
     });
   }
 
-  const miniCartPanel = document.getElementById('miniCartPanel');
-  const miniCartBackdrop = document.getElementById('miniCartBackdrop');
-  const miniCartToggles = () => document.querySelectorAll('.js-mini-cart-toggle');
-  const accountMenuWrap = document.getElementById('accountMenuWrap');
   const accountMenuToggle = document.getElementById('accountMenuToggle');
   const accountMenuPanel = document.getElementById('accountMenuPanel');
-
-  const openMiniCart = () => {
-    if (!miniCartPanel) return;
-    miniCartPanel.classList.remove('d-none');
-    miniCartBackdrop?.classList.remove('d-none');
-    requestAnimationFrame(() => {
-      miniCartPanel.classList.add('is-open');
-      miniCartBackdrop?.classList.add('is-open');
-    });
-  };
-  const closeMiniCart = () => {
-    if (!miniCartPanel) return;
-    miniCartPanel.classList.remove('is-open');
-    miniCartBackdrop?.classList.remove('is-open');
-    setTimeout(() => {
-      miniCartPanel.classList.add('d-none');
-      miniCartBackdrop?.classList.add('d-none');
-    }, 220);
-  };
-  const setAccountMenuOpen = (open) => {
+  const accountMenuWrap = document.getElementById('accountMenuWrap');
+  const setAccountMenu = (open) => {
     if (!accountMenuToggle || !accountMenuPanel) return;
+    accountMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     accountMenuPanel.classList.toggle('pointer-events-none', !open);
     accountMenuPanel.classList.toggle('pointer-events-auto', open);
     accountMenuPanel.classList.toggle('opacity-0', !open);
     accountMenuPanel.classList.toggle('opacity-100', open);
     accountMenuPanel.classList.toggle('translate-y-2', !open);
     accountMenuPanel.classList.toggle('translate-y-0', open);
-    accountMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   };
-  const closeAccountMenu = () => setAccountMenuOpen(false);
+  accountMenuToggle?.addEventListener('click', (event) => {
+    event.preventDefault();
+    setAccountMenu(accountMenuToggle.getAttribute('aria-expanded') !== 'true');
+  });
+  document.addEventListener('click', (event) => {
+    if (accountMenuWrap && !accountMenuWrap.contains(event.target)) setAccountMenu(false);
+  });
 
-  const replaceMiniCart = (html) => {
-    if (!html || !miniCartPanel) return;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const incoming = doc.getElementById('miniCartPanel');
-    if (!incoming) return;
-    miniCartPanel.innerHTML = incoming.innerHTML;
-    refreshIcons();
+  const megaToggle = document.getElementById('megaMenuToggle');
+  const megaPanel = document.getElementById('megaMenuPanel');
+  const megaWrap = megaToggle?.closest('.group');
+  const setMegaMenu = (open) => {
+    if (!megaToggle || !megaPanel) return;
+    megaToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    megaPanel.classList.toggle('pointer-events-none', !open);
+    megaPanel.classList.toggle('pointer-events-auto', open);
+    megaPanel.classList.toggle('opacity-0', !open);
+    megaPanel.classList.toggle('opacity-100', open);
+    megaPanel.classList.toggle('translate-y-2', !open);
+    megaPanel.classList.toggle('translate-y-0', open);
   };
+  megaToggle?.addEventListener('click', (event) => {
+    event.preventDefault();
+    setMegaMenu(megaToggle.getAttribute('aria-expanded') !== 'true');
+  });
+  document.addEventListener('click', (event) => {
+    if (megaWrap && !megaWrap.contains(event.target)) setMegaMenu(false);
+  });
 
-  const updateMiniCartBadge = (count) => {
-    miniCartToggles().forEach((toggle) => {
+  const mobileNavToggle = document.getElementById('mobileNavToggle');
+  const mobileNavPanel = document.getElementById('mobileNavPanel');
+  mobileNavToggle?.addEventListener('click', () => {
+    mobileNavPanel?.classList.toggle('hidden');
+  });
+
+  const searchInput = document.getElementById('instantSearchInput');
+  const searchSuggestions = document.getElementById('instantSearchSuggestions');
+  let searchTimer = null;
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async () => {
+      const q = (searchInput.value || '').trim();
+      if (!searchSuggestions) return;
+      if (!q) {
+        searchSuggestions.innerHTML = '';
+        searchSuggestions.classList.add('hidden');
+        return;
+      }
+      try {
+        const res = await fetch(`/api/search/suggest/?q=${encodeURIComponent(q)}`, { credentials: 'same-origin' });
+        const data = await res.json();
+        searchSuggestions.innerHTML = (data.results || []).map((item) => (
+          `<a href="${item.url}" class="block rounded-lg px-3 py-2 transition hover:bg-slate-50">
+            <div class="text-sm font-semibold text-slate-900">${item.label}</div>
+            <div class="text-xs text-slate-500">${item.subtext || ''}</div>
+          </a>`
+        )).join('') || '<div class="px-3 py-2 text-sm text-slate-500">No suggestions found.</div>';
+        searchSuggestions.classList.remove('hidden');
+      } catch (_) {
+        searchSuggestions.innerHTML = '<div class="px-3 py-2 text-sm text-red-500">Search unavailable.</div>';
+        searchSuggestions.classList.remove('hidden');
+      }
+    }, 180);
+  });
+  document.addEventListener('click', (event) => {
+    if (searchSuggestions && !searchSuggestions.contains(event.target) && event.target !== searchInput) {
+      searchSuggestions.classList.add('hidden');
+    }
+  });
+  document.getElementById('mobileSearchToggle')?.addEventListener('click', () => searchInput?.focus());
+
+  const money = (value) => `\u09F3${value || '0.00'}`;
+
+  const updateCartBadge = (count) => {
+    document.querySelectorAll('a[href="/orders/cart/"]').forEach((toggle) => {
       let badge = toggle.querySelector('.badge');
       if (count > 0) {
         if (!badge) {
           badge = document.createElement('span');
-          badge.className = 'badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-white';
+          badge.className = 'badge absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white';
           toggle.appendChild(badge);
         }
         badge.textContent = String(count);
@@ -86,178 +165,120 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const money = (value) => `\u09F3${value || '0.00'}`;
-
   const updateCartSummary = (data) => {
     const totals = data?.cart_totals || {};
     const setText = (selector, value) => {
-      const node = document.querySelector(selector);
-      if (node) node.textContent = value;
+      document.querySelectorAll(selector).forEach((node) => { node.textContent = value; });
     };
-    setText('.cart-subtotal-value', money(totals.subtotal || data?.cart_subtotal));
-    setText('.cart-coupon-discount-value', `-${money(totals.coupon_discount)}`);
-    setText('.cart-reward-discount-value', `-${money(totals.reward_discount)}`);
-    setText('.cart-total-value', money(totals.total));
-    setText('.cart-free-delivery-remaining', money(totals.free_delivery_remaining));
+    if (totals.subtotal || data?.cart_subtotal) setText('.cart-subtotal-value', money(totals.subtotal || data.cart_subtotal));
+    if (typeof totals.coupon_discount !== 'undefined') setText('.cart-coupon-discount-value', `-${money(totals.coupon_discount)}`);
+    if (typeof totals.reward_discount !== 'undefined') setText('.cart-reward-discount-value', `-${money(totals.reward_discount)}`);
+    if (typeof totals.total !== 'undefined') setText('.cart-total-value', money(totals.total));
+    if (typeof totals.free_delivery_remaining !== 'undefined') setText('.cart-free-delivery-remaining', money(totals.free_delivery_remaining));
   };
 
-  miniCartToggles().forEach((btn) => btn.addEventListener('click', (e) => {
-    if (!miniCartPanel) return;
-    e.preventDefault();
-    if (miniCartPanel?.classList.contains('is-open')) closeMiniCart();
-    else openMiniCart();
-  }));
-  miniCartBackdrop?.addEventListener('click', closeMiniCart);
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('#miniCartClose')) closeMiniCart();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeMiniCart();
-      closeSearchOverlay();
-      closeMobileNav();
-      setMegaMenuOpen(false);
-      closeAccountMenu();
-    }
-  });
-
-  accountMenuToggle?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const open = accountMenuToggle.getAttribute('aria-expanded') !== 'true';
-    setAccountMenuOpen(open);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!accountMenuWrap?.contains(e.target)) closeAccountMenu();
-  });
-
-  const notify = (message) => {
-    if (!message) return;
-    let box = document.getElementById('cartNotice');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'cartNotice';
-      box.className = 'cart-notice';
-      document.body.appendChild(box);
-    }
-    box.textContent = message;
-    box.classList.add('is-visible');
-    clearTimeout(box.timer);
-    box.timer = setTimeout(() => box.classList.remove('is-visible'), 2000);
-  };
-
-  document.addEventListener('submit', async (e) => {
-    const form = e.target.closest('form.js-add-to-cart-ajax');
+  document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form.js-add-to-cart-ajax');
     if (!form) return;
-    e.preventDefault();
+    event.preventDefault();
     const button = form.querySelector("button[type='submit']");
-    const formData = new FormData(form);
-    if (button) button.disabled = true;
+    button && (button.disabled = true);
     try {
       const res = await fetch(form.action, {
         method: 'POST',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
-        body: formData,
+        body: new FormData(form),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error();
-      replaceMiniCart(data.mini_cart_html);
-      updateMiniCartBadge(Number(data.cart_count || 0));
-      openMiniCart();
+      if (!data.ok) throw new Error('cart add failed');
+      updateCartBadge(Number(data.cart_count || 0));
+      updateCartSummary(data);
       notify(data.message || 'Added to cart.');
     } catch (_) {
       form.submit();
     } finally {
-      if (button) button.disabled = false;
+      button && (button.disabled = false);
     }
   });
 
-  document.addEventListener('change', async (e) => {
-    const input = e.target.closest('.cart-qty-input');
+  document.addEventListener('change', async (event) => {
+    const input = event.target.closest('.cart-qty-input');
     if (!input) return;
     const form = input.closest('form.js-cart-update-form');
     if (!form) return;
-    const line = form.closest('.cart-line');
     try {
       const res = await fetch(form.action, {
         method: 'POST',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
         body: new FormData(form),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error();
-      if (Number(data.item_quantity || 0) <= 0) {
-        line?.remove();
-      } else {
-        input.value = String(data.item_quantity);
-        line?.querySelector('.cart-line-total') && (line.querySelector('.cart-line-total').textContent = money(data.item_total));
-      }
-      replaceMiniCart(data.mini_cart_html);
-      updateMiniCartBadge(Number(data.cart_count || 0));
+      if (!data.ok) throw new Error('cart update failed');
+      const line = form.closest('.cart-line');
+      if (Number(data.item_quantity || 0) <= 0) line?.remove();
+      const totalNode = line?.querySelector('.cart-line-total');
+      if (totalNode && data.item_total) totalNode.textContent = money(data.item_total);
+      updateCartBadge(Number(data.cart_count || 0));
       updateCartSummary(data);
     } catch (_) {
       form.submit();
     }
   });
 
-  document.addEventListener('submit', async (e) => {
-    const form = e.target.closest('form.js-cart-remove-form');
+  document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form.js-cart-remove-form');
     if (!form) return;
-    e.preventDefault();
-    const line = form.closest('.cart-line');
+    event.preventDefault();
     try {
       const res = await fetch(form.action, {
         method: 'POST',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
         body: new FormData(form),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error();
-      line?.remove();
-      replaceMiniCart(data.mini_cart_html);
-      updateMiniCartBadge(Number(data.cart_count || 0));
+      if (!data.ok) throw new Error('cart remove failed');
+      form.closest('.cart-line')?.remove();
+      updateCartBadge(Number(data.cart_count || 0));
       updateCartSummary(data);
       notify('Item removed from cart.');
-      if (Number(data.cart_count || 0) <= 0) window.location.reload();
+      if (Number(data.cart_count || 0) <= 0 && document.body.contains(document.querySelector('[data-cart-content]'))) {
+        window.location.reload();
+      }
     } catch (_) {
       form.submit();
     }
   });
 
-  const updateWishlistBadge = (count) => {
-    document.querySelectorAll('.js-wishlist-link').forEach((link) => {
-      let badge = link.querySelector('.js-wishlist-badge');
-      if (count > 0) {
-        if (!badge) {
-          badge = document.createElement('span');
-          badge.className = 'js-wishlist-badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-white';
-          link.appendChild(badge);
-        }
-        badge.textContent = String(count);
-      } else {
-        badge?.remove();
-      }
-    });
-  };
-
-  document.addEventListener('submit', async (e) => {
-    const form = e.target.closest('form.js-wishlist-ajax');
+  document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form.js-wishlist-ajax');
     if (!form) return;
-    e.preventDefault();
+    event.preventDefault();
     try {
       const res = await fetch(form.action, {
         method: 'POST',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
         body: new FormData(form),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error();
-      updateWishlistBadge(Number(data.wishlist_count || 0));
+      if (!data.ok) throw new Error('wishlist failed');
+      document.querySelectorAll('.js-wishlist-link').forEach((link) => {
+        let badge = link.querySelector('.js-wishlist-badge');
+        const count = Number(data.wishlist_count || 0);
+        if (count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'js-wishlist-badge absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-white';
+            link.appendChild(badge);
+          }
+          badge.textContent = String(count);
+        } else {
+          badge?.remove();
+        }
+      });
       notify(data.message || 'Wishlist updated.');
       window.location.reload();
     } catch (_) {
@@ -269,386 +290,150 @@ document.addEventListener('DOMContentLoaded', () => {
   const shopGrid = document.getElementById('shopProductGrid');
   const shopNav = document.getElementById('shopCategoryNav');
   const shopCount = document.getElementById('shopProductCount');
-  const status = document.getElementById('shopResultsStatus');
-  let nextPage = null;
-  let loadingMore = false;
+  const shopStatus = document.getElementById('shopResultsStatus');
 
   const fetchShop = async (append = false, page = 1) => {
     if (!shopForm || !shopGrid) return;
     const params = new URLSearchParams(new FormData(shopForm));
     params.set('page', String(page));
-    status && (status.textContent = 'Loading products...');
-    if (!append) {
-      shopGrid.classList.add('is-loading');
-      shopGrid.setAttribute('aria-busy', 'true');
+    shopGrid.classList.add('is-loading');
+    shopStatus && (shopStatus.textContent = 'Loading products...');
+    try {
+      const res = await fetch(`${shopForm.action}?${params.toString()}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error('shop fetch failed');
+      if (append) {
+        const doc = new DOMParser().parseFromString(data.html, 'text/html');
+        const incomingCards = doc.querySelectorAll('#shopProductsGrid > *');
+        const target = shopGrid.querySelector('#shopProductsGrid');
+        incomingCards.forEach((node) => target?.appendChild(node));
+        shopGrid.querySelector('.js-load-more-products')?.remove();
+        doc.querySelector('.js-load-more-products') && shopGrid.appendChild(doc.querySelector('.js-load-more-products'));
+      } else {
+        shopGrid.innerHTML = data.html;
+      }
+      if (shopNav && data.nav_html) shopNav.innerHTML = data.nav_html;
+      if (shopCount) shopCount.textContent = `${data.count} products`;
+      shopStatus && (shopStatus.textContent = '');
+      refreshIcons();
+    } finally {
+      shopGrid.classList.remove('is-loading');
     }
-    const res = await fetch(`${shopForm.action}?${params.toString()}`, {
-      headers: {'X-Requested-With': 'XMLHttpRequest'},
-      credentials: 'same-origin',
-    });
-    const data = await res.json();
-    if (!data.ok) return;
-    if (shopNav && data.nav_html) {
-      shopNav.innerHTML = data.nav_html;
-    }
-    if (append) {
-      const doc = new DOMParser().parseFromString(data.html, 'text/html');
-      const cards = doc.querySelectorAll('#shopProductsGrid > div');
-      const container = shopGrid.querySelector('#shopProductsGrid');
-      cards.forEach((card) => container?.appendChild(card));
-      const moreBtn = shopGrid.querySelector('.js-load-more-products');
-      if (moreBtn) moreBtn.remove();
-      const incomingMore = doc.querySelector('.js-load-more-products');
-      if (incomingMore) shopGrid.appendChild(incomingMore);
-    } else {
-      shopGrid.innerHTML = data.html;
-    }
-    shopCount && (shopCount.textContent = `${data.count} products`);
-    nextPage = data.next_page;
-    status && (status.textContent = '');
-    shopGrid.classList.remove('is-loading');
-    shopGrid.setAttribute('aria-busy', 'false');
-    refreshIcons();
   };
 
   if (shopForm && shopGrid) {
-    ['change', 'input'].forEach((eventName) => {
-      shopForm.addEventListener(eventName, (e) => {
-        const target = e.target;
-        if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
-        if (target.name === 'q' && eventName === 'input') return;
-        fetchShop(false, 1);
-      });
-    });
-    const searchInput = document.getElementById('shopSearch');
-    let searchTimer = null;
-    searchInput?.addEventListener('input', () => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => fetchShop(false, 1), 350);
-    });
-    shopForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    shopForm.addEventListener('submit', (event) => {
+      event.preventDefault();
       fetchShop(false, 1);
     });
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.js-load-more-products');
-      if (!btn || loadingMore) return;
-      loadingMore = true;
-      btn.disabled = true;
-      const page = Number(btn.dataset.nextPage || nextPage || 2);
-      await fetchShop(true, page);
-      loadingMore = false;
+    shopForm.addEventListener('change', (event) => {
+      const target = event.target;
+      if (target.matches('input, select')) fetchShop(false, 1);
+    });
+    let debounceTimer = null;
+    document.getElementById('shopSearch')?.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchShop(false, 1), 260);
+    });
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('.js-load-more-products');
+      if (!button) return;
+      fetchShop(true, Number(button.dataset.nextPage || 2));
     });
   }
-
-  const mobileToggle = document.getElementById('mobileNavToggle');
-  const mobilePanel = document.getElementById('mobileNavPanel');
-  const mobileAccountToggle = document.getElementById('mobileAccountToggle');
-  const mobileAccountPanel = document.getElementById('mobileAccountPanel');
-  const closeMobileNav = () => {
-    mobilePanel?.classList.add('hidden');
-    mobilePanel?.classList.remove('is-open');
-    mobileToggle?.setAttribute('aria-expanded', 'false');
-    mobileCategoriesPanel?.classList.add('hidden');
-    mobileCategoriesToggle?.setAttribute('aria-expanded', 'false');
-    mobileAccountPanel?.classList.add('hidden');
-    mobileAccountToggle?.setAttribute('aria-expanded', 'false');
-  };
-  mobileToggle?.addEventListener('click', () => {
-    const open = mobilePanel?.classList.contains('hidden');
-    mobilePanel?.classList.toggle('hidden', !open);
-    mobilePanel?.classList.toggle('is-open', !!open);
-    mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-
-  const megaMenuWrap = document.getElementById('megaMenuWrap');
-  const megaMenuToggle = document.getElementById('megaMenuToggle');
-  const megaMenuPanel = document.getElementById('megaMenuPanel');
-  const megaCategoriesList = document.getElementById('megaCategoriesList');
-  const mobileCategoriesToggle = document.getElementById('mobileCategoriesToggle');
-  const mobileCategoriesPanel = document.getElementById('mobileCategoriesPanel');
-  const mobileCategoriesList = document.getElementById('mobileCategoriesList');
-  let categoriesLoaded = false;
-  let categoriesLoading = false;
-
-  const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  }[char]));
-
-  const renderDesktopCategories = (items) => {
-    if (!megaCategoriesList) return;
-    megaCategoriesList.innerHTML = items.map((category) => {
-      const children = (category.children || []).map((child) => (
-        `<a href="/category/${encodeURIComponent(child.slug)}/" class="text-sm text-stone transition hover:text-rosewood">${escapeHtml(child.name)}</a>`
-      )).join('');
-      return `
-        <div>
-          <a href="/category/${encodeURIComponent(category.slug)}/" class="text-sm font-bold uppercase tracking-[0.16em] text-ink">${escapeHtml(category.name)}</a>
-          <div class="mt-3 grid gap-2">
-            ${children || '<span class="text-sm text-stone">No sub-categories</span>'}
-          </div>
-        </div>
-      `;
-    }).join('');
-  };
-
-  const renderMobileCategories = (items) => {
-    if (!mobileCategoriesList) return;
-    mobileCategoriesList.innerHTML = items.map((category) => {
-      const children = (category.children || []).map((child) => (
-        `<a href="/category/${encodeURIComponent(child.slug)}/" class="ml-3 rounded-xl px-3 py-2 text-sm text-stone transition hover:bg-white hover:text-rosewood">${escapeHtml(child.name)}</a>`
-      )).join('');
-      return `
-        <div class="grid gap-1">
-          <a href="/category/${encodeURIComponent(category.slug)}/" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">${escapeHtml(category.name)}</a>
-          ${children}
-        </div>
-      `;
-    }).join('');
-  };
-
-  const loadCategories = async () => {
-    if (categoriesLoaded || categoriesLoading) return;
-    const apiUrl = megaCategoriesList?.dataset.url || mobileCategoriesList?.dataset.url;
-    if (!apiUrl) return;
-    categoriesLoading = true;
-    try {
-      const res = await fetch(apiUrl, {credentials: 'same-origin'});
-      const data = await res.json();
-      if (!data.ok) throw new Error('Category load failed');
-      const items = data.results || [];
-      if (!items.length) {
-        if (megaCategoriesList) megaCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
-        if (mobileCategoriesList) mobileCategoriesList.innerHTML = '<div class="text-sm text-stone">No categories found.</div>';
-        categoriesLoaded = true;
-        return;
-      }
-      renderDesktopCategories(items);
-      renderMobileCategories(items);
-      categoriesLoaded = true;
-      refreshIcons();
-    } catch (_) {
-      if (megaCategoriesList) megaCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
-      if (mobileCategoriesList) mobileCategoriesList.innerHTML = '<div class="text-sm text-red-600">Failed to load categories.</div>';
-    } finally {
-      categoriesLoading = false;
-    }
-  };
-
-  const setMegaMenuOpen = (open) => {
-    if (!megaMenuPanel || !megaMenuToggle) return;
-    megaMenuPanel.classList.toggle('pointer-events-none', !open);
-    megaMenuPanel.classList.toggle('pointer-events-auto', open);
-    megaMenuPanel.classList.toggle('opacity-0', !open);
-    megaMenuPanel.classList.toggle('opacity-100', open);
-    megaMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) loadCategories();
-  };
-
-  megaMenuWrap?.addEventListener('mouseenter', () => loadCategories());
-  megaMenuToggle?.addEventListener('focus', () => loadCategories());
-  megaMenuToggle?.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isOpen = megaMenuToggle.getAttribute('aria-expanded') === 'true';
-    setMegaMenuOpen(!isOpen);
-  });
-  document.addEventListener('click', (e) => {
-    if (!megaMenuWrap?.contains(e.target)) setMegaMenuOpen(false);
-  });
-
-  mobileCategoriesToggle?.addEventListener('click', () => {
-    const open = mobileCategoriesPanel?.classList.contains('hidden');
-    mobileCategoriesPanel?.classList.toggle('hidden', !open);
-    mobileCategoriesToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) loadCategories();
-  });
-
-  mobileAccountToggle?.addEventListener('click', () => {
-    const open = mobileAccountPanel?.classList.contains('hidden');
-    mobileAccountPanel?.classList.toggle('hidden', !open);
-    mobileAccountToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchToggle = document.getElementById('searchOverlayToggle');
-  const mobileSearchToggle = document.getElementById('mobileSearchToggle');
-  const searchClose = document.getElementById('searchOverlayClose');
-  const searchInput = document.getElementById('instantSearchInput');
-  const searchSuggestions = document.getElementById('instantSearchSuggestions');
-  const recentWrap = document.getElementById('recentSearches');
-  const recentKey = 'beauty_recent_searches_v1';
-  const getRecent = () => {
-    try {
-      return JSON.parse(localStorage.getItem(recentKey) || '[]');
-    } catch (_) {
-      return [];
-    }
-  };
-  const setRecent = (values) => localStorage.setItem(recentKey, JSON.stringify(values.slice(0, 6)));
-  const renderRecent = () => {
-    if (!recentWrap) return;
-    const items = getRecent();
-    recentWrap.innerHTML = '';
-    items.forEach((term) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-ink';
-      button.textContent = term;
-      button.addEventListener('click', () => {
-        if (searchInput) searchInput.value = term;
-        window.location.href = `/shop/?q=${encodeURIComponent(term)}`;
-      });
-      recentWrap.appendChild(button);
-    });
-  };
-  const openSearchOverlay = () => {
-    searchOverlay?.classList.remove('hidden');
-    renderRecent();
-    searchInput?.focus();
-  };
-  const closeSearchOverlay = () => searchOverlay?.classList.add('hidden');
-  searchToggle?.addEventListener('click', openSearchOverlay);
-  mobileSearchToggle?.addEventListener('click', () => {
-    closeMobileNav();
-    openSearchOverlay();
-  });
-  searchClose?.addEventListener('click', closeSearchOverlay);
-  searchOverlay?.addEventListener('click', (e) => {
-    if (e.target === searchOverlay) closeSearchOverlay();
-  });
-
-  let suggestTimer = null;
-  searchInput?.addEventListener('input', () => {
-    clearTimeout(suggestTimer);
-    suggestTimer = setTimeout(async () => {
-      const q = (searchInput.value || '').trim();
-      if (!q || !searchSuggestions) {
-        if (searchSuggestions) searchSuggestions.innerHTML = '';
-        return;
-      }
-      const res = await fetch(`/api/search/suggest/?q=${encodeURIComponent(q)}`, {credentials: 'same-origin'});
-      const data = await res.json();
-      searchSuggestions.innerHTML = '';
-      (data.results || []).forEach((item) => {
-        const link = document.createElement('a');
-        link.href = item.url;
-        link.className = 'block rounded-[12px] border border-black/10 px-3 py-2 hover:bg-[#f8fafc]';
-        const label = document.createElement('div');
-        label.className = 'text-sm font-semibold text-ink';
-        label.textContent = item.label || '';
-        const subtext = document.createElement('div');
-        subtext.className = 'text-xs text-stone';
-        subtext.textContent = item.subtext || '';
-        link.append(label, subtext);
-        link.addEventListener('click', () => {
-          const recent = [q, ...getRecent().filter((v) => v !== q)];
-          setRecent(recent);
-        });
-        searchSuggestions.appendChild(link);
-      });
-    }, 220);
-  });
-
-  searchInput?.closest('form')?.addEventListener('submit', () => {
-    const q = (searchInput.value || '').trim();
-    if (!q) return;
-    setRecent([q, ...getRecent().filter((v) => v !== q)]);
-  });
 
   const detailImage = document.querySelector('.detail-main-image');
   document.querySelectorAll('.detail-thumb').forEach((thumb) => {
     thumb.addEventListener('click', () => {
-      if (!detailImage) return;
-      detailImage.src = thumb.src;
-      document.querySelectorAll('.detail-thumb').forEach((node) => node.classList.remove('active-thumb'));
-      thumb.classList.add('active-thumb');
+      const image = thumb.querySelector('img');
+      if (!detailImage || !image) return;
+      detailImage.src = image.src;
+      document.querySelectorAll('.detail-thumb').forEach((node) => node.classList.remove('active-thumb', 'border-primary'));
+      thumb.classList.add('active-thumb', 'border-primary');
     });
   });
 
   const qtyInput = document.querySelector('.js-detail-quantity');
   const detailPrice = document.getElementById('detailPrice');
   const detailTotalPrice = document.getElementById('detailTotalPrice');
-  const detailSku = document.getElementById('detailSku');
+  const mobileDetailTotal = document.getElementById('mobileDetailTotalPrice');
   const variantInput = document.getElementById('variantIdInput');
+  const detailSku = document.getElementById('detailSku');
+  const stockLabel = document.getElementById('variantStockLabel');
+  const addToCartButton = document.getElementById('addToCartButton');
+
   const updateDetailTotal = () => {
-    if (!detailPrice || !detailTotalPrice || !qtyInput) return;
+    if (!qtyInput || !detailPrice || !detailTotalPrice) return;
     const unitPrice = Number(detailPrice.dataset.currentPrice || detailPrice.dataset.basePrice || 0);
     const quantity = Math.max(Number(qtyInput.value || 1), 1);
     const total = money((unitPrice * quantity).toFixed(2));
     detailTotalPrice.textContent = total;
-    const mobileTotal = document.getElementById('mobileDetailTotalPrice');
-    if (mobileTotal) mobileTotal.textContent = total;
+    if (mobileDetailTotal) mobileDetailTotal.textContent = total;
   };
-  document.querySelectorAll('.js-qty-button').forEach((btn) => {
-    btn.addEventListener('click', () => {
+
+  document.querySelectorAll('.js-qty-button').forEach((button) => {
+    button.addEventListener('click', () => {
       if (!qtyInput) return;
-      const step = Number(btn.dataset.step || 0);
-      const max = Number(qtyInput.max || 999);
+      const step = Number(button.dataset.step || 0);
+      const max = Number(qtyInput.max || 99);
       const next = Math.min(Math.max(Number(qtyInput.value || 1) + step, 1), max);
       qtyInput.value = String(next);
       updateDetailTotal();
     });
   });
-  qtyInput?.addEventListener('input', () => {
-    const max = Number(qtyInput.max || 999);
-    const value = Math.min(Math.max(Number(qtyInput.value || 1), 1), max);
-    qtyInput.value = String(value);
-    updateDetailTotal();
-  });
-  document.querySelectorAll('.js-variant-option').forEach((option) => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.js-variant-option').forEach((node) => node.classList.remove('active'));
-      option.classList.add('active');
-      if (variantInput) variantInput.value = option.dataset.variantId || '';
-      const stockLabel = document.getElementById('variantStockLabel');
-      const stock = Number(option.dataset.stock || 0);
-      if (stockLabel) {
-        stockLabel.textContent = stock > 0 ? `${stock} available` : 'Out of stock';
-        stockLabel.classList.toggle('text-danger', stock <= 0);
-        stockLabel.classList.toggle('text-success', stock > 0);
+  qtyInput?.addEventListener('input', updateDetailTotal);
+
+  document.querySelectorAll('.js-variant-option').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.js-variant-option').forEach((node) => node.classList.remove('active', 'border-primary', 'bg-primary', 'text-white'));
+      button.classList.add('active', 'border-primary', 'bg-primary', 'text-white');
+      if (variantInput) variantInput.value = button.dataset.variantId || '';
+      if (detailPrice) {
+        detailPrice.dataset.currentPrice = button.dataset.price || detailPrice.dataset.basePrice || '0.00';
+        detailPrice.textContent = money(button.dataset.price || detailPrice.dataset.basePrice || '0.00');
       }
-      const addButton = document.getElementById('addToCartButton');
-      if (addButton) {
-        addButton.disabled = stock <= 0;
-        addButton.textContent = stock > 0 ? 'Add to Cart' : 'Out of Stock';
-      }
+      if (detailSku) detailSku.textContent = button.dataset.sku || detailSku.textContent;
+      const stock = Number(button.dataset.stock || 0);
       if (qtyInput) {
         qtyInput.max = String(Math.max(stock, 1));
         qtyInput.value = String(Math.min(Math.max(Number(qtyInput.value || 1), 1), Math.max(stock, 1)));
       }
-      if (detailSku) detailSku.textContent = option.dataset.sku || detailSku.textContent;
-      if (detailPrice && option.dataset.price) {
-        detailPrice.dataset.currentPrice = option.dataset.price;
-        detailPrice.textContent = money(option.dataset.price);
+      if (stockLabel) {
+        stockLabel.textContent = stock > 0 ? 'In stock' : 'Out of stock';
+        stockLabel.classList.toggle('text-success', stock > 0);
+        stockLabel.classList.toggle('text-accent', stock <= 0);
       }
+      if (addToCartButton) addToCartButton.disabled = stock <= 0;
       updateDetailTotal();
     });
   });
-  if (detailPrice && !detailPrice.dataset.currentPrice) {
-    detailPrice.dataset.currentPrice = detailPrice.dataset.basePrice || '0.00';
-  }
   updateDetailTotal();
 
-  const productSlug = window.location.pathname.split('/').filter(Boolean).slice(-1)[0];
-  if (window.location.pathname.includes('/product/') && productSlug) {
-    setInterval(async () => {
-      try {
-        const res = await fetch(`/api/products/${productSlug}/availability/`, {credentials: 'same-origin'});
-        if (!res.ok) return;
-        const data = await res.json();
-        const addButton = document.getElementById('addToCartButton');
-        const stockLabel = document.getElementById('variantStockLabel');
-        if (addButton) addButton.disabled = !data.product.is_orderable;
-        if (stockLabel && !document.querySelector('.js-variant-option.active')) {
-          stockLabel.textContent = data.product.in_stock ? `${data.product.stock} available` : 'Out of stock';
-        }
-      } catch (_) {}
-    }, 30000);
-  }
+  document.querySelectorAll('[data-countdown]').forEach((node) => {
+    const target = new Date(node.dataset.countdown).getTime();
+    if (Number.isNaN(target)) return;
+    const updateCountdown = () => {
+      const diff = Math.max(target - Date.now(), 0);
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      node.querySelector('.countdown-days') && (node.querySelector('.countdown-days').textContent = String(days).padStart(2, '0'));
+      node.querySelector('.countdown-hours') && (node.querySelector('.countdown-hours').textContent = String(hours).padStart(2, '0'));
+      node.querySelector('.countdown-minutes') && (node.querySelector('.countdown-minutes').textContent = String(minutes).padStart(2, '0'));
+      node.querySelector('.countdown-seconds') && (node.querySelector('.countdown-seconds').textContent = String(seconds).padStart(2, '0'));
+    };
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  });
 
-  refreshIcons();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setAccountMenu(false);
+      setMegaMenu(false);
+    }
+  });
 });

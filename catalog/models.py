@@ -157,6 +157,25 @@ class Product(models.Model):
     def is_deal_active(self):
         return self.is_daily_deal and (self.deal_ends_at is None or self.deal_ends_at > timezone.now())
 
+    @property
+    def key_features(self):
+        features = []
+        for line in (self.specifications or '').splitlines():
+            if ':' in line:
+                label, value = line.split(':', 1)
+                label = label.strip()
+                value = value.strip()
+                if label and value:
+                    features.append(f'{label}: {value}')
+            elif line.strip():
+                features.append(line.strip())
+            if len(features) == 3:
+                break
+        if not features and self.short_description:
+            parts = [part.strip() for part in self.short_description.split(',') if part.strip()]
+            features = parts[:3] if parts else [self.short_description.strip()]
+        return features[:3]
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')

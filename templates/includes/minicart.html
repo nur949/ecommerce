@@ -1,46 +1,51 @@
-<div class="mini-cart-backdrop d-none" id="miniCartBackdrop"></div>
-<aside class="mini-cart-drawer d-none" id="miniCartPanel" aria-hidden="true">
-  <div class="mini-cart-header">
+<div id="miniCartBackdrop" class="fixed inset-0 z-[90] hidden bg-slate-950/35"></div>
+<aside id="miniCartPanel" class="mini-cart-drawer fixed right-0 top-0 z-[95] hidden h-full w-full max-w-md border-l border-line bg-white shadow-soft">
+  <div class="flex items-center justify-between border-b border-line px-5 py-4">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Cart Drawer</p>
-      <h4 class="mt-1 text-xl font-semibold text-ink">Quick Cart</h4>
+      <p class="text-xs font-bold uppercase tracking-[0.18em] text-muted">Cart Summary</p>
+      <h3 class="font-display text-xl font-bold">Your Bag</h3>
     </div>
-    <button type="button" class="btn-close !m-0" id="miniCartClose" aria-label="Close cart"></button>
+    <button id="miniCartClose" type="button" class="grid h-10 w-10 place-items-center rounded-xl2 border border-line bg-slatebg">
+      <i data-lucide="x" class="h-4 w-4"></i>
+    </button>
   </div>
-  {% if cart_count %}
-  <div class="mini-cart-list">
-    <div class="rounded-[14px] bg-[#f8fafc] p-3 text-xs text-stone">
-      {% if cart_totals.free_delivery_remaining > 0 %}
-      Add <strong>&#2547;{{ cart_totals.free_delivery_remaining }}</strong> more for free delivery.
-      {% else %}
-      Free delivery unlocked.
-      {% endif %}
-    </div>
-    {% for item in cart_items %}
-    <div class="mini-cart-item">
-      <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}">
-      <div class="mini-cart-item-copy">
-        <h5 class="text-sm font-semibold text-ink">{{ item.product.name }}</h5>
-        <p class="text-xs">{{ item.quantity }} x &#2547;{{ item.unit_price }}</p>
+  <div class="flex h-[calc(100%-170px)] flex-col overflow-y-auto px-5 py-4">
+    {% if cart_items %}
+      <div class="mini-cart-list">
+        {% for item in cart_items %}
+          <div class="mini-cart-item grid gap-3 rounded-xl2 border border-line bg-slatebg/60 p-3">
+            <img src="{{ item.product.primary_image_url }}" alt="{{ item.product.name }}" class="h-20 w-16 rounded-lg object-cover">
+            <div class="min-w-0">
+              <p class="line-clamp-2 text-sm font-semibold">{{ item.product.name }}</p>
+              <p class="mt-1 text-xs text-muted">Qty {{ item.quantity }}{% if item.variant %} • {{ item.variant.value }}{% endif %}</p>
+              <p class="mt-2 text-sm font-bold text-primary">&#2547;{{ item.total }}</p>
+            </div>
+            <form action="{% url 'catalog:remove_cart_item' item.key %}" method="post" class="js-cart-remove-form">
+              {% csrf_token %}
+              <button type="submit" class="grid h-9 w-9 place-items-center rounded-lg border border-line bg-white"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
+            </form>
+          </div>
+        {% endfor %}
       </div>
-      <strong class="text-sm text-ink">&#2547;{{ item.total }}</strong>
-    </div>
-    {% endfor %}
+    {% else %}
+      <div class="grid flex-1 place-items-center text-center">
+        <div>
+          <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-slatebg text-primary"><i data-lucide="shopping-cart" class="h-7 w-7"></i></div>
+          <h3 class="font-display text-xl font-bold">Cart is empty</h3>
+          <p class="mt-2 text-sm text-muted">Add a few products and come back here for instant checkout.</p>
+        </div>
+      </div>
+    {% endif %}
   </div>
-  <div class="mini-cart-footer">
-    <div class="mb-3 flex items-center justify-between text-sm text-stone"><span>Subtotal</span><strong class="text-ink">&#2547;{{ cart_totals.subtotal }}</strong></div>
-    <div class="mb-3 flex items-center justify-between text-sm text-stone"><span>Discount</span><strong class="text-ink">-&#2547;{{ cart_totals.discount_total }}</strong></div>
-    <div class="mb-4 flex items-center justify-between text-sm text-stone"><span>Total</span><strong class="text-lg text-ink">&#2547;{{ cart_totals.total }}</strong></div>
+  <div class="border-t border-line px-5 py-4">
+    <div class="mb-4 space-y-2 text-sm">
+      <div class="flex justify-between"><span class="text-muted">Subtotal</span><strong class="cart-subtotal-value">&#2547;{{ cart_totals.subtotal }}</strong></div>
+      <div class="flex justify-between"><span class="text-muted">Discount</span><strong class="cart-coupon-discount-value">-&#2547;{{ cart_totals.coupon_discount|add:cart_totals.reward_discount }}</strong></div>
+      <div class="flex justify-between text-base"><span class="font-semibold">Total</span><strong class="cart-total-value text-primary">&#2547;{{ cart_totals.total }}</strong></div>
+    </div>
     <div class="grid gap-2">
-      <a href="{% url 'orders:cart' %}" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink">View Cart</a>
-      <a href="{% url 'orders:checkout' %}" class="inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">Checkout</a>
+      <a href="{% url 'orders:cart' %}" class="rounded-xl2 border border-line bg-slatebg px-4 py-3 text-center text-sm font-bold">View Cart</a>
+      <a href="{% url 'orders:checkout' %}" class="rounded-xl2 bg-primary px-4 py-3 text-center text-sm font-bold text-white transition duration-300 hover:bg-blue-700">Checkout</a>
     </div>
   </div>
-  {% else %}
-  <div class="mini-cart-empty">
-    <h5 class="text-xl font-semibold text-ink">Your cart is empty</h5>
-    <p class="mt-2 text-sm text-stone">Add products to continue to checkout.</p>
-    <a href="{% url 'catalog:shop' %}" class="mt-5 inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">Start Shopping</a>
-  </div>
-  {% endif %}
 </aside>

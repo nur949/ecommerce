@@ -1,147 +1,161 @@
-<div class="fixed inset-x-0 top-0 z-50 border-b border-white/60 bg-white/95 text-ink shadow-soft backdrop-blur">
-  <div class="bg-[#111827] text-white">
-    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] md:justify-between">
-      <span>Free delivery over ৳{{ cart_totals.free_delivery_threshold }}</span>
-      <span>100% authentic beauty products</span>
-      <span>Rewards + birthday offers</span>
-    </div>
-  </div>
-  <header class="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-4 md:gap-6 lg:px-8">
-    <a href="{% url 'core:home' %}" class="font-brand text-3xl font-semibold uppercase tracking-[0.24em] text-[#111827]" aria-label="{{ site_settings.site_name }}">{{ site_settings.site_name }}</a>
-    <button type="button" id="searchOverlayToggle" class="hidden h-12 items-center gap-3 rounded-full border border-black/10 bg-[#f8fafc] px-5 text-sm text-stone md:flex">
-      <i data-lucide="search" class="h-4 w-4"></i>
-      <span>Search by product, brand, SKU, or EAN</span>
-    </button>
-    <div class="flex items-center justify-end gap-2">
-      <div id="accountMenuWrap" class="relative hidden md:block">
-        <button type="button" id="accountMenuToggle" class="inline-flex rounded-full border border-black/10 bg-white p-2.5 text-ink transition hover:border-rosewood hover:text-rosewood" aria-label="Account menu" aria-expanded="false" aria-controls="accountMenuPanel">
-          <i data-lucide="user" class="h-4 w-4"></i>
-        </button>
-        <div id="accountMenuPanel" class="pointer-events-none absolute right-0 top-full z-40 mt-3 w-64 translate-y-2 rounded-[8px] border border-black/10 bg-white p-2 opacity-0 shadow-panel transition duration-200">
-          <div class="border-b border-black/5 px-3 py-3">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-stone">Account</p>
-            <p class="mt-1 text-sm font-semibold text-ink">{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.username }}{% else %}Welcome to {{ site_settings.site_name }}{% endif %}</p>
-          </div>
-          <div class="grid gap-1 pt-2">
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'profiles:profile' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="user-round" class="h-4 w-4"></i>Profile</a>
-            <a href="{% url 'accounts:dashboard' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="layout-dashboard" class="h-4 w-4"></i>Dashboard</a>
-            <a href="{% url 'accounts:wishlist' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="heart" class="h-4 w-4"></i>Wishlist</a>
-            <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="log-out" class="h-4 w-4"></i>Logout</button></form>
-            {% else %}
-            <a href="{% url 'accounts:login' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="log-in" class="h-4 w-4"></i>Login</a>
-            <a href="{% url 'accounts:register' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="user-plus" class="h-4 w-4"></i>Registration</a>
-            {% endif %}
-            <a href="{% url 'orders:tracking' %}" class="flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#f1f5f9] hover:text-rosewood"><i data-lucide="package-search" class="h-4 w-4"></i>Track Order</a>
-          </div>
-        </div>
-      </div>
-      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="js-wishlist-link relative hidden rounded-full border border-black/10 bg-white p-2.5 text-ink transition hover:border-rosewood hover:text-rosewood md:inline-flex" aria-label="Wishlist">
-        <i data-lucide="heart" class="h-4 w-4"></i>
-        {% if wishlist_count %}<span class="js-wishlist-badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-white">{{ wishlist_count }}</span>{% endif %}
-      </a>
-      <a href="{% url 'orders:cart' %}" class="js-mini-cart-toggle relative inline-flex rounded-full border border-black/10 bg-white p-2.5 text-ink transition hover:border-rosewood hover:text-rosewood" id="miniCartToggle" aria-label="Cart" aria-expanded="false" aria-controls="miniCartPanel">
-        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
-        {% if cart_count %}<span class="badge absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-white">{{ cart_count }}</span>{% endif %}
-      </a>
-      <button id="mobileNavToggle" type="button" class="inline-flex rounded-full border border-black/10 bg-white p-2.5 text-ink lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
+<header class="sticky top-0 z-50 border-b border-slate-200/70 bg-[#081621] shadow-[0_10px_24px_rgba(8,22,33,.10)]">
+  <div class="mx-auto max-w-7xl px-4 lg:px-8">
+    <div class="flex items-center gap-3 py-3 lg:gap-5 lg:py-4">
+      <button id="mobileNavToggle" type="button" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl2 border border-white/10 bg-white/5 text-white lg:hidden">
         <i data-lucide="menu" class="h-4 w-4"></i>
       </button>
+
+      <a href="{% url 'core:home' %}" class="flex shrink-0 items-center gap-3">
+        <span class="grid h-11 w-11 place-items-center rounded-xl2 bg-primary text-lg font-extrabold text-white shadow-card">Z</span>
+        <div class="hidden sm:block">
+          <p class="font-display text-xl font-bold tracking-[-0.03em] text-white">{{ site_settings.site_name }}</p>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">Tech store Bangladesh</p>
+        </div>
+      </a>
+
+      <div class="relative hidden flex-1 md:block">
+        <form action="{% url 'catalog:shop' %}" method="get" class="flex h-12 items-center rounded-xl2 bg-white px-4 shadow-[0_8px_18px_rgba(15,23,42,.14)]">
+          <i data-lucide="search" class="h-4 w-4 text-slate-400"></i>
+          <input id="instantSearchInput" type="search" name="q" placeholder="Search for products, brands and categories" class="h-full w-full bg-transparent px-3 text-sm font-medium text-slate-900 outline-none">
+          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-white transition duration-300 hover:bg-blue-700">Search</button>
+        </form>
+        <div id="instantSearchSuggestions" class="absolute inset-x-0 top-full mt-2 hidden rounded-xl2 border border-line bg-white p-2 shadow-soft"></div>
+      </div>
+
+      <button id="mobileSearchToggle" type="button" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl2 border border-white/10 bg-white/5 text-white md:hidden">
+        <i data-lucide="search" class="h-4 w-4"></i>
+      </button>
+
+      <div class="hidden items-center gap-5 text-white xl:flex">
+        <a href="{% url 'catalog:shop' %}?availability=in_stock" class="theme-toplink">
+          <i data-lucide="briefcase-business" class="h-5 w-5 text-accent"></i>
+          <span>
+            <strong>Office</strong>
+            <small>Latest offers</small>
+          </span>
+        </a>
+        <a href="{% url 'catalog:shop' %}?sort=price_desc" class="theme-toplink">
+          <i data-lucide="zap" class="h-5 w-5 text-accent"></i>
+          <span>
+            <strong>Happy Hour</strong>
+            <small>Special deals</small>
+          </span>
+        </a>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2">
+        <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="js-wishlist-link relative inline-flex h-11 w-11 items-center justify-center rounded-xl2 border border-white/10 bg-white/5 text-white transition duration-300 hover:border-white/30 hover:bg-white/10">
+          <i data-lucide="heart" class="h-4 w-4"></i>
+          {% if wishlist_count %}<span class="js-wishlist-badge absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">{{ wishlist_count }}</span>{% endif %}
+        </a>
+        <a href="{% url 'orders:cart' %}" class="relative inline-flex h-11 w-11 items-center justify-center rounded-xl2 border border-white/10 bg-white/5 text-white transition duration-300 hover:border-white/30 hover:bg-white/10">
+          <i data-lucide="shopping-cart" class="h-4 w-4"></i>
+          {% if cart_count %}<span class="badge absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">{{ cart_count }}</span>{% endif %}
+        </a>
+        <div class="relative hidden md:block" id="accountMenuWrap">
+          <button id="accountMenuToggle" type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-xl2 border border-white/10 bg-white/5 text-white transition duration-300 hover:border-white/30 hover:bg-white/10" aria-expanded="false">
+            <i data-lucide="user" class="h-4 w-4"></i>
+          </button>
+          <div id="accountMenuPanel" class="pointer-events-none absolute right-0 top-full mt-2 w-64 translate-y-2 rounded-xl2 border border-line bg-white p-2 opacity-0 shadow-soft transition duration-300">
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'accounts:dashboard' %}" class="block rounded-lg px-3 py-2 text-sm transition hover:bg-slatebg">Dashboard</a>
+              <a href="{% url 'profiles:profile' %}" class="block rounded-lg px-3 py-2 text-sm transition hover:bg-slatebg">Profile</a>
+              <a href="{% url 'accounts:wishlist' %}" class="block rounded-lg px-3 py-2 text-sm transition hover:bg-slatebg">Wishlist</a>
+              <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="w-full rounded-lg px-3 py-2 text-left text-sm transition hover:bg-slatebg">Logout</button></form>
+            {% else %}
+              <a href="{% url 'accounts:login' %}" class="block rounded-lg px-3 py-2 text-sm transition hover:bg-slatebg">Login</a>
+              <a href="{% url 'accounts:register' %}" class="block rounded-lg px-3 py-2 text-sm transition hover:bg-slatebg">Register</a>
+            {% endif %}
+          </div>
+        </div>
+        <a href="{% url 'catalog:shop' %}?sort=latest" class="hidden rounded-xl2 bg-[linear-gradient(135deg,#0d6efd,#44b7ff)] px-4 py-3 text-xs font-extrabold uppercase tracking-[0.15em] text-white shadow-[0_12px_28px_rgba(13,110,253,.26)] transition duration-300 hover:-translate-y-0.5 lg:inline-flex">
+          PC Builder
+        </a>
+      </div>
     </div>
-  </header>
-  <nav class="hidden border-t border-black/5 lg:block">
-    <div class="mx-auto flex max-w-7xl items-center gap-8 px-4 py-3 lg:px-8">
-      <a href="{% url 'core:home' %}" class="text-sm font-semibold text-ink transition hover:text-rosewood">Home</a>
-      <a href="{% url 'catalog:shop' %}" class="text-sm font-semibold text-ink transition hover:text-rosewood">Shop</a>
-      <div class="group relative" id="megaMenuWrap">
-        <button type="button" id="megaMenuToggle" class="inline-flex items-center gap-2 text-sm font-semibold text-ink transition hover:text-rosewood" aria-expanded="false" aria-controls="megaMenuPanel">
-          Categories <i data-lucide="chevron-down" class="h-4 w-4"></i>
+  </div>
+
+  <div class="border-t border-white/10 bg-white">
+    <div class="mx-auto hidden max-w-7xl items-center gap-7 px-4 py-3 text-[15px] font-bold text-slate-800 lg:flex lg:px-8">
+      <div class="group relative">
+        <button id="megaMenuToggle" type="button" class="flex items-center gap-2 transition duration-300 hover:text-primary" aria-expanded="false">
+          <i data-lucide="layout-grid" class="h-4 w-4"></i>
+          Categories
+          <i data-lucide="chevron-down" class="h-4 w-4"></i>
         </button>
-        <div id="megaMenuPanel" class="pointer-events-none absolute left-0 top-full z-30 mt-2 w-[min(980px,92vw)] rounded-[24px] border border-black/10 bg-white p-6 opacity-0 shadow-panel transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
-          <div id="megaCategoriesList" data-url="{% url 'catalog:api_categories' %}" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            <div class="text-sm text-stone">Loading categories...</div>
+        <div id="megaMenuPanel" class="pointer-events-none absolute left-0 top-full mt-3 w-[min(1080px,92vw)] translate-y-2 rounded-2xl border border-line bg-white p-5 opacity-0 shadow-soft transition duration-300">
+          <div id="megaCategoriesList" data-url="{% url 'catalog:api_categories' %}" class="grid grid-cols-4 gap-5">
+          {% for item in mega_categories %}
+            <div class="rounded-xl2 border border-slate-200 bg-slatebg/55 p-4">
+              <a href="{{ item.category.get_absolute_url }}" class="font-display text-base font-bold transition hover:text-primary">{{ item.category.name }}</a>
+              <div class="mt-3 grid gap-2 text-sm text-muted">
+                {% for child in item.children %}
+                  <a href="{{ child.get_absolute_url }}" class="transition hover:text-primary">{{ child.name }}</a>
+                {% empty %}
+                  <span>No subcategories yet</span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
           </div>
         </div>
       </div>
-      <a href="{% url 'core:blog_index' %}" class="text-sm font-semibold text-ink transition hover:text-rosewood">Blog</a>
-    </div>
-  </nav>
-  <div id="mobileNavPanel" class="hidden border-t border-black/5 bg-white px-4 py-4 lg:hidden">
-    <div class="grid gap-2 text-sm font-medium text-ink">
-      <button type="button" id="mobileSearchToggle" class="rounded-2xl px-4 py-3 text-left transition hover:bg-[#f1f5f9]">Search</button>
-      <a href="{% url 'core:home' %}" class="rounded-2xl px-4 py-3 transition hover:bg-[#f1f5f9]">Home</a>
-      <a href="{% url 'catalog:shop' %}" class="rounded-2xl px-4 py-3 transition hover:bg-[#f1f5f9]">Shop</a>
-      <button type="button" id="mobileCategoriesToggle" class="flex items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:bg-[#f1f5f9]" aria-expanded="false" aria-controls="mobileCategoriesPanel">
-        <span>Categories</span>
-        <i data-lucide="chevron-down" class="h-4 w-4"></i>
-      </button>
-      <div id="mobileCategoriesPanel" class="hidden rounded-2xl bg-[#f8fafc] px-4 py-3">
-        <div id="mobileCategoriesList" data-url="{% url 'catalog:api_categories' %}" class="grid gap-2">
-          <div class="text-sm text-stone">Loading categories...</div>
-        </div>
+      <a href="{% url 'core:home' %}" class="transition duration-300 hover:text-primary">Home</a>
+      <a href="{% url 'catalog:shop' %}" class="transition duration-300 hover:text-primary">Shop</a>
+      <a href="{% url 'core:corporate' %}" class="transition duration-300 hover:text-primary">Corporate</a>
+      <a href="{% url 'core:blog_index' %}" class="transition duration-300 hover:text-primary">Blog</a>
+      <div class="ml-auto flex items-center gap-4 text-xs font-extrabold uppercase tracking-[0.14em] text-slate-500">
+        <span class="rounded-full bg-red-50 px-3 py-2 text-accent">Hot deals live</span>
+        <span>{{ site_settings.support_phone }}</span>
       </div>
-      <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-2xl px-4 py-3 transition hover:bg-[#f1f5f9]">Wishlist</a>
-      <button type="button" id="mobileAccountToggle" class="flex items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:bg-[#f1f5f9]" aria-expanded="false" aria-controls="mobileAccountPanel">
-        <span>Account</span>
-        <i data-lucide="chevron-down" class="h-4 w-4"></i>
-      </button>
-      <div id="mobileAccountPanel" class="hidden rounded-2xl bg-[#f8fafc] px-4 py-3">
-        <div class="grid gap-1">
-          {% if request.user.is_authenticated %}
-          <a href="{% url 'profiles:profile' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Profile</a>
-          <a href="{% url 'accounts:dashboard' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Dashboard</a>
-          <a href="{% url 'accounts:wishlist' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Wishlist</a>
-          <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Logout</button></form>
-          {% else %}
-          <a href="{% url 'accounts:login' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Login</a>
-          <a href="{% url 'accounts:register' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Registration</a>
-          {% endif %}
-          <a href="{% url 'orders:tracking' %}" class="rounded-xl px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white hover:text-rosewood">Track Order</a>
-        </div>
+    </div>
+
+    <div class="border-t border-slate-200/80 bg-white lg:hidden">
+      <div class="mx-auto flex max-w-7xl gap-3 overflow-x-auto px-4 py-3 text-sm font-bold text-slate-700 [scrollbar-width:none]">
+        {% for item in mega_categories %}
+          <a href="{{ item.category.get_absolute_url }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 transition duration-300 hover:border-primary hover:text-primary">{{ item.category.name }}</a>
+        {% endfor %}
       </div>
     </div>
   </div>
-</div>
 
-<nav class="mobile-bottom-nav lg:hidden" aria-label="Mobile primary navigation">
+  <div id="mobileNavPanel" class="hidden border-t border-white/10 bg-[#081621] px-4 py-4 lg:hidden">
+    <div class="mb-4 md:hidden">
+      <form action="{% url 'catalog:shop' %}" method="get" class="flex h-12 items-center rounded-xl2 bg-white px-4">
+        <i data-lucide="search" class="h-4 w-4 text-slate-400"></i>
+        <input type="search" name="q" placeholder="Search products" class="h-full w-full bg-transparent px-3 text-sm outline-none">
+      </form>
+    </div>
+    <div class="grid gap-2">
+      <a href="{% url 'core:home' %}" class="rounded-xl2 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/5">Home</a>
+      <a href="{% url 'catalog:shop' %}" class="rounded-xl2 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/5">Shop</a>
+      <details id="mobileCategoriesToggle" class="rounded-xl2 bg-white/5 px-4 py-3 text-white">
+        <summary class="cursor-pointer text-sm font-semibold">Categories</summary>
+        <div id="mobileCategoriesList" data-url="{% url 'catalog:api_categories' %}" class="mt-3 grid gap-2">
+          {% for item in mega_categories %}
+            <a href="{{ item.category.get_absolute_url }}" class="text-sm font-semibold text-white">{{ item.category.name }}</a>
+            {% for child in item.children %}
+              <a href="{{ child.get_absolute_url }}" class="pl-3 text-sm text-white/65">{{ child.name }}</a>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </details>
+      <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" class="rounded-xl2 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/5">Account</a>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-bottom-nav lg:hidden" aria-label="Mobile navigation">
   <a href="{% url 'core:home' %}">
-    <i data-lucide="home" class="h-5 w-5"></i>
-    <span>Home</span>
+    <i data-lucide="house" class="h-5 w-5"></i><span>Home</span>
   </a>
   <a href="{% url 'catalog:shop' %}">
-    <i data-lucide="search" class="h-5 w-5"></i>
-    <span>Shop</span>
-  </a>
-  <a href="{% if request.user.is_authenticated %}{% url 'accounts:wishlist' %}{% else %}{% url 'accounts:login' %}{% endif %}">
-    <i data-lucide="heart" class="h-5 w-5"></i>
-    <span>Saved</span>
+    <i data-lucide="layout-grid" class="h-5 w-5"></i><span>Categories</span>
   </a>
   <a href="{% url 'orders:cart' %}">
-    <i data-lucide="shopping-bag" class="h-5 w-5"></i>
-    <span>Cart</span>
+    <i data-lucide="shopping-cart" class="h-5 w-5"></i><span>Cart</span>
+  </a>
+  <a href="{% if request.user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}">
+    <i data-lucide="user" class="h-5 w-5"></i><span>Profile</span>
   </a>
 </nav>
-
-<div id="searchOverlay" class="fixed inset-0 z-[80] hidden bg-[#0f172acc] px-4 py-10 backdrop-blur">
-  <div class="mx-auto max-w-3xl rounded-[24px] border border-white/20 bg-white p-6 shadow-panel">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-xl font-semibold text-ink">Instant Search</h2>
-      <button type="button" id="searchOverlayClose" class="rounded-full border border-black/10 p-2 text-ink"><i data-lucide="x" class="h-4 w-4"></i></button>
-    </div>
-    <form action="{% url 'catalog:shop' %}" method="get" class="rounded-full border border-black/10 bg-[#f8fafc] px-4">
-      <div class="flex items-center gap-2">
-        <i data-lucide="search" class="h-4 w-4 text-stone"></i>
-        <input id="instantSearchInput" type="search" name="q" class="h-12 w-full border-0 bg-transparent text-sm text-ink placeholder:text-stone focus:outline-none focus:ring-0" placeholder="Try: niacinamide, lipstick, 8801234567890">
-        <button class="rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white" type="submit">Search</button>
-      </div>
-    </form>
-    <div class="mt-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Recent Searches</p>
-      <div id="recentSearches" class="mt-3 flex flex-wrap gap-2"></div>
-    </div>
-    <div class="mt-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone">Suggestions</p>
-      <div id="instantSearchSuggestions" class="mt-2 grid gap-2"></div>
-    </div>
-  </div>
-</div>

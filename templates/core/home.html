@@ -1,54 +1,208 @@
 {% extends 'base.html' %}
-{% block title %}{{ site_settings.site_name }} | Premium Beauty Catalog{% endblock %}
+{% block title %}{{ site_settings.site_name }} | Modern Electronics Marketplace{% endblock %}
+{% block meta_description %}Shop laptops, phones, components, accessories, and daily deals with a fast search-first ecommerce experience.{% endblock %}
 {% block content %}
-{% include 'core/partials/hero_section.html' %}
-
-<section class="px-4 pb-14 lg:px-8">
+<section class="px-4 pb-6 pt-5 lg:px-8 lg:pt-7">
   <div class="mx-auto max-w-7xl">
-    <div class="mb-6 flex items-center justify-between">
-      <h2 class="font-brand text-4xl font-semibold uppercase tracking-[0.1em] text-ink">Top Categories</h2>
-      <a href="{% url 'catalog:shop' %}" class="text-sm font-bold text-rosewood">See All</a>
+    <div class="grid gap-4 xl:grid-cols-[minmax(0,2.75fr)_320px] xl:items-stretch">
+      <div class="hero-stage overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,.06)]">
+        <div id="home-hero-slider" class="swiper home-hero-slider" data-hero-slider>
+          <div class="swiper-wrapper">
+            {% for slide in hero_slides %}
+              <div class="swiper-slide">
+                <a href="{{ slide.cta_url|default:request.path }}" class="hero-slide-link block">
+                  <img src="{{ slide.primary_image_url|default:'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1600&h=720&fit=crop' }}" alt="{{ slide.title|default:site_settings.site_name }}" class="h-[220px] w-full object-cover md:h-[330px] xl:h-[430px]">
+                </a>
+              </div>
+            {% empty %}
+              <div class="swiper-slide">
+                <a href="{% url 'catalog:shop' %}" class="hero-slide-link block">
+                  <img src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1600&h=720&fit=crop" alt="Hero banner" class="h-[220px] w-full object-cover md:h-[330px] xl:h-[430px]">
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <a href="{% url 'catalog:shop' %}" class="hero-slide-link block">
+                  <img src="https://images.pexels.com/photos/777001/pexels-photo-777001.jpeg?auto=compress&cs=tinysrgb&w=1600&h=720&fit=crop" alt="Gaming setup banner" class="h-[220px] w-full object-cover md:h-[330px] xl:h-[430px]">
+                </a>
+              </div>
+              <div class="swiper-slide">
+                <a href="{% url 'catalog:shop' %}" class="hero-slide-link block">
+                  <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=1600&h=720&fit=crop" alt="Phone banner" class="h-[220px] w-full object-cover md:h-[330px] xl:h-[430px]">
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4 pb-4 md:px-6 md:pb-5">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 rounded-full bg-slate-950/55 px-3 py-2 backdrop-blur">
+                <div class="swiper-pagination !static !w-auto"></div>
+                <div class="hero-progress hidden h-1.5 w-24 overflow-hidden rounded-full bg-white/20 md:block">
+                  <div class="hero-progress-bar h-full w-1/3 rounded-full bg-white"></div>
+                </div>
+              </div>
+              <div class="hidden items-center gap-2 md:flex">
+                <button type="button" class="hero-slider-prev pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white/90 text-slate-900 shadow-lg transition duration-300 hover:bg-white" aria-label="Previous slide">
+                  <i data-lucide="chevron-left" class="h-4 w-4"></i>
+                </button>
+                <button type="button" class="hero-slider-next pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white/90 text-slate-900 shadow-lg transition duration-300 hover:bg-white" aria-label="Next slide">
+                  <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-4 xl:grid-rows-2">
+        {% for banner in hero_right_banners %}
+          <a href="{{ banner.url }}" class="hero-side-banner block overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,.06)] transition duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+            <img src="{{ banner.primary_image_url|default:'https://images.pexels.com/photos/3394658/pexels-photo-3394658.jpeg?auto=compress&cs=tinysrgb&w=900&h=700&fit=crop' }}" alt="{{ banner.title }}" class="h-[132px] w-full object-cover md:h-[170px] xl:h-full">
+          </a>
+        {% empty %}
+          <a href="{% url 'catalog:shop' %}" class="hero-side-banner block overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,.06)] transition duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+            <img src="https://images.pexels.com/photos/2115257/pexels-photo-2115257.jpeg?auto=compress&cs=tinysrgb&w=900&h=700&fit=crop" alt="Accessory banner" class="h-[132px] w-full object-cover md:h-[170px] xl:h-full">
+          </a>
+          <a href="{% url 'catalog:shop' %}" class="hero-side-banner block overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,.06)] transition duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+            <img src="https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=900&h=700&fit=crop" alt="Components banner" class="h-[132px] w-full object-cover md:h-[170px] xl:h-full">
+          </a>
+        {% endfor %}
+      </div>
     </div>
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {% for item in popular_categories_data %}
-      <a href="{{ item.category.get_absolute_url }}" class="top-category-item rounded-[24px] border border-black/5 bg-white p-4 shadow-soft transition hover:-translate-y-0.5">
-        <img src="{{ item.image_url }}" alt="{{ item.category.name }}" class="h-48 w-full rounded-[18px] object-cover">
-        <h3 class="mt-4 text-lg font-semibold text-ink">{{ item.category.name }}</h3>
-        <p class="mt-2 text-sm text-stone">{{ item.subtitle }}</p>
+
+    <div class="mt-4 rounded-[14px] border border-slate-200 bg-white px-4 py-3 shadow-[0_8px_20px_rgba(15,23,42,.04)]">
+      <div class="theme-marquee text-sm font-semibold text-slate-600">
+        <span>Today&apos;s store update: fast delivery, verified stock, official warranty and live support available across Bangladesh.</span>
+      </div>
+    </div>
+
+    <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <a href="{% url 'catalog:shop' %}?category=laptop" class="theme-shortcut-card">
+        <span class="theme-shortcut-icon bg-red-500"><i data-lucide="laptop" class="h-5 w-5"></i></span>
+        <span>
+          <strong>Laptop Finder</strong>
+          <small>Find your device faster</small>
+        </span>
       </a>
+      <a href="{% url 'core:corporate' %}" class="theme-shortcut-card">
+        <span class="theme-shortcut-icon bg-primary"><i data-lucide="message-circle" class="h-5 w-5"></i></span>
+        <span>
+          <strong>Raise a Query</strong>
+          <small>Talk to product experts</small>
+        </span>
+      </a>
+      <a href="{% url 'core:outlets' %}" class="theme-shortcut-card">
+        <span class="theme-shortcut-icon bg-emerald-500"><i data-lucide="map-pinned" class="h-5 w-5"></i></span>
+        <span>
+          <strong>Store Locator</strong>
+          <small>Find nearby outlets</small>
+        </span>
+      </a>
+      <a href="{% url 'orders:tracking' %}" class="theme-shortcut-card">
+        <span class="theme-shortcut-icon bg-amber-500"><i data-lucide="settings-2" class="h-5 w-5"></i></span>
+        <span>
+          <strong>Order Tracking</strong>
+          <small>Check delivery progress</small>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="px-4 py-8 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-5 text-center">
+      <h2 class="font-display text-3xl font-bold tracking-[-0.03em] text-slate-900 md:text-4xl">Featured Category</h2>
+      <p class="mt-2 text-sm font-medium text-slate-500">Get your desired product from featured category.</p>
+    </div>
+    <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+      {% for item in popular_categories_data %}
+        <a href="{{ item.category.get_absolute_url }}" class="top-category-item rounded-[14px] border border-slate-200 bg-white p-5 text-center shadow-[0_10px_22px_rgba(15,23,42,.04)] transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-soft">
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <i data-lucide="{{ item.icon }}" class="h-6 w-6"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900">{{ item.category.name }}</h3>
+          <p class="mt-2 line-clamp-2 text-xs font-medium text-slate-500">{{ item.subtitle }}</p>
+        </a>
       {% endfor %}
     </div>
   </div>
 </section>
 
-<section class="px-4 pb-14 lg:px-8">
+<section class="px-4 py-8 lg:px-8">
   <div class="mx-auto max-w-7xl">
     <div class="mb-6 flex items-center justify-between">
-      <h2 class="font-brand text-4xl font-semibold uppercase tracking-[0.1em] text-ink">Trending Products</h2>
-      <a href="{% url 'catalog:shop' %}" class="text-sm font-bold text-rosewood">Browse catalog</a>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-primary">Featured Products</p>
+        <h2 class="mt-2 font-display text-3xl font-bold tracking-[-0.03em] md:text-4xl">Top picks for fast decisions</h2>
+      </div>
+      <a href="{% url 'catalog:shop' %}?sort=latest" class="text-sm font-bold text-primary">See more</a>
     </div>
-    <div class="row g-4">
-      {% for product in trending_products %}
-      <div class="col-6 col-md-4 col-xl-3">{% include 'catalog/partials/product_card.html' with product=product %}</div>
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      {% for product in featured_products %}
+        {% include 'catalog/partials/product_card.html' with product=product %}
       {% endfor %}
     </div>
   </div>
 </section>
 
-<section class="px-4 pb-16 lg:px-8">
-  <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-3">
-    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
-      <h3 class="text-lg font-semibold text-ink">Brand Story</h3>
-      <p class="mt-3 text-sm leading-7 text-stone">We curate beauty products around performance, ingredient safety, and genuine sourcing. Every product page highlights usage and suitability.</p>
-    </article>
-    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
-      <h3 class="text-lg font-semibold text-ink">Product Benefits</h3>
-      <p class="mt-3 text-sm leading-7 text-stone">Compare formulas, coverage, finish, and skin compatibility. Filter quickly by brand, budget, and user rating to find your best match.</p>
-    </article>
-    <article class="rounded-[24px] border border-black/5 bg-white p-6 shadow-soft">
-      <h3 class="text-lg font-semibold text-ink">Top Shopping Paths</h3>
-      <p class="mt-3 text-sm leading-7 text-stone">Discover by category, jump to EAN search for exact products, or save favorites in wishlist for a personalized checkout flow.</p>
-    </article>
+<section class="px-4 py-8 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[14px] border border-[#0f58d8] bg-[linear-gradient(135deg,#0d6efd,#0a58ca)] p-6 text-white shadow-soft md:p-8">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-white/75">Flash Sale</p>
+        <h2 class="mt-2 font-display text-3xl font-bold tracking-[-0.03em] md:text-4xl">Limited-time deals with visible urgency</h2>
+        <p class="mt-3 max-w-2xl text-sm leading-7 text-white/80">Red discount markers, live countdowns, and low-stock cues push the decision without clutter.</p>
+      </div>
+      {% with first_deal=flash_sale_products|first %}
+        <div class="rounded-xl2 bg-white/10 px-5 py-4 backdrop-blur" {% if first_deal and first_deal.deal_ends_at %}data-countdown="{{ first_deal.deal_ends_at|date:'c' }}"{% endif %}>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-white/70">Ends in</p>
+          <div class="mt-2 flex gap-3 text-center">
+            <div><p class="countdown-days text-2xl font-bold">00</p><span class="text-[11px] uppercase text-white/70">Days</span></div>
+            <div><p class="countdown-hours text-2xl font-bold">00</p><span class="text-[11px] uppercase text-white/70">Hours</span></div>
+            <div><p class="countdown-minutes text-2xl font-bold">00</p><span class="text-[11px] uppercase text-white/70">Min</span></div>
+            <div><p class="countdown-seconds text-2xl font-bold">00</p><span class="text-[11px] uppercase text-white/70">Sec</span></div>
+          </div>
+        </div>
+      {% endwith %}
+    </div>
+    <div class="mt-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
+      {% for product in flash_sale_products %}
+        {% include 'catalog/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="px-4 py-8 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-primary">Trending Now</p>
+        <h2 class="mt-2 font-display text-3xl font-bold tracking-[-0.03em] md:text-4xl">High-interest products this week</h2>
+      </div>
+      <a href="{% url 'catalog:shop' %}?sort=rating" class="text-sm font-bold text-primary">Top rated</a>
+    </div>
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      {% for product in trending_products %}
+        {% include 'catalog/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="px-4 pb-14 pt-8 lg:px-8">
+  <div class="mx-auto max-w-7xl rounded-[14px] border border-slate-200 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,.05)]">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.18em] text-primary">Brands</p>
+        <h2 class="mt-2 font-display text-3xl font-bold tracking-[-0.03em] md:text-4xl">Popular brands shoppers look for</h2>
+      </div>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {% for brand in brand_showcase %}
+        <a href="{% url 'catalog:shop' %}?brand={{ brand }}" class="rounded-xl2 border border-slate-200 bg-slatebg px-5 py-6 text-center text-sm font-bold uppercase tracking-[0.16em] text-slate-500 transition duration-300 hover:border-primary hover:bg-primary hover:text-white">{{ brand }}</a>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endblock %}
